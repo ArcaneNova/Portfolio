@@ -1,0 +1,167 @@
+import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-scroll';
+import { FaGithub, FaLinkedinIn, FaTwitter, FaCodepen, FaEnvelope } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
+
+const Footer = () => {
+  const footerRef = useRef(null);
+  const contentRef = useRef(null);
+
+  // Navigation links
+  const navLinks = [
+    { name: 'Home', to: 'hero' },
+    { name: 'About', to: 'about' },
+    { name: 'Skills', to: 'skills' },
+    { name: 'Projects', to: 'projects' },
+    { name: 'Stats', to: 'stats' },
+    { name: 'Challenge', to: 'challenge' },
+    { name: 'Contact', to: 'contact' }
+  ];
+
+  // Social links
+  const socialLinks = [
+    { icon: <FaGithub />, url: 'https://github.com/yourusername', label: 'GitHub' },
+    { icon: <FaLinkedinIn />, url: 'https://linkedin.com/in/yourusername', label: 'LinkedIn' },
+    { icon: <FaTwitter />, url: 'https://twitter.com/yourusername', label: 'Twitter' },
+    { icon: <FaCodepen />, url: 'https://codepen.io/yourusername', label: 'CodePen' },
+    { icon: <FaEnvelope />, url: 'mailto:your.email@example.com', label: 'Email' }
+  ];
+
+  // Animations
+  useGSAP(() => {
+    if (!footerRef.current) return;
+    
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: footerRef.current,
+        start: 'top 95%',
+        toggleActions: 'play none none none'
+      }
+    });
+    
+    tl.fromTo(
+      contentRef.current,
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
+    );
+  }, []);
+  
+  // Get current year for copyright
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer ref={footerRef} className="bg-black-100 relative overflow-hidden">
+      {/* Background grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,212,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,212,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+      
+      {/* Glow effect */}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-100 to-transparent opacity-50"></div>
+      
+      <div ref={contentRef} className="container mx-auto px-4 py-12">
+        {/* Footer content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+          {/* Branding */}
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-4">
+              <span className="text-blue-100">Dev</span>Portfolio
+            </h3>
+            <p className="text-blue-50 mb-6 max-w-md">
+              Crafting digital experiences with modern technologies and creative solutions.
+            </p>
+            {/* Social icons */}
+            <div className="flex space-x-4">
+              {socialLinks.map((link, index) => (
+                <motion.a
+                  key={index}
+                  href={link.url}
+                  target={link.url.startsWith('mailto:') ? '_self' : '_blank'}
+                  rel="noopener noreferrer"
+                  aria-label={link.label}
+                  className="w-10 h-10 rounded-full bg-black-200 flex items-center justify-center border border-blue-100/20 text-blue-50 hover:text-blue-100 hover:border-blue-100/40 transition-colors duration-300"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  {link.icon}
+                </motion.a>
+              ))}
+            </div>
+          </div>
+          
+          {/* Quick links */}
+          <div>
+            <h3 className="text-xl font-bold text-white mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              {navLinks.map((link, index) => (
+                <li key={index}>
+                  <Link
+                    to={link.to}
+                    spy={true}
+                    smooth={true}
+                    offset={-70}
+                    duration={800}
+                    className="text-blue-50 hover:text-blue-100 transition-colors duration-300 cursor-pointer inline-block py-1"
+                  >
+                    <motion.span
+                      whileHover={{ x: 5 }}
+                      className="flex items-center"
+                    >
+                      <span className="text-blue-100 mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        &gt;
+                      </span>
+                      {link.name}
+                    </motion.span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Contact info */}
+          <div>
+            <h3 className="text-xl font-bold text-white mb-4">Contact</h3>
+            <div className="space-y-4">
+              <p className="text-blue-50">
+                <span className="block text-white">Email:</span>
+                <a 
+                  href="mailto:your.email@example.com" 
+                  className="hover:text-blue-100 transition-colors duration-300"
+                >
+                  your.email@example.com
+                </a>
+              </p>
+              <p className="text-blue-50">
+                <span className="block text-white">Location:</span>
+                San Francisco, CA
+              </p>
+              <p className="text-blue-50">
+                <span className="block text-white">Availability:</span>
+                <span className="flex items-center mt-1">
+                  <span className="w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse"></span>
+                  Open to opportunities
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Copyright */}
+        <div className="pt-8 border-t border-blue-100/10 text-center">
+          <p className="text-blue-50">
+            © {currentYear} Your Name | All Rights Reserved
+          </p>
+          <p className="text-sm text-blue-50/70 mt-2">
+            Developed with React, Three.js & Framer Motion
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
