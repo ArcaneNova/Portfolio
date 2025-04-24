@@ -3,7 +3,7 @@ import { Link } from 'react-scroll';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGithub, FaLinkedinIn, FaTwitter } from 'react-icons/fa';
 import { HiMenuAlt4, HiX } from 'react-icons/hi';
-import GlowEffect from './GlowEffect';
+import GlowEffect from './GlowEffect.jsx';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -22,9 +22,9 @@ const Navbar = () => {
 
   // Social links
   const socialLinks = [
-    { icon: <FaGithub />, url: 'https://github.com/yourusername', label: 'GitHub' },
-    { icon: <FaLinkedinIn />, url: 'https://linkedin.com/in/yourusername', label: 'LinkedIn' },
-    { icon: <FaTwitter />, url: 'https://twitter.com/yourusername', label: 'Twitter' }
+    { icon: <FaGithub />, url: 'https://github.com/ArcaneNova', label: 'GitHub' },
+    { icon: <FaLinkedinIn />, url: 'https://linkedin.com/in/mdarshadnoor', label: 'LinkedIn' },
+    { icon: <FaTwitter />, url: 'https://twitter.com/ArcaneNova_', label: 'Twitter' }
   ];
 
   useEffect(() => {

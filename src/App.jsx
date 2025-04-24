@@ -1,13 +1,13 @@
-import Footer from "./components/Footer";
-import Contact from "./sections/Contact";
-import Hero from "./sections/Hero";
-import Navbar from "./components/Navbar";
-import Skills from "./sections/Skills";
-import Projects from "./sections/Projects";
-import About from "./sections/About";
-import Stats from "./sections/Stats";
-import Challenge from "./sections/Challenge";
-import HolographicBackground from "./components/HolographicBackground";
+import Footer from "./components/Footer.jsx";
+import Contact from "./sections/Contact.jsx";
+import Hero from "./sections/Hero.jsx";
+import Navbar from "./components/Navbar.jsx";
+import Skills from "./sections/Skills.jsx";
+import Projects from "./sections/Projects.jsx";
+import About from "./sections/About.jsx";
+import Stats from "./sections/Stats.jsx";
+import Challenge from "./sections/Challenge.jsx";
+import HolographicBackground from "./components/HolographicBackground.jsx";
 import { useEffect, useState, Component } from "react";
 
 const App = () => {

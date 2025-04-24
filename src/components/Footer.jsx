@@ -5,7 +5,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { FaGithub, FaLinkedinIn, FaTwitter, FaCodepen, FaEnvelope, FaHeart } from 'react-icons/fa';
-import GlowEffect from './GlowEffect';
+import GlowEffect from './GlowEffect.jsx';
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);

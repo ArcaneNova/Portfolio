@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import GlowEffect from './GlowEffect';
+import GlowEffect from './GlowEffect.jsx';
 
 const FloatingCard = ({ 
   children, 
