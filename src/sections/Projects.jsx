@@ -111,8 +111,8 @@ const Projects = () => {
       date: 'June 2024 - Aug 2024',
       status: 'live',
       links: {
-        github: 'https://github.com/yourusername/annadata',
-        live: 'https://annadata-pro.netlify.app'
+        github: 'https://github.com/ArcaneNova?tab=repositories',
+        live: 'https://annadata-pro.netlify.app/'
       },
       featured: false,
       achievements: 'AIU Anveshan Winner',
@@ -134,7 +134,7 @@ const Projects = () => {
       date: 'March 2024 - April 2024',
       status: 'live',
       links: {
-        github: 'https://github.com/yourusername/3d-portfolio',
+        github: 'https://github.com/ArcaneNova/Portfolio',
         live: '#'
       },
       featured: false,
@@ -156,7 +156,7 @@ const Projects = () => {
       date: 'Jan 2024 - Feb 2024',
       status: 'live',
       links: {
-        github: 'https://github.com/yourusername/delhi-metro',
+        github: 'https://github.com/ArcaneNova',
         live: '#'
       },
       featured: false,
