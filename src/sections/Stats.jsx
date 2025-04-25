@@ -54,8 +54,8 @@ const platformData = [
     stats: [
       { label: 'Stars', value: '10', icon: <FaStar /> },
       { label: 'Repositories', value: '90+', icon: <FaCodepen /> },
-      { label: 'Followers', value: '5', icon: <FaUsers /> },
-      { label: 'Contributions', value: '1000+', icon: <FaCodeBranch /> }
+      { label: 'Followers', value: '2', icon: <FaUsers /> },
+      { label: 'Contributions', value: '90+', icon: <FaCodeBranch /> }
     ],
     url: 'https://github.com/ArcaneNova',
     color: 'from-gray-700 to-gray-900',
