@@ -20,25 +20,25 @@ const socialLinks = [
   {
     name: 'LinkedIn',
     icon: <FaLinkedin size={20} />,
-    url: 'https://linkedin.com/in/yourusername',
+    url: 'https://www.linkedin.com/in/mdarshadnoor',
     color: 'bg-gradient-to-r from-blue-400 to-blue-600'
   },
   {
     name: 'Twitter',
     icon: <FaTwitter size={20} />,
-    url: 'https://twitter.com/yourusername',
+    url: 'https://twitter.com/ArcaneNova_',
     color: 'bg-gradient-to-r from-blue-400 to-cyan-400'
   },
   {
     name: 'GitHub',
     icon: <FaGithub size={20} />,
-    url: 'https://github.com/yourusername',
+    url: 'https://github.com/ArcaneNova',
     color: 'bg-gradient-to-r from-gray-600 to-gray-800'
   },
   {
     name: 'Discord',
     icon: <FaDiscord size={20} />,
-    url: 'https://discord.gg/yourinvite',
+    url: 'https://discord.gg/officialarshadnoor',
     color: 'bg-gradient-to-r from-indigo-500 to-purple-500'
   }
 ];

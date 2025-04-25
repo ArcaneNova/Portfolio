@@ -21,11 +21,11 @@ const Footer = () => {
   ];
   
   const socialLinks = [
-    { icon: <FaGithub />, href: 'https://github.com/yourusername', label: 'GitHub' },
-    { icon: <FaLinkedin />, href: 'https://linkedin.com/in/yourusername', label: 'LinkedIn' },
-    { icon: <FaTwitter />, href: 'https://twitter.com/yourusername', label: 'Twitter' },
-    { icon: <FaDiscord />, href: 'https://discord.gg/yourinvite', label: 'Discord' },
-    { icon: <FaEnvelope />, href: 'mailto:your.email@example.com', label: 'Email' },
+    { icon: <FaGithub />, href: 'https://github.com/ArcaneNova', label: 'GitHub' },
+    { icon: <FaLinkedin />, href: 'https://linkedin.com/in/mdarshadnoor', label: 'LinkedIn' },
+    { icon: <FaTwitter />, href: 'https://twitter.com/ArcaneNova_', label: 'Twitter' },
+    { icon: <FaDiscord />, href: 'https://discord.gg/officialarshadnoor', label: 'Discord' },
+    { icon: <FaEnvelope />, href: 'mailto:arshadnoor585@gmail.com', label: 'Email' },
   ];
   
   useGSAP(() => {
