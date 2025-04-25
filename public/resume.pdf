@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Md Arshad Noor - Resume</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #0d47a1;
+      --secondary-color: #e0e0e0;
+      --text-color: #333333;
+      --text-light: #757575;
+      --background-color: #ffffff;
+      --border-color: #dddddd;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+      color: var(--text-color);
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: var(--background-color);
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+      border-radius: 2px;
+      overflow: hidden; /* Ensure no content bleeds outside */
+    }
+
+    .resume-header {
+      padding: 30px 40px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .resume-header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+
+    .resume-header p {
+      font-size: 18px;
+      color: var(--text-light);
+      margin-bottom: 15px;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .contact-item i {
+      color: var(--primary-color);
+    }
+
+    .contact-item a {
+      color: var(--text-color);
+      text-decoration: none;
+    }
+
+    .contact-item a:hover {
+      text-decoration: underline;
+    }
+
+    .resume-body {
+      padding: 30px 40px;
+    }
+
+    .section {
+      margin-bottom: 25px;
+      page-break-inside: avoid; /* Prevent section breaks within PDF */
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-header {
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--secondary-color);
+      padding-bottom: 5px;
+    }
+
+    .section-header h2 {
+      font-size: 18px;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .skill-item {
+      background-color: var(--secondary-color);
+      padding: 5px 12px;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
+    .experience-item, .project-item, .education-item, .certification-item {
+      margin-bottom: 20px;
+      page-break-inside: avoid; /* Prevent item breaks within PDF */
+    }
+
+    .experience-item:last-child, .project-item:last-child, .education-item:last-child, .certification-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 3px;
+    }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text-color);
+    }
+
+    .company, .period {
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    .company {
+      margin-bottom: 5px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 5px 0;
+    }
+
+    li {
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    .tech-tag {
+      background-color: var(--secondary-color);
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      color: var(--text-color);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .download-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .download-btn:hover {
+      background-color: #083378;
+    }
+
+    .back-to-portfolio {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: white;
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 14px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    .back-to-portfolio:hover {
+      background-color: var(--secondary-color);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+      }
+
+      .container {
+        box-shadow: none;
+      }
+
+      .resume-header, .resume-body {
+        padding: 20px;
+      }
+
+      .contact-info {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .back-to-portfolio {
+        top: 10px;
+        left: 10px;
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      
+      body {
+        padding: 0;
+        background-color: white;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      .container {
+        box-shadow: none;
+        max-width: 100%;
+        width: 100%;
+        height: 100%;
+        padding: 25mm;
+        margin: 0;
+      }
+
+      .resume-header, .resume-body {
+        padding: 0;
+      }
+
+      .resume-header {
+        margin-bottom: 20px;
+        border-bottom-color: #999;
+      }
+
+      .section {
+        margin-bottom: 20px;
+      }
+
+      .section-header {
+        margin-bottom: 12px;
+      }
+
+      .actions, .back-to-portfolio {
+        display: none !important;
+      }
+      
+      .skill-item, .tech-tag {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="/" class="back-to-portfolio">
+    <i class="fas fa-arrow-left"></i>
+    Back to Portfolio
+  </a>
+  
+  <div class="container" id="resume-container">
+    <div class="resume-header">
+      <h1>Md Arshad Noor</h1>
+      <p>Software Engineer</p>
+      <div class="contact-info">
+        <div class="contact-item">
+          <i class="fas fa-envelope"></i>
+          <a href="mailto:arshadnoor585@gmail.com">arshadnoor585@gmail.com</a>
+        </div>
+        <div class="contact-item">
+          <i class="fas fa-phone"></i>
+          <a href="tel:+916200388471">+91-6200388471</a>
+        </div>
+        <div class="contact-item">
+          <i class="fab fa-linkedin"></i>
+          <a href="https://linkedin.com/in/mdarshadnoor" target="_blank">linkedin.com/in/mdarshadnoor</a>
+        </div>
+        <div class="contact-item">
+          <i class="fab fa-github"></i>
+          <a href="https://github.com/ArcaneNova" target="_blank">github.com/ArcaneNova</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="resume-body">
+      <div class="section">
+        <div class="section-header">
+          <h2>Skills</h2>
+        </div>
+        <div class="skills-grid">
+          <div class="skill-item">C++</div>
+          <div class="skill-item">JavaScript</div>
+          <div class="skill-item">Python</div>
+          <div class="skill-item">GoLang</div>
+          <div class="skill-item">TypeScript</div>
+          <div class="skill-item">Java</div>
+          <div class="skill-item">React</div>
+          <div class="skill-item">Next.js</div>
+          <div class="skill-item">Node.js</div>
+          <div class="skill-item">Tailwind CSS</div>
+          <div class="skill-item">Bootstrap</div>
+          <div class="skill-item">HTML/CSS</div>
+          <div class="skill-item">Scikit-learn</div>
+          <div class="skill-item">Docker</div>
+          <div class="skill-item">MySQL</div>
+          <div class="skill-item">MongoDB</div>
+          <div class="skill-item">PostgreSQL</div>
+          <div class="skill-item">Redis</div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-header">
+          <h2>Experience</h2>
+        </div>
+        
+        <div class="experience-item">
+          <div class="title-row">
+            <div class="item-title">Self Project – EklavyaTravel.com</div>
+            <div class="period">Nov 2024 – Jan 2025</div>
+          </div>
+          <div class="company">Software Engineer</div>
+          <ul>
+            <li>Built a Golang backend to handle 900,000+ village datasets with optimized PostgreSQL queries.</li>
+            <li>Integrated Redis caching for performance, created secure REST APIs.</li>
+            <li>Collaborated with frontend team on Next.js UI for responsive village data access.</li>
+          </ul>
+          <div class="tech-stack">
+            <span class="tech-tag">GoLang</span>
+            <span class="tech-tag">PostgreSQL</span>
+            <span class="tech-tag">Redis</span>
+            <span class="tech-tag">Next.js</span>
+            <span class="tech-tag">REST API</span>
+          </div>
+        </div>
+        
+        <div class="experience-item">
+          <div class="title-row">
+            <div class="item-title">SIH 2024 – PowerIQ</div>
+            <div class="period">Nov 2024 – Dec 2024</div>
+          </div>
+          <div class="company">Machine Learning Engineer</div>
+          <ul>
+            <li>Developed LSTM model for time-series electricity demand forecasting with weather data integration.</li>
+            <li>Deployed ML model using FastAPI, improved latency by 80% over Flask deployment.</li>
+            <li>Built a Next.js dashboard with NextAuth authentication for secure model access.</li>
+          </ul>
+          <div class="tech-stack">
+            <span class="tech-tag">LSTM</span>
+            <span class="tech-tag">FastAPI</span>
+            <span class="tech-tag">Next.js</span>
+            <span class="tech-tag">Weather API</span>
+            <span class="tech-tag">NextAuth</span>
+          </div>
+        </div>
+        
+        <div class="experience-item">
+          <div class="title-row">
+            <div class="item-title">Lawawere Project</div>
+            <div class="period">Oct 2024 – Nov 2024</div>
+          </div>
+          <div class="company">Frontend Developer (Freelance)</div>
+          <ul>
+            <li>Developed a React-based platform to simplify understanding of Indian Constitution.</li>
+            <li>Used Framer Motion for animated legal content and Express.js backend for API calls.</li>
+          </ul>
+          <div class="tech-stack">
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">Express.js</span>
+            <span class="tech-tag">MongoDB</span>
+            <span class="tech-tag">Framer Motion</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-header">
+          <h2>Projects</h2>
+        </div>
+        
+        <div class="project-item">
+          <div class="title-row">
+            <div class="item-title">PowerIQ – Delhi Electricity Demand Prediction</div>
+            <div class="period">Nov 2024 – Dec 2024</div>
+          </div>
+          <ul>
+            <li>Time-series LSTM model for demand forecasting.</li>
+            <li>Integrated weather API and deployed model using FastAPI.</li>
+            <li>SIH 2024 Grand Finale Finalist.</li>
+          </ul>
+          <div class="tech-stack">
+            <span class="tech-tag">LSTM</span>
+            <span class="tech-tag">FastAPI</span>
+            <span class="tech-tag">Next.js</span>
+          </div>
+        </div>
+        
+        <div class="project-item">
+          <div class="title-row">
+            <div class="item-title">Lawawere – Indian Constitution Awareness</div>
+            <div class="period">Oct 2024 – Nov 2024</div>
+          </div>
+          <ul>
+            <li>React + Express + MongoDB platform for interactive legal learning.</li>
+          </ul>
+          <div class="tech-stack">
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">Express.js</span>
+            <span class="tech-tag">MongoDB</span>
+          </div>
+        </div>
+        
+        <div class="project-item">
+          <div class="title-row">
+            <div class="item-title">Eklavyatravel – Village Directory</div>
+            <div class="period">Nov 2024 – Jan 2025</div>
+          </div>
+          <ul>
+            <li>Golang backend, Redis cache, PostgreSQL data engine.</li>
+            <li>Next.js frontend for high-speed village and facility info access.</li>
+          </ul>
+          <div class="tech-stack">
+            <span class="tech-tag">GoLang</span>
+            <span class="tech-tag">PostgreSQL</span>
+            <span class="tech-tag">Redis</span>
+            <span class="tech-tag">Next.js</span>
+          </div>
+        </div>
+        
+        <div class="project-item">
+          <div class="title-row">
+            <div class="item-title">Annadata – A Unified Platform for Farmers, Vendors, and Consumers</div>
+            <div class="period">Mar 2025 – Apr 2025</div>
+          </div>
+          <ul>
+            <li>Marketplace platform connecting farmers directly with vendors and consumers.</li>
+            <li>Eliminates middlemen to ensure fair prices for farmers and fresh produce for consumers.</li>
+            <li>Role-based platform with dashboards for Admin, Vendors, Consumers, and Farmers.</li>
+          </ul>
+          <div class="tech-stack">
+            <span class="tech-tag">React.js</span>
+            <span class="tech-tag">Express.js</span>
+            <span class="tech-tag">MongoDB</span>
+            <span class="tech-tag">Node.js</span>
+            <span class="tech-tag">Tailwind CSS</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-header">
+          <h2>Certifications</h2>
+        </div>
+        <div class="certification-item">
+          <ul>
+            <li><strong>Complete Interview Preparation (C++) – GFG</strong> | May 2024 – Jul 2024</li>
+            <li><strong>GFG 160 Days of Problem Solving</strong> | Jul 2024 – Oct 2024</li>
+            <li><strong>Google Prompting Essentials</strong> | Aug 2024 – Dec 2024</li>
+            <li><strong>Generative AI for Software Development – Deeplearning.ai</strong> | Aug 2024 – Dec 2024</li>
+            <li><strong>Generative AI for Everyone</strong> | Aug 2024 – Dec 2024</li>
+            <li><strong>Generative AI Fundamentals – IBM</strong> | Aug 2024 – Dec 2024</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-header">
+          <h2>Achievements</h2>
+        </div>
+        <div class="project-item">
+          <ul>
+            <li>SIH 2024 Grand Finale Finalist – among 5000+ teams</li>
+            <li>Code-a-fest – 3rd Rank out of 500+ participants</li>
+            <li>Dean's Top 11% Student – Academic & Extracurricular Excellence</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-header">
+          <h2>Education</h2>
+        </div>
+        <div class="education-item">
+          <div class="title-row">
+            <div class="item-title">Lovely Professional University, Punjab</div>
+            <div class="period">Aug 2022 – Present</div>
+          </div>
+          <div class="company">B.Tech Computer Science Engineering | CGPA: 5.90</div>
+        </div>
+        
+        <div class="education-item">
+          <div class="title-row">
+            <div class="item-title">Al-Shams Millia College, Araria</div>
+            <div class="period">Apr 2019 – Mar 2021</div>
+          </div>
+          <div class="company">Intermediate | 73%</div>
+        </div>
+        
+        <div class="education-item">
+          <div class="title-row">
+            <div class="item-title">Azad Academy, Araria</div>
+            <div class="period">Apr 2018 – Mar 2019</div>
+          </div>
+          <div class="company">Matriculation | 80.9%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="actions">
+    <button class="download-btn" onclick="generatePDF()">
+      <i class="fas fa-download"></i>
+      Download PDF
+    </button>
+  </div>
+
+  <!-- PDF Generation Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    function generatePDF() {
+      // Get container element
+      const element = document.querySelector('#resume-container');
+      
+      // Remove any download buttons to avoid them appearing in the PDF
+      const downloadBtn = document.querySelector('.download-btn');
+      const originalBtnText = downloadBtn.innerHTML;
+      downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+      downloadBtn.disabled = true;
+      
+      // Configure html2pdf options
+      const options = {
+        margin: [15, 15, 15, 15], // Top, left, bottom, right margins in mm
+        filename: 'Md_Arshad_Noor_Resume.pdf',
+        image: { type: 'jpeg', quality: 1.0 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true,
+          letterRendering: true,
+          windowWidth: 1200 // Set a fixed width for consistent rendering
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait',
+          compress: true
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+      
+      // Hide back button to avoid it appearing in PDF
+      const backButton = document.querySelector('.back-to-portfolio');
+      backButton.style.display = 'none';
+      
+      // Generate PDF with improved worker
+      html2pdf().from(element).set(options).toPdf().get('pdf').then(function(pdf) {
+        // Add metadata
+        pdf.setProperties({
+          title: 'Md Arshad Noor - Resume',
+          subject: 'Professional Resume',
+          author: 'Md Arshad Noor',
+          keywords: 'resume, cv, software engineer, developer',
+          creator: 'html2pdf'
+        });
+        
+        // Save the PDF
+        pdf.save('Md_Arshad_Noor_Resume.pdf');
+        
+        // Restore button state and show back button
+        setTimeout(() => {
+          backButton.style.display = '';
+          downloadBtn.innerHTML = originalBtnText;
+          downloadBtn.disabled = false;
+        }, 1000);
+      });
+    }
+    
+    // Add event listeners for window load to ensure fonts are loaded
+    window.addEventListener('load', function() {
+      // Force repaint to ensure all styles are applied
+      document.body.style.display = 'none';
+      document.body.offsetHeight; // Force a reflow
+      document.body.style.display = '';
+    });
+  </script>
+</body>
+</html> 

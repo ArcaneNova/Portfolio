@@ -9,6 +9,7 @@ import Stats from "./sections/Stats.jsx";
 import Challenge from "./sections/Challenge.jsx";
 import HolographicBackground from "./components/HolographicBackground.jsx";
 import { useEffect, useState, Component } from "react";
+import CVSection from "./sections/CV.jsx";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -131,6 +132,7 @@ const App = () => {
         <Projects />
         <Stats />
         <Challenge />
+        <CVSection />
         <Contact />
         <Footer />
       </div>

@@ -1,142 +1,184 @@
-<div align="center">
-  <br />
-    <a href="https://www.youtube.com/watch?v=E-fdPfRxkzQ" target="_blank">
-      <img src="public/images/readme.png" alt="Project Banner">
-    </a>
-  <br />
+# 🚀 Advanced 3D Portfolio Website
 
-  <div>
-    <img src="https://img.shields.io/badge/-Three.js-black?style=for-the-badge&logo=three.js&logoColor=white" />
-    <img src="https://img.shields.io/badge/-GSAP-88CE02?style=for-the-badge&logo=greensock&logoColor=white" />
-    <img src="https://img.shields.io/badge/-Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
-  </div>
+A modern, cyberpunk-themed portfolio website with interactive 3D elements, holographic backgrounds, and futuristic UI components. This portfolio showcases projects, skills, achievements, and personal journey in an engaging, visually impressive format.
 
-  <h3 align="center">Interactive 3D Portfolio Website</h3>
+![Portfolio Preview](public/portfolio-preview.jpg)
 
-   <div align="center">
-     Build this project step by step with our detailed tutorial on <a href="https://www.youtube.com/@javascriptmastery/videos" target="_blank"><b>JavaScript Mastery</b></a> YouTube. Join the JSM family!
-    </div>
-</div>
+## ✨ Features
 
-## 📋 <a name="table">Table of Contents</a>
+### 🌟 Visual Design
+- **Holographic 3D Background**: Dynamic, interactive background with Three.js
+- **Cyberpunk Interface**: Futuristic UI components with glow effects and scanner animations
+- **Custom Animations**: GSAP-powered animations triggered by scroll and interaction
+- **Responsive Design**: Optimized for all device sizes
 
-1. 🤖 [Introduction](#introduction)
-2. ⚙️ [Tech Stack](#tech-stack)
-3. 🔋 [Features](#features)
-4. 🤸 [Quick Start](#quick-start)
-5. 🔗 [Assets & Snippets](#links)
-6. 🚀 [More](#more)
+### 📋 Key Sections
 
-## ⚠️ Tutorial
+#### 🏠 Home/Hero
+- Interactive typing effect
+- Animated profile image with cyberpunk styling
+- Smooth fade-in animations for a captivating entrance
 
-This repository contains the code corresponding to an in-depth tutorial available on our YouTube channel, <a href="https://www.youtube.com/@javascriptmastery/videos" target="_blank"><b>JavaScript Mastery</b></a>.
+#### 👤 About
+- Personal biography with cyberpunk interface styling
+- Interactive journey timeline with animation
+- Achievements showcase with visual cards
 
-If you prefer visual learning, this is the perfect resource for you. Follow our tutorial to learn how to build projects like these step-by-step in a beginner-friendly manner!
+#### 💻 Projects
+- Featured projects carousel
+- Category filtering (Web, ML/AI, Full Stack, API/Backend)
+- Interactive 3D cards with hover effects
+- Project details including:
+  - Status badges (live, ongoing, completed)
+  - Tech stack tags
+  - Key features/highlights
+  - Links to live demos and GitHub repos
 
-<a href="https://www.youtube.com/watch?v=E-fdPfRxkzQ" target="_blank"><img src="https://github.com/sujatagunale/EasyRead/assets/151519281/1736fca5-a031-4854-8c09-bc110e3bc16d" /></a>
+#### 🛠️ Skills
+- Interactive visualization of technical skills
+- Categorized display (Programming Languages, Frontend, Backend, ML/AI)
+- Progress indicators for skill proficiency
+- Tools and technologies showcase
 
-## <a name="introduction">🤖 Introduction</a>
+#### 📊 Stats
+- Animated counters for statistics (lines of code, projects, contributions)
+- GitHub-style contribution graph
+- Coding platform statistics (GitHub, LeetCode, etc.)
+- Interactive platform tabs
 
-The 3D Portfolio project is a highly engaging personal website that features animated 3D scenes, smooth camera transitions, interactive model showcases, and responsive design. It’s ideal for developers, designers, or freelancers looking to stand out in the digital crowd.
+#### 🎯 Challenge
+- Interactive challenge tracking cards
+- Progress indicators for ongoing challenges
+- Recent updates with dynamic content
 
-If you're getting started and need assistance or face any bugs, join our active Discord community with over **50k+** members. It's a place where people help each other out.
+#### 📞 Contact
+- Contact form with animations
+- Social media links with hover effects
+- Personal information with cyberpunk styling
 
-<a href="https://discord.com/invite/n6EdbFJ" target="_blank"><img src="https://github.com/sujatagunale/EasyRead/assets/151519281/618f4872-1e10-42da-8213-1d69e486d02e" /></a>
+### 🔧 Technical Features
+- **Modular Components**: Clean component architecture for maintainability
+- **State Management**: Efficient React state handling
+- **Performance Optimized**: Fast loading and smooth animations
+- **SEO Friendly**: Proper meta tags and semantic HTML
+- **Accessible**: Designed with accessibility in mind
 
-## <a name="tech-stack">⚙️ Tech Stack</a>
+## 🚀 Technologies Used
 
-- Three.js
-- React Three Fiber
-- Drei
-- GSAP
-- Tailwind CSS
-- Vite
-- React 19
+### Frontend Framework & Libraries
+- **React 19**: Modern component-based architecture
+- **Three.js**: 3D graphics and effects
+- **GSAP**: Advanced animations and transitions
+- **Framer Motion**: UI animations and gestures
 
-## <a name="features">🔋 Features</a>
+### Styling & UI
+- **Tailwind CSS 4**: Utility-first CSS framework
+- **React Icons**: Comprehensive icon library
+- **Custom Components**: Reusable UI components like:
+  - CyberpunkInterface
+  - GlowEffect
+  - HolographicBackground
+  - TypewriterEffect
 
-### Features of the 3D Portfolio Project
+### Build Tools
+- **Vite**: Fast, modern build tool
+- **ESLint**: Code quality and consistency
+- **Netlify**: Deployment and hosting
 
-👉 Animated 3D models and reveal animations
+## 🔧 Setup & Installation
 
-👉 Realistic lighting and shadows
+### Prerequisites
+- Node.js (v18.0.0 or later)
+- npm or yarn
 
-👉 GSAP-powered scroll interactions
+### Installation
+1. Clone the repository
+   ```bash
+   git clone https://github.com/yourusername/3d-portfolio.git
+   cd 3d-portfolio
+   ```
 
-👉 Responsive design with Tailwind CSS and Flexbox/Grid
+2. Install dependencies
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-👉 Micro Interactions
+3. Start the development server
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-👉 Multi-section layout (About, Projects, Contact)
+4. Build for production
+   ```bash
+   npm run build
+   # or
+   yarn build
+   ```
 
-👉 Mobile optimized 3D experience
+## 🌐 Deployment
 
-and many more, including code architecture and reusability.
+This project is configured for easy deployment to Netlify. The `netlify.toml` file contains the necessary configuration.
 
-## <a name="quick-start">🤸 Quick Start</a>
+### Deploying to Netlify
+1. Push your code to a GitHub repository
+2. Connect the repository to Netlify
+3. Netlify will automatically deploy the site
 
-Follow these steps to set up the project locally on your machine.
+## 📁 Project Structure
 
-**Prerequisites**
-
-Make sure you have the following installed on your machine:
-
-- [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/en)
-- [npm](https://www.npmjs.com/) (Node Package Manager)
-
-**Cloning the Repository**
-
-```bash
-git clone https://github.com/adrianhajdin/3d-portfolio.git
-cd 3d-portfolio
+```
+/
+├── public/                  # Static assets
+├── src/
+│   ├── components/          # Reusable UI components
+│   │   ├── CyberpunkInterface.jsx
+│   │   ├── GlowEffect.jsx
+│   │   ├── HolographicBackground.jsx
+│   │   ├── NavBar.jsx
+│   │   └── ...
+│   ├── sections/            # Main page sections
+│   │   ├── About.jsx        # About section
+│   │   ├── Challenge.jsx    # Challenge tracking section
+│   │   ├── Contact.jsx      # Contact section
+│   │   ├── Hero.jsx         # Hero/intro section
+│   │   ├── Projects.jsx     # Projects showcase section
+│   │   ├── Skills.jsx       # Skills showcase section
+│   │   └── Stats.jsx        # Statistics section
+│   ├── App.jsx              # Main app component
+│   └── main.jsx             # Entry point
+├── index.html               # HTML template
+├── tailwind.config.js       # Tailwind CSS configuration
+├── vite.config.js           # Vite configuration
+└── package.json             # Dependencies and scripts
 ```
 
-**Installation**
+## 🎨 Customization
 
-Install the project dependencies using npm:
+### Changing Personal Information
+- Edit the text content in each section component
+- Update project data in `Projects.jsx`
+- Update skills data in `Skills.jsx`
 
-```bash
-npm install
-```
+### Modifying the Theme
+- Edit the color schemes in `tailwind.config.js`
+- Modify animations in GSAP configurations
+- Update 3D elements in HolographicBackground component
 
-**Set Up Environment Variables**
+## 📝 License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-Create a new file named `.env` in the root of your project and add the following content:
+## 🙏 Acknowledgements
+- Three.js for 3D graphics capabilities
+- GSAP for smooth animations
+- Tailwind CSS for styling utilities
+- React ecosystem for component architecture
 
-```env
-VITE_APP_EMAILJS_SERVICE_ID=
-VITE_APP_EMAILJS_TEMPLATE_ID=
-VITE_APP_EMAILJS_PUBLIC_KEY=
-```
+---
 
-Replace the placeholder values with your actual **[EmailJS](https://www.emailjs.com/)** credentials.
+Created with ❤️ by [Your Name]
 
-**Running the Project**
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:5173](http://localhost:5173/) in your browser to view the project.
-
-
-## <a name="links">🔗 Assets and Snippets</a>
-
-Assets and snippets used in the project can be found in the **[video kit](https://jsm.dev/pfolio25-kit)**.
-
-<a href="https://jsm.dev/pfolio25-kit" target="_blank">
-  <img src="public/images/readme-video-kit.png" alt="Video Kit Banner">
-</a>
-
-
-## <a name="more">🚀 More</a>
-
-**Advance your skills with JSM Pro Courses**
-
-Enjoyed creating this project? Dive deeper into our PRO courses for a richer learning adventure. They're packed with
-detailed explanations, cool features, and exercises to boost your skills. Give it a go!
-
-<a href="https://beta.jsmastery.pro/" target="_blank">
-  <img src="public/images/readme-bottom.png" alt="Project Banner">
-</a>
+---

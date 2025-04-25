@@ -109,7 +109,7 @@ const Hero = () => {
             <HologramButton 
               variant="danger" 
               icon={<FaFileAlt />} 
-              onClick={() => window.open('/resume.pdf', '_blank')}
+              onClick={() => window.open('/ats-resume.html', '_blank')}
             >
               Resume
             </HologramButton>

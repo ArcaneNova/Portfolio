@@ -11,8 +11,8 @@ gsap.registerPlugin(ScrollTrigger);
 const timelineEvents = [
   {
     year: "2019",
-    title: "Passed 10th & Got My First Computer",
-    description: "Passed my 10th examination and got 81% marks.Got my first computer and started learning HTML & CSS, beginning my journey in tech.",
+    title: "Passed 10th",
+    description: "Passed my 10th examination and got 81% marks.",
     icon: "💻",
     color: "from-blue-400 to-cyan-300"
   },
@@ -213,7 +213,7 @@ const About = () => {
             <CyberpunkInterface title="BIOGRAPHY">
               <div className="space-y-6 p-6">
                 <p className="bio-text text-blue-50 leading-relaxed">
-                  I'm a software engineer with a passion for building innovative applications that solve real-world problems. My journey in tech began in 2012 when I got my first computer and discovered the world of programming.
+                  I'm a software engineer with a passion for building innovative applications that solve real-world problems. My journey in tech began in 2016 when I got my first computer and discovered the world of programming.
                 </p>
                 
                 <p className="bio-text text-blue-50 leading-relaxed">
