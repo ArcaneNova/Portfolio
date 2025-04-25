@@ -15,7 +15,7 @@ const statsData = [
   {
     id: 'code',
     icon: <FaLaptopCode />,
-    value: 210000,
+    value: 50000,
     label: 'Lines of Code',
     description: 'Written across various projects',
     color: 'from-blue-400 to-cyan-400'
@@ -23,7 +23,7 @@ const statsData = [
   {
     id: 'projects',
     icon: <FaCodepen />,
-    value: 87,
+    value: 50,
     label: 'Projects Completed',
     description: 'From small tools to large apps',
     color: 'from-purple-500 to-blue-500'
@@ -31,7 +31,7 @@ const statsData = [
   {
     id: 'contributions',
     icon: <FaGithub />,
-    value: 200,
+    value: 90,
     label: 'GitHub Contributions',
     description: 'Last 12 months of activity',
     color: 'from-teal-400 to-blue-400'
@@ -84,19 +84,19 @@ const platformData = [
     url: 'https://www.codewars.com/users/yourusername',
     color: 'from-red-700 to-red-900',
     badgeColor: 'bg-red-800'
-  },
-  {
-    name: 'HackerRank',
-    icon: <SiHackerrank size={30} />,
-    stats: [
-      { label: 'Skills Verified', value: '8', icon: <FaAward /> },
-      { label: 'Badges', value: '12', icon: <FaStar /> },
-      { label: 'Points', value: '3420', icon: <FaCodeBranch /> }
-    ],
-    url: 'https://www.hackerrank.com/yourusername',
-    color: 'from-green-600 to-green-800',
-    badgeColor: 'bg-green-700'
-  }
+   },
+  // {
+  //   name: 'HackerRank',
+  //   icon: <SiHackerrank size={30} />,
+  //   stats: [
+  //     { label: 'Skills Verified', value: '8', icon: <FaAward /> },
+  //     { label: 'Badges', value: '12', icon: <FaStar /> },
+  //     { label: 'Points', value: '3420', icon: <FaCodeBranch /> }
+  //   ],
+  //   url: 'https://www.hackerrank.com/yourusername',
+  //   color: 'from-green-600 to-green-800',
+  //   badgeColor: 'bg-green-700'
+  // }
 ];
 
 // GitHub-like contribution visualization
