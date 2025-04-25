@@ -115,7 +115,7 @@ const Projects = () => {
         live: 'https://annadata-pro.netlify.app'
       },
       featured: false,
-      achievements: 'AIU Aveshan Winner',
+      achievements: 'AIU Anveshan Winner',
       highlights: [
         'Developed a platform connecting farmers, vendors, and consumers directly',
         'Built responsive UI with React.js and TailwindCSS',
