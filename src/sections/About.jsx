@@ -5,7 +5,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
 import CyberpunkInterface from '../components/CyberpunkInterface';
 import GlowEffect from '../components/GlowEffect';
-import mdarshadnoor from "../assets/mdarshadnoor.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -181,7 +180,7 @@ const About = () => {
             <GlowEffect color="blue-100" intensity="high" className="rounded-full">
               <div className="relative w-48 h-48 rounded-full overflow-hidden border-2 border-blue-100/30">
                 <img 
-                  src={mdarshadnoor}
+                  src="/profile.png" 
                   alt="Profile" 
                   className="w-full h-full object-cover"
                 />

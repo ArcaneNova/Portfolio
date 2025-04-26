@@ -13,7 +13,7 @@ import Button from '../components/Button';
 import { SectionWrapper } from '../hoc/index.js';
 
 // Use a placeholder image URL instead of importing from assets
-const profileImage = "/mdarshadnoor.png";
+const profileImage = "/profile.png";
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
