@@ -170,7 +170,6 @@ export const authAPI = {
 // Projects API
 export const projectsAPI = {
   getAllProjects: async (params) => {
-    // Use the dedicated projects function implementation
     return await ProjectAPI.getProjects(params);
   },
   getProject: (id) => API.get(`/projects/${id}`),
@@ -184,14 +183,170 @@ export const projectsAPI = {
 
 // Blogs API
 export const blogsAPI = {
-  getAllBlogs: async (params) => {
-    // Use the BlogAPI implementation which will try to use mock data if backend is unavailable
-    return await BlogAPI.getBlogs(params);
+  /**
+   * Get all blogs with pagination and filtering
+   * @param {Object} params - Query parameters
+   * @param {number} params.page - Page number
+   * @param {number} params.limit - Items per page
+   * @param {string} params.sort - Sort field and direction (e.g., 'createdAt:desc')
+   * @param {string} params.tag - Filter by tag
+   * @returns {Promise} - The API response
+   */
+  getAllBlogs: async (params = {}) => {
+    try {
+      console.log('Fetching blogs from Netlify function');
+      
+      // Build query parameters
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.sort) queryParams.append('sort', params.sort);
+      if (params.tag) queryParams.append('tag', params.tag);
+      
+      const url = `${getApiUrl('/.netlify/functions/blogs', '/api/blogs')}?${queryParams.toString()}`;
+      const response = await API.get(url);
+      return response;
+    } catch (error) {
+      console.error('Error fetching blogs:', error);
+      throw error;
+    }
   },
-  getBlog: (id) => API.get(`/blogs/${id}`),
-  createBlog: (blogData) => API.post('/blogs', blogData),
-  updateBlog: (id, blogData) => API.put(`/blogs/${id}`, blogData),
-  deleteBlog: (id) => API.delete(`/blogs/${id}`),
+  
+  /**
+   * Get a blog by ID
+   * @param {string} id - Blog ID
+   * @returns {Promise} - The API response
+   */
+  getBlogById: async (id) => {
+    try {
+      console.log(`Fetching blog with ID: ${id}`);
+      const url = `${getApiUrl('/.netlify/functions/blogs', '/api/blogs')}/${id}`;
+      const response = await API.get(url);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching blog ${id}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Get a blog by slug
+   * @param {string} slug - Blog slug
+   * @returns {Promise} - The API response
+   */
+  getBlogBySlug: async (slug) => {
+    try {
+      console.log(`Fetching blog with slug: ${slug}`);
+      const url = `${getApiUrl('/.netlify/functions/blogs', '/api/blogs')}/slug/${slug}`;
+      const response = await API.get(url);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching blog with slug ${slug}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Create a new blog
+   * @param {Object} blogData - Blog data
+   * @returns {Promise} - The API response
+   */
+  createBlog: async (blogData) => {
+    try {
+      console.log('Creating new blog');
+      const url = getApiUrl('/.netlify/functions/blogs', '/api/blogs');
+      const response = await API.post(url, blogData);
+      return response;
+    } catch (error) {
+      console.error('Error creating blog:', error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Update a blog
+   * @param {string} id - Blog ID
+   * @param {Object} blogData - Updated blog data
+   * @returns {Promise} - The API response
+   */
+  updateBlog: async (id, blogData) => {
+    try {
+      console.log(`Updating blog with ID: ${id}`);
+      const url = `${getApiUrl('/.netlify/functions/blogs', '/api/blogs')}/${id}`;
+      const response = await API.put(url, blogData);
+      return response;
+    } catch (error) {
+      console.error(`Error updating blog ${id}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Delete a blog
+   * @param {string} id - Blog ID
+   * @returns {Promise} - The API response
+   */
+  deleteBlog: async (id) => {
+    try {
+      console.log(`Deleting blog with ID: ${id}`);
+      const url = `${getApiUrl('/.netlify/functions/blogs', '/api/blogs')}/${id}`;
+      const response = await API.delete(url);
+      return response;
+    } catch (error) {
+      console.error(`Error deleting blog ${id}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Increment blog view count
+   * @param {string} id - Blog ID
+   * @returns {Promise} - The API response
+   */
+  incrementViews: async (id) => {
+    try {
+      console.log(`Incrementing views for blog with ID: ${id}`);
+      const url = `${getApiUrl('/.netlify/functions/blogs', '/api/blogs')}/${id}/views`;
+      const response = await API.post(url);
+      return response;
+    } catch (error) {
+      console.error(`Error incrementing views for blog ${id}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Toggle like on a blog
+   * @param {string} id - Blog ID
+   * @returns {Promise} - The API response
+   */
+  toggleLike: async (id) => {
+    try {
+      console.log(`Toggling like for blog with ID: ${id}`);
+      const url = `${getApiUrl('/.netlify/functions/blogs', '/api/blogs')}/${id}/like`;
+      const response = await API.post(url);
+      return response;
+    } catch (error) {
+      console.error(`Error toggling like for blog ${id}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Get blog tags for filtering
+   * @returns {Promise} - The API response
+   */
+  getTags: async () => {
+    try {
+      console.log('Fetching blog tags');
+      const url = `${getApiUrl('/.netlify/functions/blogs', '/api/blogs')}/tags`;
+      const response = await API.get(url);
+      return response;
+    } catch (error) {
+      console.error('Error fetching blog tags:', error);
+      throw error;
+    }
+  }
 };
 
 // Motivations API
@@ -244,49 +399,47 @@ export const uploadAPI = {
 export const ProjectAPI = {
   getProjects: async (params = {}) => {
     try {
-      console.log('Attempting to use dedicated projects function');
-      
-      // Build query params
+      console.log('Trying dedicated projects function');
       const queryParams = new URLSearchParams();
+      
       if (params.limit) queryParams.append('limit', params.limit);
       if (params.page) queryParams.append('page', params.page);
-      if (params.tags && params.tags.length > 0) {
-        queryParams.append('tags', params.tags.join(','));
+      if (params.sort) queryParams.append('sort', params.sort);
+      if (params.tags) {
+        const tags = Array.isArray(params.tags) ? params.tags : [params.tags];
+        tags.forEach(tag => queryParams.append('tag', tag));
       }
       
-      // Get the URL using the helper function
       const url = getApiUrl(
-        '/.netlify/functions/projects', 
-        '/api/projects'
+        `/.netlify/functions/projects?${queryParams.toString()}`,
+        `/api/projects?${queryParams.toString()}`
       );
+      console.log('Fetching from URL:', url);
       
-      // Add query parameters if they exist
-      const fullUrl = queryParams.toString() 
-        ? `${url}?${queryParams.toString()}` 
-        : url;
-      
-      console.log('Fetching from URL:', fullUrl);
-      
-      const response = await fetch(fullUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(url);
       
       if (!response.ok) {
-        throw new Error(`Projects function returned ${response.status}: ${response.statusText}`);
+        throw new Error(`Error fetching projects: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('Projects function response:', data);
-      return data;
+      return { data, status: response.status };
     } catch (error) {
-      console.log('Projects function failed, falling back to regular API route');
+      console.log('Projects function failed, trying regular API route');
       console.error('Projects function error:', error.message);
       
-      // Fall back to regular API route
-      return API.get('/projects', { params }).then(res => res.data);
+      try {
+        return await API.get('/projects', { params });
+      } catch (apiError) {
+        console.error('Projects API error:', apiError.message);
+        return { 
+          data: {
+            success: false,
+            message: 'Failed to fetch projects'
+          },
+          status: 500
+        };
+      }
     }
   }
 };
