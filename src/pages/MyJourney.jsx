@@ -10,11 +10,11 @@ import GlowEffect from '../components/GlowEffect';
 import HolographicBackground from '../components/HolographicBackground';
 import TechParticlesGrid from '../components/TechParticlesGrid';
 import { FaQuoteLeft, FaQuoteRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import mdarshadnoor from "../assets/mdarshadnoor-smile.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
 // Profile image
-const profileImage = "/pic/mdarshadnoor-smile.png";
 
 const journeyData = [
   {
@@ -839,7 +839,7 @@ const MyJourney = () => {
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full blur-md opacity-70 animate-pulse"></div>
                 <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-2 border-white/30">
                   <img 
-                    src={profileImage} 
+                    src={mdarshadnoor} 
                     alt="Md Arshad Noor" 
                     className="w-full h-full object-cover"
                   />
