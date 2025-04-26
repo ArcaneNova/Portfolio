@@ -1,236 +1,259 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth.jsx';
-import { FaUser, FaLock, FaExclamationCircle, FaInfoCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { FaUser, FaLock, FaBug, FaServer, FaSpinner } from 'react-icons/fa';
 import axios from 'axios';
+import api from '../../utils/api';
 
 const LoginPage = () => {
-  const [credentials, setCredentials] = useState({ email: '', password: '' });
-  const [loginError, setLoginError] = useState('');
-  const [debugInfo, setDebugInfo] = useState(null);
-  const [showDebug, setShowDebug] = useState(false);
-  const { login, logout, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [debugInfo, setDebugInfo] = useState({
+    apiConnected: null,
+    responseTime: null,
+    serverInfo: null
+  });
+  const [showDebug, setShowDebug] = useState(false);
 
   // Check API connectivity on component mount
   useEffect(() => {
-    const checkApi = async () => {
+    const checkApiConnection = async () => {
+      const startTime = Date.now();
       try {
-        const info = {
-          baseUrl: axios.defaults.baseURL || 'Not set globally',
-          production: import.meta.env.PROD ? 'Yes' : 'No',
-          apiEndpoint: '/api/health'
-        };
-        
-        // Try to ping the health endpoint
-        try {
-          const response = await axios.get('/api/health');
-          info.healthCheck = response.data;
-          info.status = 'Connected';
-        } catch (error) {
-          info.healthCheck = 'Failed';
-          info.status = 'Disconnected';
-          info.error = error.message;
-        }
-        
-        setDebugInfo(info);
-      } catch (err) {
-        setDebugInfo({ error: err.message });
+        const response = await axios.get('/api/health', { timeout: 5000 });
+        const endTime = Date.now();
+        setDebugInfo({
+          apiConnected: true,
+          responseTime: `${endTime - startTime}ms`,
+          serverInfo: response.data
+        });
+      } catch (error) {
+        setDebugInfo({
+          apiConnected: false,
+          responseTime: null,
+          serverInfo: null
+        });
       }
     };
     
-    checkApi();
+    checkApiConnection();
   }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCredentials(prev => ({ ...prev, [name]: value }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoginError('');
-    
+    setError('');
+    setIsLoading(true);
+
     try {
-      // Set default credentials if development environment
-      if (!import.meta.env.PROD && credentials.email === 'demo' && credentials.password === 'demo') {
-        setCredentials({
-          email: 'admin@example.com',
-          password: 'password123'
-        });
-        // The login will be attempted with the updated credentials on the next render
-        return;
-      }
+      // For development - log the login attempt
+      console.log(`Attempting login with email: ${email}`);
       
-      console.log('Attempting login with:', credentials.email);
-      const user = await login(credentials);
-      console.log('Login successful:', user);
+      await login(email, password);
       
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        setLoginError('Unauthorized access. Admin privileges required.');
-        await logout();
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      let errorMessage = 'Login failed. Please check your credentials.';
+      // Navigate to the intended route or dashboard
+      const from = location.state?.from?.pathname || '/admin';
+      navigate(from, { replace: true });
+    } catch (error) {
+      setIsLoading(false);
       
-      if (err.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        errorMessage = err.response.data?.message || 
-                       `Server error: ${err.response.status} ${err.response.statusText}`;
+      // Enhanced error handling
+      if (error.response) {
+        // Server responded with an error status
+        setError(error.response.data.message || 'Login failed. Please check your credentials.');
+        console.error('Login Error Response:', error.response.status, error.response.data);
         
-        setDebugInfo({
-          ...debugInfo,
-          errorResponse: {
-            status: err.response.status,
-            data: err.response.data,
-            headers: err.response.headers
-          }
-        });
-      } else if (err.request) {
-        // The request was made but no response was received
-        errorMessage = 'No response from server. Please check your connection.';
-        setDebugInfo({
-          ...debugInfo,
-          errorRequest: err.request
-        });
+        setDebugInfo(prev => ({
+          ...prev,
+          lastError: `${error.response.status}: ${error.response.data.message || 'Unknown error'}`,
+          errorType: 'Response Error',
+          timestamp: new Date().toISOString()
+        }));
+      } else if (error.request) {
+        // Request was made but no response received
+        setError('Cannot connect to the server. Please try again later.');
+        console.error('Login Request Error:', error.request);
+        
+        setDebugInfo(prev => ({
+          ...prev,
+          lastError: 'Network error - no response from server',
+          errorType: 'Request Error',
+          timestamp: new Date().toISOString()
+        }));
+      } else {
+        // Something else caused an error
+        setError(error.message || 'An unexpected error occurred');
+        console.error('Login Error:', error.message);
+        
+        setDebugInfo(prev => ({
+          ...prev,
+          lastError: error.message,
+          errorType: 'Unknown Error',
+          timestamp: new Date().toISOString()
+        }));
       }
-      
-      setLoginError(errorMessage);
-      setShowDebug(true);
     }
   };
 
+  // Auto-fill development credentials for ease of testing
+  const fillDevCredentials = () => {
+    setEmail('admin@example.com');
+    setPassword('password123');
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black-200 px-4">
-      {/* Background elements */}
-      <div className="absolute inset-0 overflow-hidden z-0">
-        <div className="absolute w-full h-full bg-[linear-gradient(rgba(0,212,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,212,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[100px]"></div>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-blue-950 to-indigo-900 p-4">
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-500 rounded-full filter blur-3xl opacity-10 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-indigo-500 rounded-full filter blur-3xl opacity-10 animate-pulse"></div>
       </div>
       
-      <div className="w-full max-w-md relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Admin <span className="text-cyan-400">Login</span></h1>
-          <p className="text-blue-100/70">Enter your credentials to access the dashboard</p>
-        </div>
-        
-        {/* Login Form */}
-        <div className="bg-black-100/30 backdrop-blur-md rounded-xl border border-blue-100/10 p-8 shadow-xl">
-          {loginError && (
-            <div className="mb-6 p-3 bg-red-500/20 border border-red-500/30 rounded-md flex items-center text-red-400">
-              <FaExclamationCircle className="mr-2 flex-shrink-0" />
-              <span className="text-sm">{loginError}</span>
-            </div>
-          )}
-          
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <label htmlFor="email" className="block text-sm font-medium text-blue-100 mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-blue-100/50">
-                  <FaUser />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={credentials.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-4 py-3 bg-black-100/70 border border-blue-100/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-colors"
-                  placeholder="admin@example.com"
-                />
-              </div>
-            </div>
+      <div className="z-10 w-full max-w-md">
+        <div className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl shadow-xl overflow-hidden">
+          <div className="px-8 pt-8 pb-6">
+            <h2 className="text-2xl font-bold text-center text-white mb-6">Admin Login</h2>
             
-            <div className="mb-6">
-              <label htmlFor="password" className="block text-sm font-medium text-blue-100 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-blue-100/50">
-                  <FaLock />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={credentials.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-4 py-3 bg-black-100/70 border border-blue-100/20 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-colors"
-                  placeholder="••••••••"
-                />
+            {error && (
+              <div className="mb-4 p-3 bg-red-500 bg-opacity-30 border border-red-500 rounded-lg text-white">
+                {error}
               </div>
-            </div>
+            )}
             
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full py-3 px-4 rounded-md text-white font-medium transition-colors ${
-                loading 
-                  ? 'bg-blue-100/20 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700'
-              }`}
-            >
-              {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Signing in...
-                </span>
-              ) : (
-                'Sign In'
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-1">Email</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaUser className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md bg-gray-800 bg-opacity-50 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="admin@example.com"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-1">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaLock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md bg-gray-800 bg-opacity-50 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70"
+              >
+                {isLoading ? (
+                  <>
+                    <FaSpinner className="animate-spin mr-2" />
+                    Logging in...
+                  </>
+                ) : "Login"}
+              </button>
+
+              {/* Dev shortcut */}
+              {process.env.NODE_ENV === 'development' && (
+                <button
+                  type="button"
+                  onClick={fillDevCredentials}
+                  className="w-full flex justify-center items-center py-1 px-2 text-xs text-blue-300 hover:text-blue-200"
+                >
+                  Use dev credentials
+                </button>
               )}
-            </button>
-          </form>
-          
-          <div className="mt-6 text-center">
-            <a href="/" className="text-sm text-blue-100 hover:text-cyan-400 transition-colors">
-              Return to homepage
-            </a>
+            </form>
           </div>
           
-          {/* Debug information toggle */}
-          <div className="mt-4 text-center">
+          <div className="px-8 py-4 bg-black bg-opacity-30 text-center">
+            <Link to="/" className="text-sm text-blue-300 hover:text-blue-200">
+              ← Return to portfolio
+            </Link>
+            <span className="mx-2 text-gray-500">|</span>
             <button 
               onClick={() => setShowDebug(!showDebug)} 
-              className="text-xs text-blue-100/50 hover:text-cyan-400"
+              className="text-sm text-blue-300 hover:text-blue-200 inline-flex items-center"
             >
-              {showDebug ? 'Hide Debug Info' : 'Show Debug Info'}
+              <FaBug className="mr-1" /> {showDebug ? "Hide Debug Info" : "Show Debug Info"}
             </button>
           </div>
           
-          {/* Debug information */}
-          {showDebug && debugInfo && (
-            <div className="mt-4 p-3 bg-black-100/50 border border-blue-100/10 rounded-md text-xs">
-              <div className="flex items-center mb-2">
-                <FaInfoCircle className="mr-2 text-cyan-400" />
-                <span className="text-cyan-400 font-medium">Debug Information</span>
-              </div>
-              <div className="text-blue-100/70 font-mono overflow-x-auto">
-                <div>Environment: {import.meta.env.MODE}</div>
-                <div>Production: {import.meta.env.PROD ? 'Yes' : 'No'}</div>
-                <div>API Status: {debugInfo.status || 'Unknown'}</div>
-                <div>API Base URL: {debugInfo.baseUrl || 'Not available'}</div>
-                {debugInfo.errorResponse && (
-                  <div className="mt-2 text-red-400">
-                    <div>Error Status: {debugInfo.errorResponse.status}</div>
-                    <div>Error Data: {JSON.stringify(debugInfo.errorResponse.data)}</div>
+          {/* Debug Information Panel */}
+          {showDebug && (
+            <div className="px-8 py-4 bg-gray-900 text-gray-300 text-sm">
+              <h3 className="font-semibold flex items-center mb-2">
+                <FaServer className="mr-2" /> API Connection Status
+              </h3>
+              <div className="space-y-1 mb-4">
+                <div className="flex">
+                  <span className="w-32 font-medium">Status:</span>
+                  <span 
+                    className={`${debugInfo.apiConnected === true ? 'text-green-400' : debugInfo.apiConnected === false ? 'text-red-400' : 'text-yellow-400'}`}
+                  >
+                    {debugInfo.apiConnected === true ? '✅ Connected' : debugInfo.apiConnected === false ? '❌ Disconnected' : 'Checking...'}
+                  </span>
+                </div>
+                {debugInfo.responseTime && (
+                  <div className="flex">
+                    <span className="w-32 font-medium">Response time:</span>
+                    <span>{debugInfo.responseTime}</span>
                   </div>
                 )}
+                {debugInfo.serverInfo && (
+                  <div className="flex">
+                    <span className="w-32 font-medium">Server info:</span>
+                    <span>{JSON.stringify(debugInfo.serverInfo)}</span>
+                  </div>
+                )}
+                {debugInfo.lastError && (
+                  <div>
+                    <div className="flex">
+                      <span className="w-32 font-medium">Last error:</span>
+                      <span className="text-red-400">{debugInfo.lastError}</span>
+                    </div>
+                    <div className="flex">
+                      <span className="w-32 font-medium">Error type:</span>
+                      <span>{debugInfo.errorType}</span>
+                    </div>
+                  </div>
+                )}
+                <div className="flex">
+                  <span className="w-32 font-medium">Timestamp:</span>
+                  <span>{debugInfo.timestamp}</span>
+                </div>
               </div>
-              <div className="mt-2 text-cyan-400/70 text-xs">
-                Default credentials: admin@example.com / password123
+              
+              <div className="text-xs text-gray-500">
+                <p>If you're having trouble connecting, check that:</p>
+                <ul className="list-disc pl-5 mt-1">
+                  <li>The API server is running</li>
+                  <li>The API is correctly deployed on Netlify</li>
+                  <li>Your network connection is stable</li>
+                </ul>
               </div>
             </div>
           )}

@@ -1,19 +1,15 @@
 import axios from 'axios';
 
-// Determine the base URL based on environment
-let baseURL;
-  // For production, use the current domain
-  baseURL = '/api';
-
 // Create an axios instance
 const API = axios.create({
-  baseURL,
+  baseURL: '/api',
   withCredentials: true,
 });
 
 // Add a request interceptor to include the token from localStorage
 API.interceptors.request.use(
   (config) => {
+    console.log(`API Request: ${config.method.toUpperCase()} ${config.url}`);
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -27,9 +23,12 @@ API.interceptors.request.use(
 
 // Add a response interceptor to handle authentication errors
 API.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`API Response: ${response.status} for ${response.config.url}`);
+    return response;
+  },
   (error) => {
-    console.error('API Error:', error.response?.status, error.response?.data);
+    console.error('API Error:', error.response?.status, error.response?.data, error.config?.url);
     // Handle session expiration
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');

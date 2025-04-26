@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import serverless from 'serverless-http';
+import path from 'path';
 
 // Routes
 import authRoutes from '../../server/routes/auth.js';

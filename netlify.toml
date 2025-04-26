@@ -6,12 +6,21 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Redirect for auth endpoints specifically to auth function
+[[redirects]]
+  from = "/api/auth/*"
+  to = "/.netlify/functions/auth/:splat"
+  status = 200
+  force = true
+
+# Redirect for all other API endpoints to server function
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/server/:splat"
   status = 200
   force = true
 
+# Serve the frontend for all other routes
 [[redirects]]
   from = "/*"
   to = "/index.html"
