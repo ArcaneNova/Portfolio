@@ -6,6 +6,13 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Special case for the specific login endpoint with direct route
+[[redirects]]
+  from = "/api/auth/login"
+  to = "/.netlify/functions/auth/login"
+  status = 200
+  force = true
+
 # Redirect for auth endpoints specifically to auth function
 [[redirects]]
   from = "/api/auth/*"
@@ -13,10 +20,10 @@
   status = 200
   force = true
 
-# Special case for the specific login endpoint
+# Redirect for health check endpoints
 [[redirects]]
-  from = "/api/auth/login"
-  to = "/.netlify/functions/auth/login"
+  from = "/api/health"
+  to = "/.netlify/functions/server/api/health"
   status = 200
   force = true
 

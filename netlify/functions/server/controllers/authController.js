@@ -11,14 +11,21 @@ const sendTokenResponse = (user, statusCode, res) => {
   // Set cookie options
   const cookieOptions = {
     expires: new Date(
-      Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+      Date.now() + (parseInt(process.env.COOKIE_EXPIRE) || 30) * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/'
   };
 
   // Remove password from response
   user.password = undefined;
+
+  // Log the token generation (avoiding logging the actual token in production)
+  console.log(`Token generated for user: ${user._id}, expires in ${process.env.JWT_EXPIRE || '30d'}`);
+  console.log('Cookie secure:', cookieOptions.secure);
+  console.log('Cookie sameSite:', cookieOptions.sameSite);
 
   res
     .status(statusCode)
@@ -65,6 +72,7 @@ export const register = async (req, res, next) => {
 // @access  Public
 export const login = async (req, res, next) => {
   try {
+    console.log('Login attempt with body:', JSON.stringify(req.body));
     const { email, password } = req.body;
 
     // Validate email & password
@@ -78,6 +86,7 @@ export const login = async (req, res, next) => {
     // Check for user
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
+      console.log(`User not found with email: ${email}`);
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
@@ -87,16 +96,24 @@ export const login = async (req, res, next) => {
     // Check if password matches
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      console.log(`Invalid password for user: ${email}`);
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
 
+    console.log(`Login successful for user: ${email}`);
+    
     // Send token response
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    next(error);
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false, 
+      message: 'Error during login',
+      error: error.message
+    });
   }
 };
 

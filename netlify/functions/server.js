@@ -15,7 +15,7 @@ import buildInPublicRoutes from '../../server/routes/buildInPublic.js';
 import taskRoutes from '../../server/routes/tasks.js';
 import uploadRoutes from '../../server/routes/upload.js';
 
-// Load environment variables
+// Load environment variables (will use Netlify environment variables in production)
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
@@ -24,10 +24,11 @@ const app = express();
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('CLIENT_URL:', process.env.CLIENT_URL);
 console.log('PORT:', process.env.PORT);
+console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set (hidden)' : 'Not set');
 
 // Middleware
 app.use(cors({
-  origin: '*', // Allow all origins in serverless function
+  origin: process.env.CLIENT_URL || '*', // Use CLIENT_URL from environment if available
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -42,7 +43,9 @@ app.use(cookieParser());
 app.use((req, res, next) => {
   console.log(`SERVER FUNCTION: ${req.method} ${req.path}`);
   console.log('Request Headers:', JSON.stringify(req.headers));
-  console.log('Request Body:', JSON.stringify(req.body));
+  if (req.method !== 'GET') {
+    console.log('Request Body:', JSON.stringify(req.body));
+  }
   next();
 });
 
