@@ -63,7 +63,22 @@ API.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-  login: (credentials) => API.post('/auth/login', credentials),
+  // Try the standalone login function first, then fall back to normal API route
+  login: async (credentials) => {
+    try {
+      console.log('Trying standalone login function first');
+      return await axios.post('/.netlify/functions/login', credentials, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (error) {
+      console.log('Standalone login failed, trying regular API route');
+      console.error('Standalone login error:', error.message);
+      return await API.post('/auth/login', credentials);
+    }
+  },
   logout: () => API.get('/auth/logout'),
   getProfile: () => API.get('/auth/me'),
   register: (userData) => API.post('/auth/register', userData),

@@ -12,12 +12,14 @@
   [headers.values]
     X-Netlify-Debug = "true"
 
-# Try the index function first for login (most likely to work)
+# Try first with the dedicated login function (most reliable)
 [[redirects]]
   from = "/api/auth/login"
-  to = "/.netlify/functions/index/api/auth/login"
+  to = "/.netlify/functions/login"
   status = 200
   force = true
+
+# Try the index function next
 
 # Fallback to other login routes if needed
 [[redirects]]

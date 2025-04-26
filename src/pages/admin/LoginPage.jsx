@@ -86,16 +86,22 @@ const LoginPage = () => {
       indexResult: 'Testing index function...'
     }));
     
+    const credentials = {
+      email: email,
+      password: password
+    };
+    
+    console.log('Sending credentials to index function:', credentials);
+    
     try {
       // Test direct call to index function
-      const response = await axios.post('/.netlify/functions/index/api/auth/login', { 
-        email, 
-        password 
-      }, {
+      const response = await axios.post('/.netlify/functions/index/api/auth/login', credentials, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
+      
+      console.log('Index function response:', response.data);
       
       setDebugInfo(prev => ({
         ...prev,
@@ -115,12 +121,125 @@ const LoginPage = () => {
         navigate(from, { replace: true });
       }
     } catch (error) {
+      console.error('Index function error:', error);
+      
       setDebugInfo(prev => ({
         ...prev,
         indexTesting: false,
         indexResult: `Error: ${error.message}`,
         indexStatus: error.response?.status || 'No response',
         indexError: error.response?.data || error.message
+      }));
+    }
+  };
+
+  // Let's also add a completely different approach with fetch
+  const testWithFetch = async () => {
+    setDebugInfo(prev => ({
+      ...prev,
+      fetchTesting: true,
+      fetchResult: 'Testing with fetch API...'
+    }));
+    
+    const credentials = {
+      email: email,
+      password: password
+    };
+    
+    try {
+      // Use fetch API instead of axios as an alternative approach
+      const response = await fetch('/.netlify/functions/index/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials)
+      });
+      
+      const data = await response.json();
+      console.log('Fetch API response:', data);
+      
+      setDebugInfo(prev => ({
+        ...prev,
+        fetchTesting: false,
+        fetchResult: `Success: ${JSON.stringify(data).slice(0, 100)}...`,
+        fetchStatus: response.status,
+        lastSuccessfulMethod: 'fetch API'
+      }));
+      
+      // If successful, store the token and redirect
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Navigate to the admin panel
+        const from = location.state?.from?.pathname || '/admin';
+        navigate(from, { replace: true });
+      }
+    } catch (error) {
+      console.error('Fetch API error:', error);
+      
+      setDebugInfo(prev => ({
+        ...prev,
+        fetchTesting: false,
+        fetchResult: `Error: ${error.message}`,
+        fetchStatus: 'Error',
+        fetchError: error.message
+      }));
+    }
+  };
+
+  // Add this new function to test direct call to the standalone login function
+  const testStandaloneFunction = async () => {
+    setDebugInfo(prev => ({
+      ...prev,
+      standaloneTesting: true,
+      standaloneResult: 'Testing standalone function...'
+    }));
+    
+    const credentials = {
+      email: email,
+      password: password
+    };
+    
+    console.log('Sending credentials to standalone function:', credentials);
+    
+    try {
+      // Call the standalone login function directly
+      const response = await axios.post('/.netlify/functions/login', credentials, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Standalone function response:', response.data);
+      
+      setDebugInfo(prev => ({
+        ...prev,
+        standaloneTesting: false,
+        standaloneResult: `Success: ${JSON.stringify(response.data).slice(0, 100)}...`,
+        standaloneStatus: response.status,
+        lastSuccessfulMethod: 'standalone function'
+      }));
+      
+      // If successful, store the token and redirect
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Navigate to the admin panel
+        const from = location.state?.from?.pathname || '/admin';
+        navigate(from, { replace: true });
+      }
+    } catch (error) {
+      console.error('Standalone function error:', error);
+      
+      setDebugInfo(prev => ({
+        ...prev,
+        standaloneTesting: false,
+        standaloneResult: `Error: ${error.message}`,
+        standaloneStatus: error.response?.status || 'No response',
+        standaloneError: error.response?.data || error.message
       }));
     }
   };
@@ -382,6 +501,58 @@ const LoginPage = () => {
                       {debugInfo.indexError && (
                         <pre className="mt-1 p-2 bg-gray-800 rounded max-h-40 overflow-auto">
                           {JSON.stringify(debugInfo.indexError, null, 2)}
+                        </pre>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                <h3 className="font-semibold mb-2">Debug Actions</h3>
+                
+                <div className="space-y-2">
+                  <button
+                    onClick={testWithFetch}
+                    disabled={debugInfo.fetchTesting}
+                    className="ml-2 px-3 py-1 bg-purple-800 hover:bg-purple-700 text-white rounded-md text-xs disabled:opacity-50"
+                  >
+                    {debugInfo.fetchTesting ? 'Testing...' : 'Test With Fetch API'}
+                  </button>
+                  
+                  {debugInfo.fetchResult && (
+                    <div className="mt-2 text-xs border-t border-gray-700 pt-2">
+                      <div><strong>Fetch API Status:</strong> {debugInfo.fetchStatus}</div>
+                      <div><strong>Result:</strong> {debugInfo.fetchResult}</div>
+                      {debugInfo.fetchError && (
+                        <pre className="mt-1 p-2 bg-gray-800 rounded max-h-40 overflow-auto">
+                          {JSON.stringify(debugInfo.fetchError, null, 2)}
+                        </pre>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                <h3 className="font-semibold mb-2">Debug Actions</h3>
+                
+                <div className="space-y-2">
+                  <button
+                    onClick={testStandaloneFunction}
+                    disabled={debugInfo.standaloneTesting}
+                    className="ml-2 px-3 py-1 bg-teal-800 hover:bg-teal-700 text-white rounded-md text-xs disabled:opacity-50"
+                  >
+                    {debugInfo.standaloneTesting ? 'Testing...' : 'Test Standalone Function'}
+                  </button>
+                  
+                  {debugInfo.standaloneResult && (
+                    <div className="mt-2 text-xs border-t border-gray-700 pt-2">
+                      <div><strong>Standalone Function Status:</strong> {debugInfo.standaloneStatus}</div>
+                      <div><strong>Result:</strong> {debugInfo.standaloneResult}</div>
+                      {debugInfo.standaloneError && (
+                        <pre className="mt-1 p-2 bg-gray-800 rounded max-h-40 overflow-auto">
+                          {JSON.stringify(debugInfo.standaloneError, null, 2)}
                         </pre>
                       )}
                     </div>

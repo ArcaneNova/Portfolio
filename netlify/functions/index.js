@@ -47,19 +47,53 @@ app.use((req, res, next) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     console.log('Processing login request in index function');
-    const { email, password } = req.body;
+    console.log('Raw request body:', req.body);
+    console.log('Content type:', req.headers['content-type']);
+    console.log('Method:', req.method);
+    
+    // If the request body is empty but this is a POST request, try to get data from query
+    let email = req.body?.email;
+    let password = req.body?.password;
+    
+    // If no body, try to parse from a string if that's how it came in
+    if (!email && !password && typeof req.body === 'string') {
+      try {
+        const parsedBody = JSON.parse(req.body);
+        email = parsedBody.email;
+        password = parsedBody.password;
+        console.log('Parsed body from string:', parsedBody);
+      } catch (e) {
+        console.log('Failed to parse body from string:', e.message);
+      }
+    }
+    
+    // If still no body, check URL params
+    if (!email && !password) {
+      email = req.query.email;
+      password = req.query.password;
+      console.log('Using query parameters as fallback');
+    }
     
     // Validate inputs
     if (!email || !password) {
+      console.log('Missing email or password. Email:', email, 'Password present:', !!password);
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password'
+        message: 'Please provide email and password',
+        debug: {
+          bodyType: typeof req.body,
+          bodyEmpty: Object.keys(req.body || {}).length === 0,
+          method: req.method,
+          contentType: req.headers['content-type']
+        }
       });
     }
 
+    console.log(`Login attempt with email: ${email}`);
+
     // Always allow admin test account for debugging
     if (email === 'admin@example.com' && password === 'password123') {
-      console.log('Using test admin credentials');
+      console.log('Using test admin credentials - successful login');
       
       // Generate token
       const token = jwt.sign(
@@ -102,7 +136,8 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Server error during login',
-      error: error.message
+      error: error.message,
+      stack: error.stack
     });
   }
 });
