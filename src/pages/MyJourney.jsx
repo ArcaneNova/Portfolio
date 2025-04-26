@@ -13,6 +13,9 @@ import { FaQuoteLeft, FaQuoteRight, FaChevronLeft, FaChevronRight } from 'react-
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Profile image
+const profileImage = "/pic/mdarshadnoor-smile.png";
+
 const journeyData = [
   {
     year: '2013',
@@ -829,6 +832,22 @@ const MyJourney = () => {
               subtitle="SYS.JOURNEY.LOG" 
               className="mb-8"
             />
+            
+            {/* Add profile image */}
+            <div className="flex justify-center mb-8">
+              <div className="relative">
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full blur-md opacity-70 animate-pulse"></div>
+                <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-2 border-white/30">
+                  <img 
+                    src={profileImage} 
+                    alt="Md Arshad Noor" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  <div className="absolute inset-0 bg-blue-500/10"></div>
+                </div>
+              </div>
+            </div>
             
             <h1 className="hero-title text-5xl md:text-7xl font-bold mb-6">
               <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
