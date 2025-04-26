@@ -8,7 +8,7 @@ import api from '../../utils/api';
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, setUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -189,8 +189,13 @@ const LoginPage = () => {
     }
   };
 
-  // Add this new function to test direct call to the standalone login function
+  // Update standalone function test for direct use
   const testStandaloneFunction = async () => {
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
+
     setDebugInfo(prev => ({
       ...prev,
       standaloneTesting: true,
@@ -198,34 +203,37 @@ const LoginPage = () => {
     }));
     
     const credentials = {
-      email: email,
-      password: password
+      email: email.trim(),
+      password: password.trim()
     };
     
-    console.log('Sending credentials to standalone function:', credentials);
+    console.log('Sending credentials to standalone function:', { ...credentials, password: '***' });
     
     try {
-      // Call the standalone login function directly
-      const response = await axios.post('/.netlify/functions/login', credentials, {
+      // Call the standalone login function directly with stringified payload
+      const response = await fetch('/.netlify/functions/login', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify(credentials)
       });
       
-      console.log('Standalone function response:', response.data);
+      const data = await response.json();
+      console.log('Standalone function response:', data);
       
       setDebugInfo(prev => ({
         ...prev,
         standaloneTesting: false,
-        standaloneResult: `Success: ${JSON.stringify(response.data).slice(0, 100)}...`,
+        standaloneResult: `Success: ${JSON.stringify(data).slice(0, 100)}...`,
         standaloneStatus: response.status,
         lastSuccessfulMethod: 'standalone function'
       }));
       
       // If successful, store the token and redirect
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         
         // Navigate to the admin panel
         const from = location.state?.from?.pathname || '/admin';
@@ -238,8 +246,8 @@ const LoginPage = () => {
         ...prev,
         standaloneTesting: false,
         standaloneResult: `Error: ${error.message}`,
-        standaloneStatus: error.response?.status || 'No response',
-        standaloneError: error.response?.data || error.message
+        standaloneStatus: 'Error',
+        standaloneError: error.message
       }));
     }
   };
@@ -249,11 +257,35 @@ const LoginPage = () => {
     setError('');
     setIsLoading(true);
 
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      setIsLoading(false);
+      return;
+    }
+
+    // Log the credentials for debugging
+    console.log('Login attempt with credentials:', { email, password: '***' });
+
     try {
-      // For development - log the login attempt
-      console.log(`Attempting login with email: ${email}`);
+      // Directly call the standalone login function instead of using the hook
+      const response = await axios.post('/.netlify/functions/login', {
+        email,
+        password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
-      await login(email, password);
+      console.log('Login successful:', response.data);
+      
+      // Store the token and user data
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Update auth context
+      setUser?.(user);
       
       // Navigate to the intended route or dashboard
       const from = location.state?.from?.pathname || '/admin';

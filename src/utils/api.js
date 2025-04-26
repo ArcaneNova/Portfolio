@@ -66,17 +66,45 @@ export const authAPI = {
   // Try the standalone login function first, then fall back to normal API route
   login: async (credentials) => {
     try {
-      console.log('Trying standalone login function first');
-      return await axios.post('/.netlify/functions/login', credentials, {
-        withCredentials: true,
+      // Ensure credentials has email and password
+      if (!credentials.email || !credentials.password) {
+        throw new Error('Email and password are required');
+      }
+      
+      console.log('Trying standalone login function with:', { 
+        email: credentials.email, 
+        password: credentials.password ? '***' : 'missing' 
+      });
+      
+      // Use fetch API directly for more control
+      const response = await fetch('/.netlify/functions/login', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password
+        })
       });
+      
+      const data = await response.json();
+      
+      // Convert to axios-like response for compatibility
+      return { 
+        data, 
+        status: response.status,
+        headers: Object.fromEntries([...response.headers.entries()])
+      };
     } catch (error) {
       console.log('Standalone login failed, trying regular API route');
       console.error('Standalone login error:', error.message);
-      return await API.post('/auth/login', credentials);
+      
+      // Fallback to regular API
+      return await API.post('/auth/login', {
+        email: credentials.email,
+        password: credentials.password
+      });
     }
   },
   logout: () => API.get('/auth/logout'),

@@ -73,6 +73,7 @@ export const AuthProvider = ({ children }) => {
   // Auth context value
   const value = {
     user,
+    setUser,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
     loading,

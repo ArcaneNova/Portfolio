@@ -37,6 +37,17 @@ export const handler = async (event, context) => {
   console.log('Event path:', event.path);
   console.log('HTTP method:', event.httpMethod);
   console.log('Headers:', JSON.stringify(event.headers));
+  console.log('Raw body type:', typeof event.body);
+  console.log('Raw body length:', event.body?.length);
+  console.log('Raw body preview:', event.body?.substring(0, 200));
+  console.log('isBase64Encoded:', event.isBase64Encoded);
+
+  // If the body is base64 encoded, decode it
+  let decodedBody = event.body;
+  if (event.isBase64Encoded) {
+    decodedBody = Buffer.from(event.body, 'base64').toString();
+    console.log('Decoded body preview:', decodedBody.substring(0, 200));
+  }
   
   try {
     // Parse request body
@@ -44,14 +55,14 @@ export const handler = async (event, context) => {
     
     try {
       // First try to parse as JSON
-      requestBody = JSON.parse(event.body);
+      requestBody = JSON.parse(decodedBody);
       console.log('Parsed request body:', requestBody);
     } catch (error) {
       console.error('Error parsing JSON body:', error);
       
       // If parsing fails, try to handle form data
       if (event.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
-        const params = new URLSearchParams(event.body);
+        const params = new URLSearchParams(decodedBody);
         requestBody = {
           email: params.get('email'),
           password: params.get('password')
@@ -81,8 +92,8 @@ export const handler = async (event, context) => {
           success: false,
           message: 'Please provide email and password',
           debug: {
-            bodyType: typeof event.body,
-            eventBodyLength: event.body?.length,
+            bodyType: typeof decodedBody,
+            eventBodyLength: decodedBody?.length,
             contentType: event.headers['content-type'],
             isBase64Encoded: event.isBase64Encoded
           }
