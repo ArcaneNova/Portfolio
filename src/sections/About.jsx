@@ -61,7 +61,7 @@ const achievementData = [
     image: "/achievements/hackathon.jpg"
   },
   {
-    title: "AIU Aveshan Winner",
+    title: "AIU Anveshan Winner",
     date: "2025",
     description: "Build a farmer, vendor and consumer platform to sell and buy products directly from farmers to vendors (thela wala) to consumers.",
     image: "/achievements/opensource.jpg"

@@ -1,0 +1,90 @@
+import axios from 'axios';
+
+// Create an axios instance
+const API = axios.create({
+  baseURL: '/api',
+  withCredentials: true,
+});
+
+// Add a request interceptor to include the token from localStorage
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Auth API
+export const authAPI = {
+  login: (credentials) => API.post('/auth/login', credentials),
+  logout: () => API.get('/auth/logout'),
+  getProfile: () => API.get('/auth/profile'),
+  register: (userData) => API.post('/auth/register', userData),
+};
+
+// Projects API
+export const projectsAPI = {
+  getAllProjects: (params) => API.get('/projects', { params }),
+  getProject: (id) => API.get(`/projects/${id}`),
+  createProject: (projectData) => API.post('/projects', projectData),
+  updateProject: (id, projectData) => API.put(`/projects/${id}`, projectData),
+  deleteProject: (id) => API.delete(`/projects/${id}`),
+  addProjectPost: (id, postData) => API.post(`/projects/${id}/posts`, postData),
+  updateProjectPost: (projectId, postId, postData) => API.put(`/projects/${projectId}/posts/${postId}`, postData),
+  deleteProjectPost: (projectId, postId) => API.delete(`/projects/${projectId}/posts/${postId}`),
+};
+
+// Blogs API
+export const blogsAPI = {
+  getAllBlogs: (params) => API.get('/blogs', { params }),
+  getBlog: (id) => API.get(`/blogs/${id}`),
+  createBlog: (blogData) => API.post('/blogs', blogData),
+  updateBlog: (id, blogData) => API.put(`/blogs/${id}`, blogData),
+  deleteBlog: (id) => API.delete(`/blogs/${id}`),
+};
+
+// Motivations API
+export const motivationsAPI = {
+  getAllMotivations: (params) => API.get('/motivations', { params }),
+  getMotivation: (id) => API.get(`/motivations/${id}`),
+  createMotivation: (motivationData) => API.post('/motivations', motivationData),
+  updateMotivation: (id, motivationData) => API.put(`/motivations/${id}`, motivationData),
+  deleteMotivation: (id) => API.delete(`/motivations/${id}`),
+};
+
+// Tasks API
+export const tasksAPI = {
+  getAllTasks: (params) => API.get('/tasks', { params }),
+  getTodaysTasks: () => API.get('/tasks/today'),
+  getTask: (id) => API.get(`/tasks/${id}`),
+  createTask: (taskData) => API.post('/tasks', taskData),
+  updateTask: (id, taskData) => API.put(`/tasks/${id}`, taskData),
+  deleteTask: (id) => API.delete(`/tasks/${id}`),
+  completeTask: (id) => API.patch(`/tasks/${id}/complete`),
+};
+
+// Build In Public API
+export const buildInPublicAPI = {
+  getAllPosts: (params) => API.get('/build-in-public', { params }),
+  getPost: (id) => API.get(`/build-in-public/${id}`),
+  createPost: (postData) => API.post('/build-in-public', postData),
+  updatePost: (id, postData) => API.put(`/build-in-public/${id}`, postData),
+  deletePost: (id) => API.delete(`/build-in-public/${id}`),
+};
+
+// Upload API
+export const uploadAPI = {
+  uploadImage: (formData) => API.post('/upload/image', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
+};
+
+export default API; 

@@ -1,39 +1,62 @@
-/**
- * A reusable CTA button component.
- * When clicked, it scrolls smoothly to the section with ID "counter",
- * with a small offset from the top for better visual placement.
- */
+import React from 'react';
+import { FaGithub, FaLinkedin, FaFileAlt } from 'react-icons/fa';
 
-const Button = ({ text, className, id }) => {
+/**
+ * A reusable button component with multiple style variants.
+ * Supports different types: filled, outlined, special
+ * Can include icons from FontAwesome
+ */
+const Button = ({ type = "filled", title, icon, link, className, id }) => {
+  // Get the right icon component
+  const getIcon = () => {
+    switch(icon) {
+      case 'github':
+        return <FaGithub className="h-5 w-5" />;
+      case 'linkedin':
+        return <FaLinkedin className="h-5 w-5" />;
+      case 'file':
+        return <FaFileAlt className="h-5 w-5" />;
+      default:
+        return null;
+    }
+  };
+  
+  // Get the appropriate class names based on button type
+  const getButtonClasses = () => {
+    switch(type) {
+      case 'filled':
+        return "bg-gradient-to-r from-cyan-500 to-blue-500 text-white";
+      case 'outlined':
+        return "border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10";
+      case 'special':
+        return "bg-gradient-to-r from-purple-500 to-pink-500 text-white";
+      default:
+        return "bg-blue-500 text-white";
+    }
+  };
+  
   return (
     <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-300 ${getButtonClasses()} ${className || ""}`}
       onClick={(e) => {
-        e.preventDefault(); // Stop the link from jumping instantly
-
-        const target = document.getElementById("counter"); // Find the section with ID "counter"
-
-        // Only scroll if we found the section and an ID is passed in
-        // taht prevents the contact button from scrolling to the top
-        if (target && id) {
-          const offset = window.innerHeight * 0.15; // Leave a bit of space at the top
-
-          // Calculate how far down the page we need to scroll
-          const top =
-            target.getBoundingClientRect().top + window.pageYOffset - offset;
-
-          // Scroll smoothly to that position
-          window.scrollTo({ top, behavior: "smooth" });
+        // If there's a section ID to scroll to, handle it
+        if (id) {
+          e.preventDefault();
+          const target = document.getElementById(id);
+          
+          if (target) {
+            const offset = window.innerHeight * 0.15;
+            const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({ top, behavior: "smooth" });
+          }
         }
       }}
-      className={`${className ?? ""} cta-wrapper`} // Add base + extra class names
     >
-      <div className="cta-button group">
-        <div className="bg-circle" />
-        <p className="text">{text}</p>
-        <div className="arrow-wrapper">
-          <img src="/images/arrow-down.svg" alt="arrow" />
-        </div>
-      </div>
+      {icon && getIcon()}
+      <span>{title}</span>
     </a>
   );
 };

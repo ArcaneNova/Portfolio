@@ -3,6 +3,8 @@
 
 :root {
   --gradient: radial-gradient(circle, #e5e5e5 0%, #fff 100%);
+  --tech-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  --glitch-ease: cubic-bezier(0.17, 0.67, 0.83, 0.67);
 }
 
 html,
@@ -13,10 +15,28 @@ body {
   color: white;
   scroll-behavior: smooth;
   font-family: "Mona Sans", sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure root element covers full page for backgrounds */
+#root {
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Ensure backgrounds are visible across the entire page */
+.fixed {
+  position: fixed !important;
 }
 
 section {
   width: 100dvw;
+  position: relative;
+  z-index: 1;
 }
 
 @theme {
@@ -1138,4 +1158,315 @@ section {
     opacity: 1;
     transform: scale(1.05);
   }
+}
+
+/* Technical overlay animations */
+@keyframes scan-slow {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes scan-reverse {
+  0% { transform: translateY(100vh); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(0); opacity: 0; }
+}
+
+.animate-scan-slow {
+  animation: scan-slow 15s linear infinite;
+}
+
+.animate-scan-reverse {
+  animation: scan-reverse 20s linear infinite;
+}
+
+.delay-1000 {
+  animation-delay: 1s;
+}
+
+/* Enhanced scan line effect */
+.scan-line {
+  animation: scanline 2s linear infinite;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(1000%);
+    opacity: 0;
+  }
+}
+
+/* Data point blink effect */
+.data-point {
+  animation: data-point-blink 3s ease infinite;
+}
+
+@keyframes data-point-blink {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Cyberpunk interface enhancements */
+.cyberpunk-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.cyberpunk-border::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.5), rgba(99, 102, 241, 0.5)) border-box;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) padding-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 3D Holographic effect for images */
+.hologram-effect {
+  position: relative;
+  isolation: isolate;
+}
+
+.hologram-effect::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgba(6, 182, 212, 0.1) 35%,
+    rgba(6, 182, 212, 0.2) 50%,
+    rgba(6, 182, 212, 0.1) 65%,
+    transparent 75%
+  );
+  animation: hologram-scan 3s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hologram-effect::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(6, 182, 212, 0.03) 0px,
+    rgba(6, 182, 212, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+}
+
+@keyframes hologram-scan {
+  0% {
+    transform: translateX(-100%) skewX(-10deg);
+  }
+  100% {
+    transform: translateX(100%) skewX(-10deg);
+  }
+}
+
+/* Neo-digital button effects */
+.neo-digital-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.neo-digital-btn::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  width: 0%;
+  left: 50%;
+  bottom: -2px;
+  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.8), transparent);
+  transition: all 0.5s ease;
+  transform: translateX(-50%);
+}
+
+.neo-digital-btn:hover::after {
+  width: 100%;
+}
+
+.neo-digital-btn:active {
+  transform: scale(0.97);
+}
+
+/* Advanced Glitch Effect */
+.advanced-glitch {
+  position: relative;
+}
+
+.advanced-glitch:hover {
+  animation: advanced-glitch-anim 0.2s linear;
+}
+
+@keyframes advanced-glitch-anim {
+  0% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+  20% {
+    transform: translate(-3px, 3px);
+    filter: hue-rotate(70deg) saturate(1.3);
+  }
+  40% {
+    transform: translate(-3px, -3px);
+    filter: hue-rotate(180deg) saturate(1.5);
+  }
+  60% {
+    transform: translate(3px, 3px);
+    filter: hue-rotate(240deg) saturate(1.2);
+  }
+  80% {
+    transform: translate(3px, -3px);
+    filter: hue-rotate(300deg) saturate(1.3);
+  }
+  100% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+}
+
+/* Technical background pattern */
+.tech-grid-bg {
+  background-image: 
+    linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Futuristic section divider */
+.section-divider {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent);
+}
+
+.section-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background-color: rgba(6, 182, 212, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+  .hologram-effect::before,
+  .hologram-effect::after {
+    opacity: 0.5; /* Reduce effect intensity on mobile */
+  }
+  
+  .section-divider {
+    opacity: 0.7; /* Make dividers more subtle on mobile */
+  }
+}
+
+.typing-effect {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.delay-600 {
+  animation-delay: 0.6s;
+}
+
+.delay-900 {
+  animation-delay: 0.9s;
+}
+
+.delay-1200 {
+  animation-delay: 1.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes floatDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(1000%); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
+}
+
+.animate-reverse-spin {
+  animation: reverseSpin 12s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes reverseSpin {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.animate-float-down {
+  animation: floatDown 20s linear infinite;
+}
+
+/* Technical overlay animations */
+@keyframes scan-slow {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes scan-reverse {
+  0% { transform: translateY(100vh); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(0); opacity: 0; }
 }

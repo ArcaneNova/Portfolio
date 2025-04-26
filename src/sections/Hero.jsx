@@ -1,10 +1,22 @@
 import React, { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
+import { useMediaQuery } from 'react-responsive';
 import TypewriterEffect from '../components/TypewriterEffect';
-import HolographicBackground from '../components/HolographicBackground';
 import CyberpunkInterface from '../components/CyberpunkInterface';
 import HologramButton from '../components/HologramButton';
 import { FaGithub, FaLinkedin, FaFileAlt } from 'react-icons/fa';
+import CircuitNetwork from '../components/CircuitNetwork';
+import Button from '../components/Button';
+import { SectionWrapper } from '../hoc/index.js';
+
+// Use a placeholder image URL instead of importing from assets
+const profileImage = "https://via.placeholder.com/400x400";
+
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
 
 const Hero = () => {
   const sectionRef = useRef(null);
@@ -12,6 +24,12 @@ const Hero = () => {
   const textContentRef = useRef(null);
   const buttonsRef = useRef(null);
   const scrollIndicatorRef = useRef(null);
+  const contentRef = useRef(null);
+  const textRef = useRef(null);
+  const imageContainerRef = useRef(null);
+  const profileImageRef = useRef(null);
+  const scanningLineRef = useRef(null);
+  const techCircleRef = useRef(null);
   
   useEffect(() => {
     // Animation timeline
@@ -57,15 +75,13 @@ const Hero = () => {
       className="relative min-h-screen w-full flex items-center justify-center overflow-hidden py-20 px-4 sm:px-6"
     >
       {/* Background */}
-      <div className="absolute inset-0 z-0">
-        <HolographicBackground />
-      </div>
+      <CircuitNetwork />
       
       {/* Hero Content Container */}
       <div className="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         
         {/* Left side - Text content */}
-        <div ref={textContentRef} className="flex flex-col space-y-6 text-center lg:text-left">
+        <div ref={contentRef} className="flex flex-col space-y-6 text-center lg:text-left">
           <h2 className="text-cyan-400 text-xl md:text-2xl font-mono tracking-wider animate-pulse">
             <CyberpunkInterface>INITIALIZING INTERFACE</CyberpunkInterface>
           </h2>
@@ -90,39 +106,36 @@ const Hero = () => {
           
           {/* Buttons */}
           <div ref={buttonsRef} className="flex flex-wrap gap-4 justify-center lg:justify-start mt-6">
-            <HologramButton 
-              variant="primary" 
-              icon={<FaGithub />} 
-              onClick={() => window.open('https://github.com/ArcaneNova', '_blank')}
-            >
-              GitHub
-            </HologramButton>
+            <Button 
+              type="filled" 
+              title="GitHub" 
+              icon="github"
+              link="https://github.com/ArcaneNova"
+            />
             
-            <HologramButton 
-              variant="secondary" 
-              icon={<FaLinkedin />} 
-              onClick={() => window.open('https://linkedin.com/in/mdarshadnoor', '_blank')}
-            >
-              LinkedIn
-            </HologramButton>
+            <Button 
+              type="outlined" 
+              title="LinkedIn" 
+              icon="linkedin"
+              link="https://linkedin.com/in/mdarshadnoor"
+            />
             
-            <HologramButton 
-              variant="danger" 
-              icon={<FaFileAlt />} 
-              onClick={() => window.open('/ats-resume.html', '_blank')}
-            >
-              Resume
-            </HologramButton>
+            <Button 
+              type="special" 
+              title="Resume" 
+              icon="file"
+              link="/ats-resume.html"
+            />
           </div>
         </div>
         
         {/* Right side - Profile Image with effects */}
-        <div ref={profileRef} className="flex justify-center items-center">
+        <div ref={imageContainerRef} className="flex justify-center items-center">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full blur-xl opacity-30 animate-pulse"></div>
             <div className="relative rounded-full border-4 border-cyan-500/50 overflow-hidden w-64 h-64 md:w-80 md:h-80">
               <img 
-                src="/profile.png" 
+                src={profileImage} 
                 alt="Profile" 
                 className="w-full h-full object-cover"
               />
@@ -155,10 +168,12 @@ const Hero = () => {
         ref={scrollIndicatorRef} 
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-cyan-400 flex flex-col items-center"
       >
-        <span className="text-sm font-mono mb-2">SCROLL DOWN</span>
-        <svg className="w-6 h-6 animate-blink" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
+        <div className="flex flex-col items-center">
+          <div className="text-white text-sm mb-2">Scroll Down</div>
+          <div className="w-5 h-10 border-2 border-white rounded-full flex items-start justify-center p-1">
+            <div className="w-1 h-2 bg-white rounded-full scroll-dot"></div>
+          </div>
+        </div>
       </div>
     </section>
   );
