@@ -2,9 +2,17 @@ import axios from 'axios';
 
 // Determine the base URL based on environment
 const isProduction = import.meta.env.PROD;
-const baseURL = isProduction 
-  ? import.meta.env.VITE_API_BASE_URL || '/api'
-  : 'http://localhost:8888/api';
+let baseURL;
+
+if (isProduction) {
+  // For production, use the current domain
+  baseURL = '/api';
+} else {
+  // For development, use localhost
+  baseURL = 'http://localhost:8888/api';
+}
+
+console.log('API BaseURL:', baseURL, 'Production mode:', isProduction);
 
 // Create an axios instance
 const API = axios.create({
@@ -30,6 +38,7 @@ API.interceptors.request.use(
 API.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', error.response?.status, error.response?.data);
     // Handle session expiration
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');

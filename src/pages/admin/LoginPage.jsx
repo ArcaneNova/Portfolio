@@ -1,13 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.jsx';
-import { FaUser, FaLock, FaExclamationCircle } from 'react-icons/fa';
+import { FaUser, FaLock, FaExclamationCircle, FaInfoCircle } from 'react-icons/fa';
+import axios from 'axios';
 
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [loginError, setLoginError] = useState('');
+  const [debugInfo, setDebugInfo] = useState(null);
+  const [showDebug, setShowDebug] = useState(false);
   const { login, logout, loading } = useAuth();
   const navigate = useNavigate();
+
+  // Check API connectivity on component mount
+  useEffect(() => {
+    const checkApi = async () => {
+      try {
+        const info = {
+          baseUrl: axios.defaults.baseURL || 'Not set globally',
+          production: import.meta.env.PROD ? 'Yes' : 'No',
+          apiEndpoint: '/api/health'
+        };
+        
+        // Try to ping the health endpoint
+        try {
+          const response = await axios.get('/api/health');
+          info.healthCheck = response.data;
+          info.status = 'Connected';
+        } catch (error) {
+          info.healthCheck = 'Failed';
+          info.status = 'Disconnected';
+          info.error = error.message;
+        }
+        
+        setDebugInfo(info);
+      } catch (err) {
+        setDebugInfo({ error: err.message });
+      }
+    };
+    
+    checkApi();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,7 +52,20 @@ const LoginPage = () => {
     setLoginError('');
     
     try {
+      // Set default credentials if development environment
+      if (!import.meta.env.PROD && credentials.email === 'demo' && credentials.password === 'demo') {
+        setCredentials({
+          email: 'admin@example.com',
+          password: 'password123'
+        });
+        // The login will be attempted with the updated credentials on the next render
+        return;
+      }
+      
+      console.log('Attempting login with:', credentials.email);
       const user = await login(credentials);
+      console.log('Login successful:', user);
+      
       if (user.role === 'admin') {
         navigate('/admin');
       } else {
@@ -27,7 +73,34 @@ const LoginPage = () => {
         await logout();
       }
     } catch (err) {
-      setLoginError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      console.error('Login error:', err);
+      let errorMessage = 'Login failed. Please check your credentials.';
+      
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        errorMessage = err.response.data?.message || 
+                       `Server error: ${err.response.status} ${err.response.statusText}`;
+        
+        setDebugInfo({
+          ...debugInfo,
+          errorResponse: {
+            status: err.response.status,
+            data: err.response.data,
+            headers: err.response.headers
+          }
+        });
+      } else if (err.request) {
+        // The request was made but no response was received
+        errorMessage = 'No response from server. Please check your connection.';
+        setDebugInfo({
+          ...debugInfo,
+          errorRequest: err.request
+        });
+      }
+      
+      setLoginError(errorMessage);
+      setShowDebug(true);
     }
   };
 
@@ -126,6 +199,41 @@ const LoginPage = () => {
               Return to homepage
             </a>
           </div>
+          
+          {/* Debug information toggle */}
+          <div className="mt-4 text-center">
+            <button 
+              onClick={() => setShowDebug(!showDebug)} 
+              className="text-xs text-blue-100/50 hover:text-cyan-400"
+            >
+              {showDebug ? 'Hide Debug Info' : 'Show Debug Info'}
+            </button>
+          </div>
+          
+          {/* Debug information */}
+          {showDebug && debugInfo && (
+            <div className="mt-4 p-3 bg-black-100/50 border border-blue-100/10 rounded-md text-xs">
+              <div className="flex items-center mb-2">
+                <FaInfoCircle className="mr-2 text-cyan-400" />
+                <span className="text-cyan-400 font-medium">Debug Information</span>
+              </div>
+              <div className="text-blue-100/70 font-mono overflow-x-auto">
+                <div>Environment: {import.meta.env.MODE}</div>
+                <div>Production: {import.meta.env.PROD ? 'Yes' : 'No'}</div>
+                <div>API Status: {debugInfo.status || 'Unknown'}</div>
+                <div>API Base URL: {debugInfo.baseUrl || 'Not available'}</div>
+                {debugInfo.errorResponse && (
+                  <div className="mt-2 text-red-400">
+                    <div>Error Status: {debugInfo.errorResponse.status}</div>
+                    <div>Error Data: {JSON.stringify(debugInfo.errorResponse.data)}</div>
+                  </div>
+                )}
+              </div>
+              <div className="mt-2 text-cyan-400/70 text-xs">
+                Default credentials: admin@example.com / password123
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
