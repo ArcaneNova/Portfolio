@@ -1,14 +1,15 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, lazy, Suspense } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from "../components/NavBar.jsx";
 import Footer from '../components/Footer';
-import CyberpunkInterface from '../components/CyberpunkInterface';
-import GlowEffect from '../components/GlowEffect';
-import HolographicBackground from '../components/HolographicBackground';
-import TechParticlesGrid from '../components/TechParticlesGrid';
+// Lazy load heavy components
+const CyberpunkInterface = lazy(() => import('../components/CyberpunkInterface'));
+const GlowEffect = lazy(() => import('../components/GlowEffect'));
+const HolographicBackground = lazy(() => import('../components/HolographicBackground'));
+const TechParticlesGrid = lazy(() => import('../components/TechParticlesGrid'));
 import { FaQuoteLeft, FaQuoteRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -325,7 +326,7 @@ const TimelineMarker = ({ year, color, active, onClick }) => (
     onClick={onClick}
   >
     <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${color} opacity-20 blur-sm`}></div>
-    <div className={`w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-black border-2 border-white/10 flex items-center justify-center
+    <div className={`w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-black border border-white/10 flex items-center justify-center
       ${active ? 'shadow-inner shadow-blue-500/50' : ''}`}>
       <div className={`text-xs sm:text-sm font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
         {year}
@@ -721,126 +722,141 @@ const QuoteSlider = () => {
 };
 
 const MyJourney = () => {
+  // Check for mobile performance optimization
+  const [isMobile, setIsMobile] = useState(false);
+  const [loadedSections, setLoadedSections] = useState({
+    hero: false,
+    timeline: false,
+    quotes: false,
+    skills: false
+  });
+  
+  // Refs and state from original component
   const [selectedJourney, setSelectedJourney] = useState(0);
-  const parallax = useParallax(0.02);
+  const parallax = useRef({ x: 0, y: 0 });
   const sectionRef = useRef(null);
   const statsRef = useRef(null);
   
-  // Add style for 3D card effect and responsiveness
+  // Optimize performance for mobile devices
   useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      .perspective-1000 { perspective: 1000px; }
-      .preserve-3d { transform-style: preserve-3d; }
-      .backface-hidden { backface-visibility: hidden; }
-      .rotateY-180 { transform: rotateY(180deg); }
-      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-      .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-      .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.5); border-radius: 2px; }
-      .hide-scrollbar::-webkit-scrollbar { display: none; }
-      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    `;
-    document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    // Lazy load sections as they become visible
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+    
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.id;
+          if (sectionId) {
+            setLoadedSections(prev => ({ ...prev, [sectionId]: true }));
+          }
+        }
+      });
+    }, observerOptions);
+    
+    // Observe main sections
+    document.querySelectorAll('section[id]').forEach(section => {
+      sectionObserver.observe(section);
+    });
+    
+    // Set up simpler parallax effect for mobile
+    const handleMouseMove = (e) => {
+      if (isMobile) return; // Skip parallax on mobile
+      
+      const x = (window.innerWidth / 2 - e.clientX) * 0.01;
+      const y = (window.innerHeight / 2 - e.clientY) * 0.01;
+      parallax.current = { x, y };
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('mousemove', handleMouseMove);
+      sectionObserver.disconnect();
+    };
   }, []);
 
   useGSAP(() => {
-    // Initial animations
+    // Use simpler animations for mobile
+    const duration = isMobile ? 0.8 : 1.2;
+    const staggerAmount = isMobile ? 0.1 : 0.2;
+    
+    // Initial hero animations - simplified for mobile
     gsap.fromTo(
       ".hero-title",
-      { opacity: 0, y: 30 },
+      { opacity: 0, y: 20 },
       { 
         opacity: 1, 
         y: 0, 
-        duration: 1.2,
-        ease: "power3.out",
+        duration: duration,
+        ease: "power2.out",
       }
     );
 
     gsap.fromTo(
       ".hero-subtitle",
-      { opacity: 0, y: 20 },
+      { opacity: 0, y: 15 },
       { 
         opacity: 1, 
         y: 0, 
-        duration: 1,
-        delay: 0.3,
+        duration: duration * 0.8,
+        delay: 0.2,
         ease: "power2.out",
       }
     );
-    
-    // Stats counter animation
-    gsap.fromTo(
-      ".stats-counter",
-      { opacity: 0, y: 20 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        stagger: 0.1,
-        duration: 0.8,
-        ease: "back.out(1.7)",
-        scrollTrigger: {
-          trigger: statsRef.current,
-          start: "top 80%",
-        }
-      }
-    );
-    
-    // Quote animation
-    gsap.fromTo(
-      ".quote-card",
-      { opacity: 0, scale: 0.9 },
-      { 
-        opacity: 1, 
-        scale: 1, 
-        duration: 1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ".quote-card",
-          start: "top 80%",
-        }
-      }
-    );
-  }, []);
+  }, [isMobile]);
 
   return (
     <div className="bg-black text-white min-h-screen overflow-hidden">
-      {/* Background Elements */}
+      {/* Background Elements - Lazy loaded with simpler version for mobile */}
       <div className="fixed inset-0 -z-10">
-        <HolographicBackground intensity={0.2} />
-        <ErrorBoundary>
-          <TechParticlesGrid count={50} />
-        </ErrorBoundary>
+        <Suspense fallback={<div className="bg-black"></div>}>
+          <HolographicBackground intensity={isMobile ? 0.1 : 0.2} />
+          {!isMobile && (
+            <TechParticlesGrid count={isMobile ? 20 : 50} />
+          )}
+        </Suspense>
       </div>
 
       {/* Navigation */}
       <Navbar />
 
       <main className="container mx-auto px-2 sm:px-4 py-12 relative">
-        {/* Hero Section */}
-        <section className="min-h-screen flex flex-col justify-center items-center py-20">
-          <motion.div 
+        {/* Hero Section - Always load */}
+        <section id="hero" className="min-h-[80vh] flex flex-col justify-center items-center py-16 md:py-20">
+          <div 
             className="max-w-5xl mx-auto text-center"
             style={{ 
-              x: parallax.x * -1, 
-              y: parallax.y * -1 
+              transform: !isMobile ? `translate(${parallax.current.x * -1}px, ${parallax.current.y * -1}px)` : 'none'
             }}
           >
-            <CyberpunkInterface 
-              title="PERSONAL ODYSSEY" 
-              subtitle="SYS.JOURNEY.LOG" 
-              className="mb-8"
-            />
+            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+              <CyberpunkInterface 
+                title="PERSONAL ODYSSEY" 
+                subtitle="SYS.JOURNEY.LOG" 
+                className="mb-8"
+                variant={isMobile ? "simple" : "detailed"}
+              />
+            </Suspense>
             
-        
-            
-            <h1 className="hero-title text-5xl md:text-7xl font-bold mb-6">
+            <h1 className="hero-title text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
               <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                 My Digital Evolution
               </span>
             </h1>
             
-            <p className="hero-subtitle text-xl md:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto">
+            <p className="hero-subtitle text-lg md:text-xl lg:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto">
               From a curious child with a dream to a software engineer building the future.
               This is my journey of growth, challenges, and constant evolution.
             </p>
@@ -851,306 +867,158 @@ const MyJourney = () => {
             >
               <a 
                 href="#journey"
-                className="inline-block px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/20 animate-pulse"
+                className="inline-block px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/20"
               >
                 Explore My Journey
               </a>
             </motion.div>
-          </motion.div>
+          </div>
           
-          {/* Scroll Indicator */}
+          {/* Simplified Scroll Indicator */}
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
             <span className="text-blue-400 text-sm mb-2">Scroll Down</span>
-            <motion.div 
-              animate={{ y: [0, 10, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="w-6 h-10 rounded-full border-2 border-blue-400 flex justify-center pt-1"
-            >
+            <div className="w-5 h-8 rounded-full border border-blue-400 flex justify-center pt-1">
               <motion.div 
-                animate={{ y: [0, 12, 0] }}
+                animate={{ y: [0, 8, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
-                className="w-1.5 h-3 bg-blue-400 rounded-full opacity-75"
-              />
-            </motion.div>
-          </div>
-        </section>
-        
-        {/* Quote Section - Make more responsive */}
-        <section className="mb-20 md:mb-32">
-          <div className="quote-card max-w-4xl mx-auto">
-            <GlowEffect color="blue" intensity="high">
-              <div className="bg-black-300/30 backdrop-blur-md p-6 md:p-10 rounded-2xl border border-blue-500/20">
-                <div className="text-4xl md:text-6xl text-blue-500/30 font-serif mb-4">"</div>
-                <blockquote className="text-xl md:text-3xl italic font-light text-center mb-6 text-blue-50">
-                You got a dream, you gotta protect it. People can't do something themselves, they wanna tell you you can't do it.
-                </blockquote>
-                <div className="text-center">
-                  <span className="inline-block px-4 py-2 rounded-full bg-blue-900/40 text-blue-300 font-semibold text-sm md:text-base">
-                  The Pursuit of Happyness
-                  </span>
-                </div>
-              </div>
-            </GlowEffect>
-          </div>
-        </section>
-        
-        {/* NEW: Sliding Quotes Section */}
-        <section className="mb-20 md:mb-32">
-          <CyberpunkInterface 
-            title="INSPIRATIONAL_QUOTES" 
-            subtitle="WISDOM.DATABASE" 
-            className="mb-8 md:mb-12"
-          />
-          
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-              Words That Ignite Greatness
-            </h2>
-            
-            <p className="text-center text-gray-300 mb-12 max-w-3xl mx-auto text-sm md:text-base">
-              A collection of powerful quotes that have inspired entrepreneurs, visionaries, and changemakers throughout history. Swipe through for wisdom that might spark your next big idea.
-            </p>
-            
-            {/* Quote Slider Component */}
-            <QuoteSlider />
-          </div>
-        </section>
-        
-        {/* Stats Section - Improve mobile layout */}
-        <section ref={statsRef} className="mb-20 md:mb-32">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-              Journey in Numbers
-            </h2>
-            
-            <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
-              <div className="stats-counter">
-                <StatCounter value="11" label="Years of Tech Journey" />
-              </div>
-              <div className="stats-counter">
-                <StatCounter value="300" label="Blog Articles Written" />
-              </div>
-              <div className="stats-counter">
-                <StatCounter value="100000" label="Website Visitors" />
-              </div>
-              <div className="stats-counter">
-                <StatCounter value="8" label="Tech Skills Mastered" />
-              </div>
-            </div>
-          </div>
-        </section>
-      
-        {/* Interactive Journey Section - Fix mobile view */}
-        <section id="journey" className="mb-20 md:mb-32">
-          <CyberpunkInterface 
-            title="TIMELINE" 
-            subtitle="EXPERIENCE.LOG" 
-            className="mb-8 md:mb-12"
-          />
-          
-          <div className="max-w-6xl mx-auto">
-            {/* Timeline Navigation */}
-            <div className="px-0 md:px-6">
-              <InteractiveTimeline 
-                data={journeyData} 
-                onSelect={setSelectedJourney} 
+                className="w-1 h-2 bg-blue-400 rounded-full opacity-75"
               />
             </div>
-            
-            {/* Journey Content */}
-            <div className="mt-8 md:mt-16 px-2">
-              <AnimatePresence mode="wait">
-                {journeyData.map((entry, index) => (
-                  <Journey3DCard 
-                    key={entry.year}
-                    entry={entry}
-                    index={index}
-                    isActive={selectedJourney === index}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
-            
-            {/* Navigation Arrows - Improve mobile placement */}
-            <div className="flex justify-between mt-6 md:mt-8 px-2 md:px-8">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400 hover:bg-blue-800/50 transition-colors"
-                onClick={() => setSelectedJourney(prev => (prev === 0 ? journeyData.length - 1 : prev - 1))}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </motion.button>
-              
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400 hover:bg-blue-800/50 transition-colors"
-                onClick={() => setSelectedJourney(prev => (prev === journeyData.length - 1 ? 0 : prev + 1))}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </motion.button>
-            </div>
           </div>
         </section>
         
-        {/* Skills Section - Better mobile layout */}
-        <section className="mb-20 md:mb-32 px-2">
-          <CyberpunkInterface 
-            title="SKILL MATRIX" 
-            subtitle="ABILITY.DATA" 
-            className="mb-8 md:mb-12"
-          />
-          
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6 md:gap-y-2">
-              {skills.map((skill, index) => (
-                <SkillBar 
-                  key={skill.name}
-                  name={skill.name}
-                  level={skill.level}
-                  color={skill.color}
-                  index={index}
+        {/* Load only when visible */}
+        {loadedSections.journey && (
+          <>
+            {/* Interactive Journey Section */}
+            <section id="journey" className="mb-16 md:mb-24">
+              <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+                <CyberpunkInterface 
+                  title="TIMELINE" 
+                  subtitle="EXPERIENCE.LOG" 
+                  className="mb-8"
+                  variant={isMobile ? "simple" : "detailed"}
                 />
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        {/* Lessons Learned Section - Mobile friendly */}
-        <section className="mb-20 md:mb-32 px-2">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
-            Key Lessons From My Journey
-          </h2>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
-            <GlowEffect color="purple" intensity="low">
-              <div className="h-full bg-black-200/50 backdrop-blur-sm p-5 md:p-6 rounded-xl border border-purple-600/20">
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 mb-4 md:mb-6 flex items-center justify-center text-xl md:text-2xl">
-                  🔄
-                </div>
-                <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">Consistency is Key</h3>
-                <p className="text-gray-300 text-sm md:text-base">
-                  Working consistently for two years led to my first payment. Progress compounds over time. Stay persistent even when results aren't immediate.
-                </p>
-              </div>
-            </GlowEffect>
-            
-            <GlowEffect color="blue" intensity="low">
-              <div className="h-full bg-black-200/50 backdrop-blur-sm p-5 md:p-6 rounded-xl border border-blue-600/20">
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-4 md:mb-6 flex items-center justify-center text-xl md:text-2xl">
-                  💡
-                </div>
-                <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">Balance Education & Skills</h3>
-                <p className="text-gray-300 text-sm md:text-base">
-                  I didn't give up on education despite earning well from my websites. The foundation of formal education combined with practical skills is powerful.
-                </p>
-              </div>
-            </GlowEffect>
-            
-            <GlowEffect color="pink" intensity="low">
-              <div className="h-full bg-black-200/50 backdrop-blur-sm p-5 md:p-6 rounded-xl border border-pink-600/20">
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-pink-600 to-red-600 mb-4 md:mb-6 flex items-center justify-center text-xl md:text-2xl">
-                  🚀
-                </div>
-                <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">Embrace Failure</h3>
-                <p className="text-gray-300 text-sm md:text-base">
-                  My startup attempt didn't succeed, but I gained invaluable experience. Failure is a stepping stone to success, not the end of the journey.
-                </p>
-              </div>
-            </GlowEffect>
-          </div>
-        </section>
-        
-        {/* Call to Action - Improve mobile layout */}
-        <section className="mb-16 md:mb-20 px-2">
-          <div className="max-w-4xl mx-auto">
-            <GlowEffect color="blue" intensity="medium">
-              <div className="bg-black-300/70 p-6 md:p-10 rounded-2xl border border-blue-600/30 backdrop-blur-md relative overflow-hidden">
-                {/* Decorative elements */}
-                <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-blue-600/10 blur-2xl"></div>
-                <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-purple-600/10 blur-xl"></div>
+              </Suspense>
+              
+              <div className="max-w-6xl mx-auto mt-8 md:mt-12">
+                {/* Render simplified timeline for better performance */}
+                {isMobile ? (
+                  <div className="px-2">
+                    <h3 className="text-xl md:text-2xl font-bold mb-4 text-center text-white">
+                      My Journey <span className="text-blue-100">Timeline</span>
+                    </h3>
+                    <div className="flex overflow-x-auto pb-4 hide-scrollbar">
+                      {journeyData.map((entry, index) => (
+                        <div 
+                          key={entry.year}
+                          className={`cursor-pointer min-w-[80px] text-center mx-2 p-2 rounded-lg ${selectedJourney === index ? 'bg-blue-900/50 border border-blue-500' : 'bg-black-300/50'}`}
+                          onClick={() => setSelectedJourney(index)}
+                        >
+                          <div className={`text-sm font-bold bg-gradient-to-r ${entry.color} bg-clip-text text-transparent`}>
+                            {entry.year}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  // Full timeline for desktop
+                  <InteractiveTimeline 
+                    data={journeyData} 
+                    onSelect={setSelectedJourney} 
+                  />
+                )}
                 
-                <div className="relative">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                    What's Next on My Journey?
-                  </h2>
+                {/* Journey Content - Show only selected item */}
+                <div className="mt-6 md:mt-10 px-2">
+                  <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+                    <Journey3DCard 
+                      entry={journeyData[selectedJourney]}
+                      index={selectedJourney}
+                      isActive={true}
+                    />
+                  </Suspense>
+                </div>
+                
+                {/* Simple Navigation Arrows */}
+                <div className="flex justify-between mt-6 px-2">
+                  <button
+                    className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400"
+                    onClick={() => setSelectedJourney(prev => (prev === 0 ? journeyData.length - 1 : prev - 1))}
+                  >
+                    <FaChevronLeft />
+                  </button>
                   
-                  <div className="text-blue-50 mb-6 md:mb-8 space-y-3 md:space-y-4 text-sm md:text-base">
-                    <p>
-                      I'm continuously learning DSA to build stronger programming foundations. Working on innovative ideas while
-                      preparing for dream opportunities. The journey continues.
-                    </p>
-                    
-                    <p>
-                      Feeling so grateful for having such supportive people in my life and those who love me unexpectedly. 
-                      I'm not surrounded by many people, but those who are in my life are the best—they've supported me through all my ups and downs.
-                    </p>
-                    
-                    <p>
-                      Thank you for reading this far. If you're working on any idea and need a partner, feel free to connect. 
-                      I would love to work on great ideas together.
-                    </p>
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <motion.a
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      href="#contact"
-                      className="inline-block px-6 md:px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/20 w-full sm:w-auto text-center text-sm md:text-base"
-                    >
-                      Get in Touch
-                    </motion.a>
-                    
-                    <motion.a
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      href="#projects"
-                      className="inline-block px-6 md:px-8 py-3 bg-transparent border-2 border-blue-600/50 text-blue-400 font-bold rounded-full hover:bg-blue-900/20 transition-all duration-300 w-full sm:w-auto text-center text-sm md:text-base"
-                    >
-                      See My Projects
-                    </motion.a>
-                  </div>
+                  <button
+                    className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400"
+                    onClick={() => setSelectedJourney(prev => (prev === journeyData.length - 1 ? 0 : prev + 1))}
+                  >
+                    <FaChevronRight />
+                  </button>
                 </div>
               </div>
-            </GlowEffect>
+            </section>
+          </>
+        )}
+        
+        {/* Call to Action - Always load (simplified) */}
+        <section className="mb-16">
+          <div className="max-w-4xl mx-auto px-2">
+            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+              <GlowEffect color="blue" intensity="low">
+                <div className="bg-black-300/70 p-5 md:p-8 rounded-xl border border-blue-600/30 backdrop-blur-sm relative overflow-hidden">
+                  <div className="relative">
+                    <h2 className="text-xl md:text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+                      Thank You For Exploring My Journey
+                    </h2>
+                    
+                    <div className="text-blue-50 mb-5 space-y-3 text-sm md:text-base">
+                      <p>
+                        If you're working on any idea and need a partner, feel free to connect. 
+                        I would love to collaborate on great ideas.
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                      <a
+                        href="#contact"
+                        className="inline-block px-5 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 w-full sm:w-auto text-center text-sm md:text-base"
+                      >
+                        Get in Touch
+                      </a>
+                      
+                      <a
+                        href="#projects"
+                        className="inline-block px-5 py-2 md:px-6 md:py-3 bg-transparent border border-blue-600/50 text-blue-400 font-bold rounded-full hover:bg-blue-900/20 transition-all duration-300 w-full sm:w-auto text-center text-sm md:text-base"
+                      >
+                        See My Projects
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </GlowEffect>
+            </Suspense>
           </div>
         </section>
       </main>
 
       <Footer />
       
-      {/* Custom CSS for 3D Perspective Effects */}
+      {/* Custom CSS for performance optimization */}
       <style jsx global>{`
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-        .preserve-3d {
-          transform-style: preserve-3d;
-        }
-        .backface-hidden {
-          backface-visibility: hidden;
-        }
-        .rotateY-180 {
-          transform: rotateY(180deg);
-        }
-        .line-clamp-6 {
-          display: -webkit-box;
-          -webkit-line-clamp: 6;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
         }
         .hide-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        
+        @media (max-width: 768px) {
+          .animation-delay-1000, .animation-delay-2000 {
+            animation-delay: 0s !important;
+          }
         }
       `}</style>
     </div>

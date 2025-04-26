@@ -263,7 +263,7 @@ const Footer = () => {
                 </div>
                 <div>
                   <p className="text-white text-sm">Location</p>
-                  <p className="text-cyan-100/70">Maharashtra, India</p>
+                  <p className="text-cyan-100/70">Jalandhar, Punjab, India</p>
                 </div>
               </div>
               
