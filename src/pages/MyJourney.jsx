@@ -3,12 +3,13 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from '../components/Navbar';
+import Navbar from "../components/NavBar.jsx";
 import Footer from '../components/Footer';
 import CyberpunkInterface from '../components/CyberpunkInterface';
 import GlowEffect from '../components/GlowEffect';
 import HolographicBackground from '../components/HolographicBackground';
 import TechParticlesGrid from '../components/TechParticlesGrid';
+import { FaQuoteLeft, FaQuoteRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -125,6 +126,167 @@ const skills = [
   { name: 'DSA', level: 75, color: 'from-yellow-500 to-green-600' },
   { name: 'DevOps', level: 65, color: 'from-green-500 to-teal-600' }
 ];
+
+// Inspirational quotes data
+const inspirationalQuotes = [
+  {
+    quote: "Your time is limited, so don't waste it living someone else's life.",
+    author: "Steve Jobs",
+    source: "Stanford Commencement Address",
+    color: "from-blue-400 to-purple-600"
+  },
+  {
+    quote: "The way to get started is to quit talking and begin doing.",
+    author: "Walt Disney",
+    source: "Entrepreneur",
+    color: "from-indigo-500 to-blue-600"
+  },
+  {
+    quote: "It's not about ideas. It's about making ideas happen.",
+    author: "Scott Belsky",
+    source: "Founder of Behance",
+    color: "from-purple-500 to-pink-600"
+  },
+  {
+    quote: "The only limit to our realization of tomorrow will be our doubts of today.",
+    author: "Franklin D. Roosevelt",
+    source: "U.S. President",
+    color: "from-green-500 to-blue-600"
+  },
+  {
+    quote: "The best way to predict the future is to create it.",
+    author: "Peter Drucker",
+    source: "Management Consultant",
+    color: "from-orange-500 to-red-600"
+  },
+  {
+    quote: "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+    author: "Nelson Mandela",
+    source: "Former President of South Africa",
+    color: "from-yellow-500 to-orange-600"
+  },
+  {
+    quote: "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+    author: "Winston Churchill",
+    source: "Former British Prime Minister",
+    color: "from-red-500 to-pink-600"
+  },
+  {
+    quote: "I have not failed. I've just found 10,000 ways that won't work.",
+    author: "Thomas Edison",
+    source: "Inventor",
+    color: "from-green-500 to-teal-600"
+  },
+  {
+    quote: "Life is what happens when you're busy making other plans.",
+    author: "John Lennon",
+    source: "Musician",
+    color: "from-blue-500 to-indigo-600"
+  },
+  {
+    quote: "You miss 100% of the shots you don't take.",
+    author: "Wayne Gretzky",
+    source: "Hockey Player",
+    color: "from-purple-500 to-violet-600"
+  },
+  {
+    quote: "I didn't fail the test. I just found 100 ways to do it wrong.",
+    author: "Benjamin Franklin",
+    source: "Founding Father",
+    color: "from-teal-500 to-green-600"
+  },
+  {
+    quote: "The future belongs to those who believe in the beauty of their dreams.",
+    author: "Eleanor Roosevelt",
+    source: "Former First Lady",
+    color: "from-pink-500 to-purple-600"
+  },
+  {
+    quote: "If you're going through hell, keep going.",
+    author: "Winston Churchill",
+    source: "Former British Prime Minister",
+    color: "from-red-600 to-orange-600"
+  },
+  {
+    quote: "The harder I work, the luckier I get.",
+    author: "Gary Player",
+    source: "Professional Golfer",
+    color: "from-indigo-600 to-blue-600"
+  },
+  {
+    quote: "It does not matter how slowly you go as long as you do not stop.",
+    author: "Confucius",
+    source: "Philosopher",
+    color: "from-green-600 to-teal-600"
+  }
+];
+
+// Movie quotes data
+const movieQuotes = [
+  {
+    quote: "You got a dream, you gotta protect it. People can't do something themselves, they wanna tell you you can't do it.",
+    author: "Chris Gardner (Will Smith)",
+    source: "The Pursuit of Happyness",
+    color: "from-blue-500 to-indigo-600"
+  },
+  {
+    quote: "Oh yes, the past can hurt. But you can either run from it, or learn from it.",
+    author: "Rafiki",
+    source: "The Lion King",
+    color: "from-orange-500 to-red-600"
+  },
+  {
+    quote: "Don't ever let somebody tell you you can't do something. Not even me. You got a dream, you gotta protect it.",
+    author: "Chris Gardner (Will Smith)",
+    source: "The Pursuit of Happyness",
+    color: "from-blue-600 to-purple-600"
+  },
+  {
+    quote: "Life moves pretty fast. If you don't stop and look around once in a while, you could miss it.",
+    author: "Ferris Bueller",
+    source: "Ferris Bueller's Day Off",
+    color: "from-green-500 to-teal-600"
+  },
+  {
+    quote: "The only thing standing between you and your goal is the story you keep telling yourself as to why you can't achieve it.",
+    author: "Jordan Belfort (Leonardo DiCaprio)",
+    source: "The Wolf of Wall Street",
+    color: "from-red-500 to-pink-600"
+  },
+  {
+    quote: "Sometimes it is the people no one can imagine anything of who do the things no one can imagine.",
+    author: "Alan Turing (Benedict Cumberbatch)",
+    source: "The Imitation Game",
+    color: "from-indigo-500 to-blue-600"
+  },
+  {
+    quote: "I'm not interested in money. I just want to be wonderful.",
+    author: "Marilyn Monroe",
+    source: "My Week with Marilyn",
+    color: "from-pink-500 to-purple-600"
+  },
+  {
+    quote: "I don't want to survive. I want to live.",
+    author: "Solomon Northup (Chiwetel Ejiofor)",
+    source: "12 Years a Slave",
+    color: "from-yellow-600 to-orange-600"
+  },
+  {
+    quote: "Nobody is gonna hit as hard as life. But it ain't about how hard you hit. It's about how hard you can get hit and keep moving forward.",
+    author: "Rocky Balboa (Sylvester Stallone)",
+    source: "Rocky Balboa",
+    color: "from-red-600 to-orange-600"
+  },
+  {
+    quote: "Great men are not born great, they grow great.",
+    author: "Mario Puzo",
+    source: "The Godfather",
+    color: "from-gray-600 to-gray-800"
+  }
+];
+
+// Combine all quotes
+const allQuotes = [...inspirationalQuotes, ...movieQuotes];
 
 // Create a simple ErrorBoundary component
 class ErrorBoundary extends React.Component {
@@ -405,6 +567,157 @@ const StatCounter = ({ value, label, duration = 2 }) => {
   );
 };
 
+// Sliding Quote Component
+const QuoteSlider = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(null);
+  const quoteRef = useRef(null);
+  const intervalRef = useRef(null);
+  
+  // Go to next quote
+  const nextQuote = () => {
+    setDirection('next');
+    setCurrentIndex(prevIndex => 
+      prevIndex === allQuotes.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+  
+  // Go to previous quote
+  const prevQuote = () => {
+    setDirection('prev');
+    setCurrentIndex(prevIndex => 
+      prevIndex === 0 ? allQuotes.length - 1 : prevIndex - 1
+    );
+  };
+  
+  // Auto rotate quotes
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      nextQuote();
+    }, 8000);
+    
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [currentIndex]);
+  
+  // Reset timer when manually navigating
+  const handleManualNav = (callback) => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    callback();
+    intervalRef.current = setInterval(() => {
+      nextQuote();
+    }, 8000);
+  };
+  
+  // Animation variants for framer motion
+  const variants = {
+    enter: (direction) => ({
+      x: direction === 'next' ? 500 : -500,
+      opacity: 0
+    }),
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction) => ({
+      x: direction === 'next' ? -500 : 500,
+      opacity: 0
+    })
+  };
+  
+  return (
+    <div className="relative max-w-4xl mx-auto">
+      <div className="relative overflow-hidden py-12">
+        <AnimatePresence custom={direction} mode="wait">
+          <motion.div
+            key={currentIndex}
+            ref={quoteRef}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "spring", stiffness: 300, damping: 30 },
+              opacity: { duration: 0.4 }
+            }}
+            className="flex flex-col items-center"
+          >
+            <GlowEffect color="blue" intensity="medium">
+              <div className={`relative bg-black-300/50 backdrop-blur-md p-8 rounded-2xl border border-${allQuotes[currentIndex].color.split(' ')[0].replace('from-', '')}-500/30 overflow-hidden`}>
+                <div className="absolute -top-10 -left-10 text-7xl opacity-10">
+                  <FaQuoteLeft />
+                </div>
+                <div className="absolute -bottom-10 -right-10 text-7xl opacity-10">
+                  <FaQuoteRight />
+                </div>
+                
+                <div className="relative z-10">
+                  <blockquote className="text-xl md:text-2xl text-center font-light mb-6 text-blue-50">
+                    "{allQuotes[currentIndex].quote}"
+                  </blockquote>
+                  
+                  <div className="text-center">
+                    <h3 className={`text-lg md:text-xl font-semibold bg-gradient-to-r ${allQuotes[currentIndex].color} bg-clip-text text-transparent mb-1`}>
+                      {allQuotes[currentIndex].author}
+                    </h3>
+                    <p className="text-gray-400 text-sm">
+                      {allQuotes[currentIndex].source}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </GlowEffect>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      
+      {/* Navigation buttons */}
+      <div className="absolute inset-y-0 left-0 flex items-center">
+        <button
+          onClick={() => handleManualNav(prevQuote)}
+          className="bg-black/50 backdrop-blur-sm text-white rounded-full p-2 transform -translate-x-1/2 hover:bg-black/70 transition-colors focus:outline-none"
+        >
+          <FaChevronLeft className="w-5 h-5" />
+        </button>
+      </div>
+      
+      <div className="absolute inset-y-0 right-0 flex items-center">
+        <button
+          onClick={() => handleManualNav(nextQuote)}
+          className="bg-black/50 backdrop-blur-sm text-white rounded-full p-2 transform translate-x-1/2 hover:bg-black/70 transition-colors focus:outline-none"
+        >
+          <FaChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+      
+      {/* Progress indicators */}
+      <div className="mt-4 flex justify-center gap-2">
+        {allQuotes.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => {
+              setDirection(index > currentIndex ? 'next' : 'prev');
+              setCurrentIndex(index);
+            }}
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              index === currentIndex 
+                ? 'bg-blue-500 w-5' 
+                : 'bg-gray-600 hover:bg-gray-500'
+            }`}
+            aria-label={`Go to quote ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const MyJourney = () => {
   const [selectedJourney, setSelectedJourney] = useState(0);
   const parallax = useParallax(0.02);
@@ -574,6 +887,28 @@ const MyJourney = () => {
                 </div>
               </div>
             </GlowEffect>
+          </div>
+        </section>
+        
+        {/* NEW: Sliding Quotes Section */}
+        <section className="mb-20 md:mb-32">
+          <CyberpunkInterface 
+            title="INSPIRATIONAL_QUOTES" 
+            subtitle="WISDOM.DATABASE" 
+            className="mb-8 md:mb-12"
+          />
+          
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+              Words That Ignite Greatness
+            </h2>
+            
+            <p className="text-center text-gray-300 mb-12 max-w-3xl mx-auto text-sm md:text-base">
+              A collection of powerful quotes that have inspired entrepreneurs, visionaries, and changemakers throughout history. Swipe through for wisdom that might spark your next big idea.
+            </p>
+            
+            {/* Quote Slider Component */}
+            <QuoteSlider />
           </div>
         </section>
         

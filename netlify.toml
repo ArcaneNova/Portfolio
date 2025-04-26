@@ -46,12 +46,6 @@
   status = 200
   force = true
 
-[[redirects]]
-  from = "/.netlify/functions/auth/login"
-  to = "/.netlify/functions/auth"
-  status = 200
-  force = true
-
 # Health check through index function
 [[redirects]]
   from = "/api/health"

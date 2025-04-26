@@ -180,7 +180,7 @@ const About = () => {
             <GlowEffect color="blue-100" intensity="high" className="rounded-full">
               <div className="relative w-48 h-48 rounded-full overflow-hidden border-2 border-blue-100/30">
                 <img 
-                  src="/profile.png" 
+                  src="/mdarshadnoor.png" 
                   alt="Profile" 
                   className="w-full h-full object-cover"
                 />
