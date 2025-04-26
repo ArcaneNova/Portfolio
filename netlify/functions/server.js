@@ -22,7 +22,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: '*', // Allow all origins in serverless function
+  origin: process.env.CLIENT_URL || 'https://arshadnoor.me',
   credentials: true
 }));
 app.use(express.json({ limit: '30mb' }));

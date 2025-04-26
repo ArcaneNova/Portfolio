@@ -1,8 +1,12 @@
 import axios from 'axios';
 
+// Determine the base URL based on environment
+const isProduction = import.meta.env.PROD;
+const baseURL = isProduction ? '/api' : 'http://localhost:5000/api';
+
 // Create an axios instance
 const API = axios.create({
-  baseURL: '/api',
+  baseURL,
   withCredentials: true,
 });
 
@@ -16,6 +20,20 @@ API.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor to handle authentication errors
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle session expiration
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/admin/login';
+    }
     return Promise.reject(error);
   }
 );

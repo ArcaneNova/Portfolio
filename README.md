@@ -168,6 +168,15 @@ This project is configured for easy deployment to Netlify, with integrated backe
    - Publish directory: `dist`
    - Functions directory: `netlify/functions`
 
+### Custom Domain Setup
+1. In Netlify dashboard, go to Site settings > Domain management
+2. Add your custom domain (e.g., `arshadnoor.me`)
+3. Configure your DNS settings according to Netlify's instructions
+4. Set up HTTPS with Netlify's free SSL certificate
+5. Update the `CLIENT_URL` environment variable to match your custom domain
+
+> **Note**: When using a custom domain with Netlify, no port is required. Your API will be accessible at `https://yourdomain.com/api/...`
+
 ## 📁 Project Structure
 
 ```
