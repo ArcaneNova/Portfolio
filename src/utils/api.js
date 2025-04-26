@@ -1,9 +1,13 @@
 import axios from 'axios';
 
+// Get the base URL from environment variables or use default
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 // Create an axios instance
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: BASE_URL,
   withCredentials: true,
+  timeout: 15000 // Increase timeout for Netlify functions
 });
 
 // Add a request interceptor to include the token from localStorage
@@ -29,6 +33,24 @@ API.interceptors.response.use(
   },
   (error) => {
     console.error('API Error:', error.response?.status, error.response?.data, error.config?.url);
+    
+    // For debugging Netlify deployments
+    console.error('Full error details:', {
+      message: error.message,
+      code: error.code,
+      config: {
+        url: error.config?.url,
+        baseURL: error.config?.baseURL,
+        method: error.config?.method,
+        headers: error.config?.headers
+      },
+      response: error.response ? {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers
+      } : 'No response'
+    });
+    
     // Handle session expiration
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
@@ -43,7 +65,7 @@ API.interceptors.response.use(
 export const authAPI = {
   login: (credentials) => API.post('/auth/login', credentials),
   logout: () => API.get('/auth/logout'),
-  getProfile: () => API.get('/auth/profile'),
+  getProfile: () => API.get('/auth/me'),
   register: (userData) => API.post('/auth/register', userData),
 };
 

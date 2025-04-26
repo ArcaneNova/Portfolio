@@ -28,22 +28,34 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
+  origin: '*', // Allow all origins during troubleshooting
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
-app.use(express.json());
-app.use(cookieParser());
 
-// Log request for debugging
+// Add CORS preflight handler
+app.options('*', cors());
+
+// Log all requests including headers
 app.use((req, res, next) => {
   console.log(`AUTH FUNCTION: ${req.method} ${req.path}`);
-  console.log('Request Body:', JSON.stringify(req.body));
+  console.log('Request Headers:', JSON.stringify(req.headers));
+  console.log('Request Body:', req.method !== 'GET' ? JSON.stringify(req.body) : '[GET request]');
+  console.log('Cookies:', JSON.stringify(req.cookies));
   console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set (hidden)' : 'Not set');
   console.log('JWT Secret:', process.env.JWT_SECRET ? 'Set (hidden)' : 'Not set');
+  
+  // Add CORS headers to every response
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS,PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+  
   next();
 });
+
+app.use(express.json());
+app.use(cookieParser());
 
 // Define auth routes directly
 const router = express.Router();

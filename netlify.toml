@@ -6,10 +6,23 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# Special case for the specific login endpoint with direct route
+# Debug redirects header for troubleshooting
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Netlify-Debug = "true"
+
+# Special case for the login endpoint
 [[redirects]]
   from = "/api/auth/login"
   to = "/.netlify/functions/auth/login"
+  status = 200
+  force = true
+
+# Special case for the me endpoint
+[[redirects]]
+  from = "/api/auth/me"
+  to = "/.netlify/functions/auth/me"
   status = 200
   force = true
 

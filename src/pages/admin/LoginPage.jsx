@@ -44,6 +44,41 @@ const LoginPage = () => {
     checkApiConnection();
   }, []);
 
+  const testDirectApiCall = async () => {
+    setDebugInfo(prev => ({
+      ...prev,
+      testing: true,
+      directApiResult: 'Testing...'
+    }));
+    
+    try {
+      // Test direct call to Netlify function
+      const response = await axios.post('/.netlify/functions/auth/login', { 
+        email, 
+        password 
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      setDebugInfo(prev => ({
+        ...prev,
+        testing: false,
+        directApiResult: `Success: ${JSON.stringify(response.data).slice(0, 100)}...`,
+        directApiStatus: response.status
+      }));
+    } catch (error) {
+      setDebugInfo(prev => ({
+        ...prev,
+        testing: false,
+        directApiResult: `Error: ${error.message}`,
+        directApiStatus: error.response?.status || 'No response',
+        directApiError: error.response?.data || error.message
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -254,6 +289,32 @@ const LoginPage = () => {
                   <li>The API is correctly deployed on Netlify</li>
                   <li>Your network connection is stable</li>
                 </ul>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                <h3 className="font-semibold mb-2">Debug Actions</h3>
+                
+                <div className="space-y-2">
+                  <button
+                    onClick={testDirectApiCall}
+                    disabled={debugInfo.testing}
+                    className="px-3 py-1 bg-blue-800 hover:bg-blue-700 text-white rounded-md text-xs disabled:opacity-50"
+                  >
+                    {debugInfo.testing ? 'Testing...' : 'Test Direct API Call'}
+                  </button>
+                  
+                  {debugInfo.directApiResult && (
+                    <div className="mt-2 text-xs">
+                      <div><strong>Status:</strong> {debugInfo.directApiStatus}</div>
+                      <div><strong>Result:</strong> {debugInfo.directApiResult}</div>
+                      {debugInfo.directApiError && (
+                        <pre className="mt-1 p-2 bg-gray-800 rounded max-h-40 overflow-auto">
+                          {JSON.stringify(debugInfo.directApiError, null, 2)}
+                        </pre>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
