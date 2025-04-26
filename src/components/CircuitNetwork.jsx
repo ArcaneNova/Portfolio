@@ -13,33 +13,33 @@ const CircuitNetwork = () => {
     // Set canvas dimensions with device pixel ratio for sharp rendering
     const dpr = Math.min(window.devicePixelRatio, 2);
     
-    // Network properties
+    // Network properties - REDUCED node count for less visual distraction
     let nodes = [];
     let connections = [];
-    const nodeCount = Math.min(150, Math.max(70, Math.floor(window.innerWidth / 12)));
-    let mouse = { x: undefined, y: undefined, radius: 180 };
+    const nodeCount = Math.min(60, Math.max(30, Math.floor(window.innerWidth / 25))); // Reduced node count significantly
+    let mouse = { x: undefined, y: undefined, radius: 150 };
     
-    // Enhanced color palette (tech-focused with more vibrant colors)
+    // Simplified, more subtle color palette
     const colors = {
       node: {
-        base: '#0ea5e9',      // Sky blue
-        accent: '#22d3ee',    // Cyan
-        highlight: '#f0f9ff', // Very light blue
-        pulse: '#0284c7',     // Darker blue for pulse
-        major: '#6366f1',     // Indigo for major nodes
-        terminal: '#14b8a6'   // Teal for terminal nodes
+        base: 'rgba(14, 165, 233, 0.4)',      // Sky blue with reduced opacity
+        accent: 'rgba(34, 211, 238, 0.4)',    // Cyan with reduced opacity
+        highlight: 'rgba(240, 249, 255, 0.6)', // Very light blue with reduced opacity
+        pulse: 'rgba(2, 132, 199, 0.3)',     // Darker blue for pulse with reduced opacity
+        major: 'rgba(99, 102, 241, 0.4)',     // Indigo for major nodes with reduced opacity
+        terminal: 'rgba(20, 184, 166, 0.4)'   // Teal for terminal nodes with reduced opacity
       },
       line: {
-        base: '#0c4a6e',      // Dark blue
-        highlight: '#0ea5e9', // Sky blue
-        active: '#38bdf8'     // Light blue for active connections
+        base: 'rgba(12, 74, 110, 0.2)',      // Dark blue with reduced opacity
+        highlight: 'rgba(14, 165, 233, 0.3)', // Sky blue with reduced opacity
+        active: 'rgba(56, 189, 248, 0.3)'     // Light blue for active connections with reduced opacity
       },
       data: {
-        base: '#22d3ee',      // Cyan
-        highlight: '#f0f9ff', // Very light blue
-        special: '#fb7185'    // Pink for special data packets
+        base: 'rgba(34, 211, 238, 0.3)',      // Cyan with reduced opacity
+        highlight: 'rgba(240, 249, 255, 0.4)', // Very light blue with reduced opacity
+        special: 'rgba(251, 113, 133, 0.3)'    // Pink for special data packets with reduced opacity
       },
-      background: 'rgba(2, 6, 23, 0.2)' // Very dark blue with transparency for trail effect
+      background: 'rgba(2, 6, 23, 0.1)' // Very dark blue with even more transparency for trail effect
     };
     
     // Calculate distance between nodes
@@ -49,7 +49,7 @@ const CircuitNetwork = () => {
       return Math.sqrt(dx * dx + dy * dy);
     };
     
-    // Find closest nodes for connections
+    // Find closest nodes for connections - REDUCED connection count
     const findNearbyNodes = (sourceNode, count) => {
       return nodes
         .filter(node => node !== sourceNode)
@@ -58,17 +58,17 @@ const CircuitNetwork = () => {
           const distB = getDistance(sourceNode, b);
           return distA - distB;
         })
-        .slice(0, count);
+        .slice(0, Math.min(2, count)); // Reduced max connections per node
     };
     
-    // Node class with enhanced visuals
+    // Node class with reduced animation intensity
     class Node {
       constructor(x, y, radius, type) {
         this.x = x;
         this.y = y;
         this.baseX = x;
         this.baseY = y;
-        this.radius = radius;
+        this.radius = radius * 0.8; // Smaller radius
         this.type = type; // 'major', 'minor', 'terminal'
         this.color = this.type === 'major' ? colors.node.major : 
                     this.type === 'terminal' ? colors.node.terminal : 
@@ -76,27 +76,27 @@ const CircuitNetwork = () => {
         this.pulseRadius = 0;
         this.isPulsing = false;
         this.pulseOpacity = 0;
-        this.pulseSpeed = 0.8 + Math.random() * 0.6;
+        this.pulseSpeed = 0.6 + Math.random() * 0.4; // Slower pulse
         this.glowing = false;
         this.glowIntensity = 0;
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = (Math.random() - 0.5) * 0.5;
-        this.friction = 0.96;
-        this.active = Math.random() > 0.4;
-        this.blinkDuration = 50 + Math.random() * 150;
+        this.vx = (Math.random() - 0.5) * 0.3; // Reduced movement speed
+        this.vy = (Math.random() - 0.5) * 0.3; // Reduced movement speed
+        this.friction = 0.98; // Increased friction for more stability
+        this.active = Math.random() > 0.6; // Fewer active nodes initially
+        this.blinkDuration = 100 + Math.random() * 200; // Longer blink cycles
         this.blinkTimer = Math.random() * this.blinkDuration;
-        this.processing = Math.random() > 0.6;
+        this.processing = Math.random() > 0.8; // Fewer processing nodes
         this.processingAngle = 0;
-        // Add slight oscillation effect
+        // Reduced oscillation
         this.oscillation = {
-          amplitude: 0.2 + Math.random() * 0.8,
+          amplitude: 0.1 + Math.random() * 0.3, // Reduced amplitude
           angle: Math.random() * Math.PI * 2,
-          speed: 0.01 + Math.random() * 0.02
+          speed: 0.005 + Math.random() * 0.01 // Slower oscillation
         };
       }
       
       update() {
-        // Handle mouse interaction
+        // Handle mouse interaction with reduced intensity
         if (mouse.x !== undefined && mouse.y !== undefined) {
           const dx = mouse.x - this.x;
           const dy = mouse.y - this.y;
@@ -104,19 +104,19 @@ const CircuitNetwork = () => {
           
           if (distance < mouse.radius) {
             this.glowing = true;
-            this.glowIntensity = 1 - (distance / mouse.radius);
+            this.glowIntensity = (1 - (distance / mouse.radius)) * 0.7; // Reduced glow intensity
             
-            // Repel from mouse with smoother effect
+            // Reduced repel effect
             const forceDirectionX = dx / distance;
             const forceDirectionY = dy / distance;
-            const force = (mouse.radius - distance) / mouse.radius;
-            const forceFactor = this.type === 'major' ? 1.5 : 
-                                this.type === 'terminal' ? 2.5 : 3;
+            const force = (mouse.radius - distance) / mouse.radius * 0.7; // Reduced force
+            const forceFactor = this.type === 'major' ? 1 : 
+                                this.type === 'terminal' ? 1.5 : 2;
             this.vx -= forceDirectionX * force * forceFactor;
             this.vy -= forceDirectionY * force * forceFactor;
           } else {
             this.glowing = false;
-            this.glowIntensity = Math.max(0, this.glowIntensity - 0.05);
+            this.glowIntensity = Math.max(0, this.glowIntensity - 0.03);
           }
         }
         
@@ -126,58 +126,58 @@ const CircuitNetwork = () => {
         this.vx *= this.friction;
         this.vy *= this.friction;
         
-        // Return to base position with oscillation effect
+        // Return to base position with reduced oscillation
         const dx = this.baseX - this.x;
         const dy = this.baseY - this.y;
         
-        // Add oscillation
+        // Reduced oscillation
         this.oscillation.angle += this.oscillation.speed;
         const oscillationX = Math.cos(this.oscillation.angle) * this.oscillation.amplitude;
         const oscillationY = Math.sin(this.oscillation.angle) * this.oscillation.amplitude;
         
-        this.x += dx * 0.05 + oscillationX;
-        this.y += dy * 0.05 + oscillationY;
+        this.x += dx * 0.03 + oscillationX; // Slower return to base
+        this.y += dy * 0.03 + oscillationY; // Slower return to base
         
-        // Handle blinking for active nodes with improved randomization
+        // Less frequent blinking
         if (this.active) {
           this.blinkTimer--;
           if (this.blinkTimer <= 0) {
-            this.active = Math.random() > 0.25;
+            this.active = Math.random() > 0.3;
             this.blinkTimer = this.blinkDuration;
           }
         } else {
           this.blinkTimer--;
           if (this.blinkTimer <= 0) {
-            this.active = Math.random() > 0.6;
+            this.active = Math.random() > 0.7;
             this.blinkTimer = this.blinkDuration * 0.8;
           }
         }
         
-        // Handle pulse animation with enhanced effect
+        // Reduced pulse frequency and intensity
         if (this.isPulsing) {
           this.pulseRadius += this.pulseSpeed;
-          this.pulseOpacity = Math.max(0, 1 - (this.pulseRadius / 60));
+          this.pulseOpacity = Math.max(0, (1 - (this.pulseRadius / 60)) * 0.6); // Reduced opacity
           
           if (this.pulseRadius > 60) {
             this.isPulsing = false;
             this.pulseRadius = 0;
             this.pulseOpacity = 0;
           }
-        } else if (Math.random() < 0.002 && (this.type === 'major' || this.type === 'terminal')) {
+        } else if (Math.random() < 0.001 && (this.type === 'major' || this.type === 'terminal')) { // Reduced pulse chance
           this.isPulsing = true;
         }
         
-        // Update processing animation with variable speed
+        // Slower processing animation
         if (this.processing) {
-          this.processingAngle += 0.03 + Math.random() * 0.02;
+          this.processingAngle += 0.02;
           if (this.processingAngle >= Math.PI * 2) {
             this.processingAngle = 0;
-            // Randomly stop or continue processing
-            if (Math.random() > 0.7) {
+            // More likely to stop processing
+            if (Math.random() > 0.5) {
               this.processing = false;
             }
           }
-        } else if (Math.random() < 0.002) {
+        } else if (Math.random() < 0.001) { // Reduced chance to start processing
           this.processing = true;
         }
       }
@@ -313,32 +313,18 @@ const CircuitNetwork = () => {
       constructor(startNode, endNode) {
         this.startNode = startNode;
         this.endNode = endNode;
-        this.active = false;
-        this.progress = 0;
-        this.speed = 0.02 + Math.random() * 0.04;
+        this.width = 0.5; // Thinner lines
+        this.maxWidth = Math.random() * 0.5 + 0.5; // Thinner max width
+        this.active = Math.random() > 0.7; // Fewer active connections
+        this.blink = Math.random() > 0.9; // Fewer blinking connections
+        this.blinkSpeed = 0.05 + Math.random() * 0.05; // Slower blinking
+        this.blinkState = 0;
+        this.color = colors.line.base;
         this.dataPackets = [];
+        this.showData = Math.random() > 0.9; // Fewer connections with data packets
+        this.dataSpeed = 0.5 + Math.random() * 1; // Slower data packets
         this.lastPacketTime = 0;
-        this.packetInterval = 40 + Math.random() * 200;
-        this.lineWidth = 1;
-        
-        // Special connections between different node types
-        if (startNode.type === 'major' && endNode.type === 'major') {
-          this.lineWidth = 2;
-          this.isTrunk = true;
-          this.color = 'major';
-        } else if (startNode.type === 'terminal' || endNode.type === 'terminal') {
-          this.lineWidth = 1.5;
-          this.isTrunk = false;
-          this.color = 'terminal';
-        } else {
-          this.isTrunk = false;
-          this.color = 'normal';
-        }
-        
-        // Higher activation chance for major connections
-        if (this.isTrunk) {
-          this.active = Math.random() > 0.5;
-        }
+        this.packetInterval = 3000 + Math.random() * 7000; // Longer intervals between packets
       }
       
       update(time) {
@@ -439,8 +425,8 @@ const CircuitNetwork = () => {
           ctx.strokeStyle = baseColor;
         }
         
-        // Trunk connections are thicker
-        ctx.lineWidth = this.lineWidth;
+        // Check if lineWidth is defined to avoid potential errors
+        ctx.lineWidth = this.lineWidth || 1;
         ctx.stroke();
         
         // Draw active connection animation (glowing trail) with enhanced effect
@@ -450,121 +436,145 @@ const CircuitNetwork = () => {
           const progressX = startX + dx * this.progress;
           const progressY = startY + dy * this.progress;
           
+          // Check for NaN or Infinity values before creating gradient
+          if (!isFinite(startX) || !isFinite(startY) || !isFinite(progressX) || !isFinite(progressY)) {
+            // Skip drawing this part if coordinates are invalid
+            return;
+          }
+          
           // Create gradient for animated part
-          const gradient = ctx.createLinearGradient(
-            startX, startY, progressX, progressY
-          );
-          
-          gradient.addColorStop(0, `rgba(34, 211, 238, ${opacity * 0.7})`);
-          gradient.addColorStop(1, `rgba(34, 211, 238, ${opacity})`);
-          
-          // Draw animated part
-          ctx.beginPath();
-          ctx.moveTo(startX, startY);
-          ctx.lineTo(progressX, progressY);
-          ctx.strokeStyle = gradient;
-          ctx.lineWidth = this.lineWidth + 1;
-          ctx.stroke();
+          try {
+            const gradient = ctx.createLinearGradient(
+              startX, startY, progressX, progressY
+            );
+            
+            gradient.addColorStop(0, `rgba(34, 211, 238, ${opacity * 0.7})`);
+            gradient.addColorStop(1, `rgba(34, 211, 238, ${opacity})`);
+            
+            // Draw animated part
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(progressX, progressY);
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = (this.lineWidth || 1) + 1;
+            ctx.stroke();
+          } catch (error) {
+            console.error("Error creating gradient:", error);
+          }
         }
         
-        // Draw data packets with enhanced visuals
+        // Draw data packets with enhanced visuals and error checking
         this.dataPackets.forEach(packet => {
           const packetX = this.startNode.x + dx * packet.position;
           const packetY = this.startNode.y + dy * packet.position;
           
-          // Create gradient for packet
-          const packetGradient = ctx.createRadialGradient(
-            packetX, packetY, 0,
-            packetX, packetY, packet.size
-          );
-          
-          if (packet.special) {
-            packetGradient.addColorStop(0, 'rgba(251, 113, 133, 1)');
-            packetGradient.addColorStop(0.6, 'rgba(251, 113, 133, 0.7)');
-            packetGradient.addColorStop(1, 'rgba(251, 113, 133, 0)');
-          } else {
-            packetGradient.addColorStop(0, 'rgba(240, 249, 255, 1)');
-            packetGradient.addColorStop(0.6, 'rgba(240, 249, 255, 0.7)');
-            packetGradient.addColorStop(1, 'rgba(240, 249, 255, 0)');
+          // Skip drawing packets with invalid coordinates
+          if (!isFinite(packetX) || !isFinite(packetY)) {
+            return;
           }
           
-          ctx.beginPath();
-          ctx.arc(packetX, packetY, packet.size, 0, Math.PI * 2);
-          ctx.fillStyle = packetGradient;
-          ctx.fill();
+          try {
+            // Create gradient for packet
+            const packetGradient = ctx.createRadialGradient(
+              packetX, packetY, 0,
+              packetX, packetY, packet.size
+            );
+            
+            if (packet.special) {
+              packetGradient.addColorStop(0, 'rgba(251, 113, 133, 1)');
+              packetGradient.addColorStop(0.6, 'rgba(251, 113, 133, 0.7)');
+              packetGradient.addColorStop(1, 'rgba(251, 113, 133, 0)');
+            } else {
+              packetGradient.addColorStop(0, 'rgba(240, 249, 255, 1)');
+              packetGradient.addColorStop(0.6, 'rgba(240, 249, 255, 0.7)');
+              packetGradient.addColorStop(1, 'rgba(240, 249, 255, 0)');
+            }
+            
+            ctx.beginPath();
+            ctx.arc(packetX, packetY, packet.size, 0, Math.PI * 2);
+            ctx.fillStyle = packetGradient;
+            ctx.fill();
+          } catch (error) {
+            console.error("Error creating packet gradient:", error);
+          }
         });
       }
     }
     
-    // Initialize network with improved node distribution
+    // Initialize network with improved node distribution and error handling
     const initializeNetwork = () => {
       nodes = [];
       connections = [];
       
-      // Create nodes with better distribution
-      for (let i = 0; i < nodeCount; i++) {
-        // Determine node type with better distribution
-        let type = 'minor';
-        let radius = 2;
-        
-        if (i < nodeCount * 0.08) {
-          type = 'major';
-          radius = 4;
-        } else if (i >= nodeCount * 0.08 && i < nodeCount * 0.25) {
-          type = 'terminal';
-          radius = 3;
-        }
-        
-        // Create node with random position but avoid edges
-        const margin = 50;
-        const x = margin + Math.random() * (window.innerWidth - margin * 2);
-        const y = margin + Math.random() * (window.innerHeight - margin * 2);
-        nodes.push(new Node(x, y, radius, type));
-      }
-      
-      // Create connections between nearby nodes with improved logic
-      for (let i = 0; i < nodes.length; i++) {
-        // Different connection counts based on node type
-        const connectionCount = nodes[i].type === 'major' ? 6 : 
-                              nodes[i].type === 'terminal' ? 4 : 3;
-        
-        const nearbyNodes = findNearbyNodes(nodes[i], connectionCount + 3);
-        
-        // Connect to a subset of nearby nodes
-        nearbyNodes.slice(0, connectionCount).forEach(node => {
-          // Make sure connection doesn't already exist
-          const connectionExists = connections.some(conn => 
-            (conn.startNode === nodes[i] && conn.endNode === node) || 
-            (conn.startNode === node && conn.endNode === nodes[i])
-          );
+      try {
+        // Create nodes with better distribution
+        for (let i = 0; i < nodeCount; i++) {
+          // Determine node type with better distribution
+          let type = 'minor';
+          let radius = 2;
           
-          if (!connectionExists) {
-            connections.push(new Connection(nodes[i], node));
+          if (i < nodeCount * 0.08) {
+            type = 'major';
+            radius = 4;
+          } else if (i >= nodeCount * 0.08 && i < nodeCount * 0.25) {
+            type = 'terminal';
+            radius = 3;
           }
-        });
-      }
-      
-      // Create a network backbone between major nodes
-      const majorNodes = nodes.filter(node => node.type === 'major');
-      for (let i = 0; i < majorNodes.length; i++) {
-        const nextIndex = (i + 1) % majorNodes.length;
-        connections.push(new Connection(majorNodes[i], majorNodes[nextIndex]));
+          
+          // Create node with random position but avoid edges
+          const margin = 50;
+          const x = margin + Math.random() * (window.innerWidth - margin * 2);
+          const y = margin + Math.random() * (window.innerHeight - margin * 2);
+          nodes.push(new Node(x, y, radius, type));
+        }
         
-        // Add some cross-connections for a more complex network
-        if (majorNodes.length > 3) {
-          const crossIndex = (i + Math.floor(majorNodes.length / 2)) % majorNodes.length;
-          if (Math.abs(i - crossIndex) > 1) {
-            connections.push(new Connection(majorNodes[i], majorNodes[crossIndex]));
+        // Create connections between nearby nodes with improved logic
+        for (let i = 0; i < nodes.length; i++) {
+          // Different connection counts based on node type
+          const connectionCount = nodes[i].type === 'major' ? 6 : 
+                                nodes[i].type === 'terminal' ? 4 : 3;
+          
+          const nearbyNodes = findNearbyNodes(nodes[i], connectionCount + 3);
+          
+          // Connect to a subset of nearby nodes
+          nearbyNodes.slice(0, connectionCount).forEach(node => {
+            // Make sure connection doesn't already exist
+            const connectionExists = connections.some(conn => 
+              (conn.startNode === nodes[i] && conn.endNode === node) || 
+              (conn.startNode === node && conn.endNode === nodes[i])
+            );
+            
+            if (!connectionExists) {
+              connections.push(new Connection(nodes[i], node));
+            }
+          });
+        }
+        
+        // Create network connections with additional safety
+        const majorNodes = nodes.filter(node => node.type === 'major');
+        if (majorNodes.length > 0) {
+          for (let i = 0; i < majorNodes.length; i++) {
+            const nextIndex = (i + 1) % majorNodes.length;
+            connections.push(new Connection(majorNodes[i], majorNodes[nextIndex]));
+            
+            if (majorNodes.length > 3) {
+              const crossIndex = (i + Math.floor(majorNodes.length / 2)) % majorNodes.length;
+              if (Math.abs(i - crossIndex) > 1) {
+                connections.push(new Connection(majorNodes[i], majorNodes[crossIndex]));
+              }
+            }
           }
         }
-      }
-      
-      // Connect some terminal nodes directly to create interesting paths
-      const terminalNodes = nodes.filter(node => node.type === 'terminal');
-      for (let i = 0; i < terminalNodes.length; i += 2) {
-        if (i + 1 < terminalNodes.length) {
-          connections.push(new Connection(terminalNodes[i], terminalNodes[i + 1]));
+        
+        // Connect terminal nodes with additional safety
+        const terminalNodes = nodes.filter(node => node.type === 'terminal');
+        for (let i = 0; i < terminalNodes.length; i += 2) {
+          if (i + 1 < terminalNodes.length) {
+            connections.push(new Connection(terminalNodes[i], terminalNodes[i + 1]));
+          }
         }
+      } catch (error) {
+        console.error("Error initializing network:", error);
       }
     };
     
@@ -642,18 +652,7 @@ const CircuitNetwork = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 bg-slate-950"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100vw',
-        height: '100vh',
-        zIndex: -2,
-        display: 'block'
-      }}
+      className="absolute w-full h-full inset-0 z-0 opacity-40" // Reduced overall opacity for subtlety
     />
   );
 };

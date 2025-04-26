@@ -5,6 +5,7 @@ import DashboardPage from './pages/admin/DashboardPage';
 import UnauthorizedPage from './pages/admin/UnauthorizedPage';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import ProjectsListPage from './pages/admin/projects/ProjectsListPage';
+import MyJourney from './pages/MyJourney';
 
 // Create the router with all routes
 const router = createBrowserRouter([
@@ -12,6 +13,10 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />
+  },
+  {
+    path: '/journey',
+    element: <MyJourney />
   },
   
   // Admin routes

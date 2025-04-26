@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 
-const TechParticlesGrid = () => {
+const TechParticlesGrid = ({ count = 120 }) => {
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   
@@ -9,43 +9,16 @@ const TechParticlesGrid = () => {
     const ctx = canvas.getContext('2d');
     contextRef.current = ctx;
     
-    // Set canvas to full screen and handle high DPI displays
-    const handleResize = () => {
-      const devicePixelRatio = Math.min(window.devicePixelRatio, 2);
-      canvas.width = window.innerWidth * devicePixelRatio;
-      canvas.height = window.innerHeight * devicePixelRatio;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      ctx.scale(devicePixelRatio, devicePixelRatio);
-      
-      // Reset particles on resize
-      initializeParticles();
-      
-      // Set the font once
-      ctx.font = '12px monospace';
-    };
-    
-    // Initial setup
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    
     // Mouse tracking for interactive effects
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let targetMouseX = mouseX;
     let targetMouseY = mouseY;
     
-    const handleMouseMove = (e) => {
-      targetMouseX = e.clientX;
-      targetMouseY = e.clientY;
-    };
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    
     // Particle system
     let particles = [];
     let connections = [];
-    const maxParticles = window.innerWidth < 768 ? 60 : 120;
+    const maxParticles = window.innerWidth < 768 ? Math.min(60, count) : count;
     const connectionDistance = window.innerWidth < 768 ? 150 : 200;
     
     // Tech symbols for node labels
@@ -252,171 +225,170 @@ const TechParticlesGrid = () => {
         particles.push(new Particle());
       }
       
-      // Initialize some with data packets
+      // Initialize some data packets
       for (let i = 0; i < maxParticles / 10; i++) {
-        const p = particles[Math.floor(Math.random() * particles.length)];
-        p.hasPacket = true;
+        const particle = particles[Math.floor(Math.random() * particles.length)];
+        particle.hasPacket = true;
       }
-      
-      // Initially create connections
-      connections = [];
-      updateConnections();
     };
     
-    // Function to update connections between particles
+    // Set canvas to full screen and handle high DPI displays
+    const handleResize = () => {
+      const devicePixelRatio = Math.min(window.devicePixelRatio, 2);
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+      
+      // Reset particles on resize
+      initializeParticles();
+      
+      // Set the font once
+      ctx.font = '12px monospace';
+    };
+    
+    // Initial setup
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    
+    const handleMouseMove = (e) => {
+      targetMouseX = e.clientX;
+      targetMouseY = e.clientY;
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    // Function to update connections
     const updateConnections = () => {
       // Remove inactive connections
-      connections = connections.filter(c => c.active);
+      connections = connections.filter(connection => connection.active);
       
-      // Check for new connections
+      // Create new connections
       for (let i = 0; i < particles.length; i++) {
-        const p1 = particles[i];
+        const particle1 = particles[i];
+        
+        // Skip if not active
+        if (!particle1.active) continue;
         
         for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
+          const particle2 = particles[j];
+          
+          // Skip if not active
+          if (!particle2.active) continue;
           
           // Calculate distance
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
+          const dx = particle1.x - particle2.x;
+          const dy = particle1.y - particle2.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
           
-          // Create connection if close enough and not too many exist
-          if (distance < connectionDistance && connections.length < maxParticles * 2) {
-            // Check if this connection already exists
-            const exists = connections.some(c => 
-              (c.start === p1 && c.end === p2) || 
-              (c.start === p2 && c.end === p1)
+          // Connect if within range and not already connected
+          if (distance < connectionDistance) {
+            // Check if connection already exists
+            const connectionExists = connections.some(
+              conn => (conn.start === particle1 && conn.end === particle2) || 
+                     (conn.start === particle2 && conn.end === particle1)
             );
             
-            if (!exists && Math.random() > 0.7) {
-              connections.push(new Connection(p1, p2));
-              
-              // If p1 has a packet but no destination, set p2 as destination
-              if (p1.hasPacket && !p1.packetDestination) {
-                p1.packetDestination = p2;
-              }
+            if (!connectionExists && Math.random() > 0.95) { // Random chance to create connection
+              connections.push(new Connection(particle1, particle2));
             }
           }
         }
       }
     };
     
-    // Initialize
-    initializeParticles();
-    
-    // Draw the grid pattern
+    // Draw grid pattern
     const drawGrid = (time) => {
-      const gridSize = 50;
-      const gridOpacity = 0.15;
+      const gridSize = 40;
+      const gridOffsetX = -(targetMouseX % gridSize);
+      const gridOffsetY = -(targetMouseY % gridSize);
       
-      // Calculate grid origin based on mouse (subtle parallax)
-      const gridOffsetX = (mouseX - window.innerWidth / 2) * 0.02;
-      const gridOffsetY = (mouseY - window.innerHeight / 2) * 0.02;
+      // Smooth mouse following
+      mouseX += (targetMouseX - mouseX) * 0.1;
+      mouseY += (targetMouseY - mouseY) * 0.1;
       
-      // Draw vertical lines
-      for (let x = 0; x < window.innerWidth; x += gridSize) {
-        const offsetX = x + gridOffsetX % gridSize;
-        
-        // Distance from mouse for highlighting
-        const distFromMouse = Math.abs(offsetX - mouseX);
-        const isHighlighted = distFromMouse < 100;
+      // Draw grid lines
+      ctx.strokeStyle = colors.grid;
+      ctx.lineWidth = 1;
+      
+      // Vertical lines
+      for (let x = gridOffsetX; x < window.innerWidth; x += gridSize) {
+        // Calculate distance to mouse X to determine if it's a highlight line
+        const distanceX = Math.abs(x - mouseX);
+        const isHighlight = distanceX < gridSize / 2;
         
         ctx.beginPath();
-        ctx.strokeStyle = isHighlighted ? colors.gridHighlight : colors.grid;
-        ctx.lineWidth = isHighlighted ? 2 : 1;
-        ctx.moveTo(offsetX, 0);
-        ctx.lineTo(offsetX, canvas.height);
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, window.innerHeight);
+        ctx.strokeStyle = isHighlight ? colors.gridHighlight : colors.grid;
+        ctx.globalAlpha = isHighlight ? 0.3 : 0.15;
         ctx.stroke();
       }
       
-      // Draw horizontal lines
-      for (let y = 0; y < window.innerHeight; y += gridSize) {
-        const offsetY = y + gridOffsetY % gridSize;
-        
-        // Distance from mouse for highlighting
-        const distFromMouse = Math.abs(offsetY - mouseY);
-        const isHighlighted = distFromMouse < 100;
+      // Horizontal lines
+      for (let y = gridOffsetY; y < window.innerHeight; y += gridSize) {
+        // Calculate distance to mouse Y to determine if it's a highlight line
+        const distanceY = Math.abs(y - mouseY);
+        const isHighlight = distanceY < gridSize / 2;
         
         ctx.beginPath();
-        ctx.strokeStyle = isHighlighted ? colors.gridHighlight : colors.grid;
-        ctx.lineWidth = isHighlighted ? 2 : 1;
-        ctx.moveTo(0, offsetY);
-        ctx.lineTo(canvas.width, offsetY);
+        ctx.moveTo(0, y);
+        ctx.lineTo(window.innerWidth, y);
+        ctx.strokeStyle = isHighlight ? colors.gridHighlight : colors.grid;
+        ctx.globalAlpha = isHighlight ? 0.3 : 0.15;
         ctx.stroke();
       }
       
-      // Draw radial highlight around mouse
-      const gradient = ctx.createRadialGradient(
-        mouseX, mouseY, 0,
-        mouseX, mouseY, 150
-      );
-      gradient.addColorStop(0, 'rgba(76, 201, 240, 0.1)');
-      gradient.addColorStop(1, 'rgba(76, 201, 240, 0)');
-      
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(mouseX, mouseY, 150, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.globalAlpha = 1;
     };
     
     // Main render loop
-    let time = 0;
     const render = () => {
-      time += 0.01;
+      // Clear canvas with semi-transparent background for trail effect
+      ctx.fillStyle = 'rgba(15, 14, 23, 0.1)';
+      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
       
-      // Smooth mouse tracking
-      mouseX += (targetMouseX - mouseX) * 0.05;
-      mouseY += (targetMouseY - mouseY) * 0.05;
+      // Draw grid background
+      drawGrid();
       
-      // Clear canvas with background
-      ctx.fillStyle = colors.background;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw grid
-      drawGrid(time);
-      
-      // Update particles
-      particles.forEach(p => p.update(time));
-      
-      // Update and manage connections
-      if (time % 1 < 0.02) {
-        updateConnections();
+      // Update and draw connections
+      updateConnections();
+      for (const connection of connections) {
+        connection.update();
+        connection.draw(ctx, mouseX, mouseY);
       }
-      connections.forEach(c => c.update());
       
-      // Draw connections first (behind particles)
-      connections.forEach(c => c.draw(ctx, mouseX, mouseY));
+      // Update and draw particles
+      for (const particle of particles) {
+        particle.update();
+        particle.draw(ctx, mouseX, mouseY);
+      }
       
-      // Draw particles
-      particles.forEach(p => p.draw(ctx, mouseX, mouseY));
+      // Spawn new particles to replace inactive ones
+      if (particles.length < maxParticles) {
+        particles.push(new Particle());
+      }
       
       // Request next frame
       requestAnimationFrame(render);
     };
     
     // Start animation
-    const animationId = requestAnimationFrame(render);
+    initializeParticles();
+    render();
     
-    // Cleanup on unmount
+    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animationId);
     };
-  }, []);
+  }, [count]);
   
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'fixed',
-        width: '100vw',
-        height: '100vh',
-        top: 0,
-        left: 0,
-        zIndex: -9999,
-        background: '#0f0e17'
-      }}
+    <canvas 
+      ref={canvasRef} 
+      className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
     />
   );
 };
