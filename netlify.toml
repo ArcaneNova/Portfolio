@@ -12,40 +12,43 @@
   [headers.values]
     X-Netlify-Debug = "true"
 
-# Try first with the dedicated login function (most reliable)
+# Try login with dedicated function
 [[redirects]]
   from = "/api/auth/login"
   to = "/.netlify/functions/login"
   status = 200
   force = true
 
-# Try the index function next
+# User profile endpoint with dedicated me function
+[[redirects]]
+  from = "/api/auth/me"
+  to = "/.netlify/functions/me"
+  status = 200
+  force = true
 
-# Fallback to other login routes if needed
+# Projects endpoint with dedicated projects function
+[[redirects]]
+  from = "/api/projects"
+  to = "/.netlify/functions/projects"
+  status = 200
+  force = true
+
+# Fallback login routes
 [[redirects]]
   from = "/api/auth/login"
   to = "/.netlify/functions/auth/login"
   status = 200
   force = true
 
-# Third alternative for login endpoint
 [[redirects]]
   from = "/api/auth/login"
   to = "/.netlify/functions/auth"
   status = 200
   force = true
 
-# Final fallback for login endpoint
 [[redirects]]
   from = "/.netlify/functions/auth/login"
   to = "/.netlify/functions/auth"
-  status = 200
-  force = true
-
-# Special case for the me endpoint
-[[redirects]]
-  from = "/api/auth/me"
-  to = "/.netlify/functions/auth/me"
   status = 200
   force = true
 

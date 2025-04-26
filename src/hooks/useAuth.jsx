@@ -15,17 +15,48 @@ export const AuthProvider = ({ children }) => {
     const checkAuthStatus = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
         
-        if (token) {
-          const response = await authAPI.getProfile();
-          setUser(response.data.data);
+        // First check if we have a user in localStorage
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+        
+        if (storedToken && storedUser) {
+          // Set the user from localStorage first for immediate UI update
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            console.log('User restored from localStorage:', parsedUser);
+            
+            // Then verify with the server in the background
+            try {
+              const response = await authAPI.getProfile();
+              if (response.data.success && response.data.data) {
+                // Update with fresh data from server
+                setUser(response.data.data);
+                console.log('User verified with server:', response.data.data);
+              }
+            } catch (profileError) {
+              console.warn('Could not verify user with server, using localStorage data:', profileError.message);
+              // We'll keep using the stored user data and not log out
+            }
+          } catch (parseError) {
+            console.error('Error parsing stored user data:', parseError);
+            // Invalid stored user data, clear it
+            localStorage.removeItem('user');
+          }
+        } else {
+          // No token or user in localStorage
+          setUser(null);
         }
       } catch (err) {
         console.error('Authentication error:', err);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setError(err.response?.data?.message || 'Authentication failed');
+        // Don't clear token/user here - only if specifically unauthorized
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+        }
+        setError(err.response?.data?.message || 'Authentication check failed');
       } finally {
         setLoading(false);
       }

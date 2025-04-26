@@ -108,13 +108,37 @@ export const authAPI = {
     }
   },
   logout: () => API.get('/auth/logout'),
-  getProfile: () => API.get('/auth/me'),
+  getProfile: async () => {
+    try {
+      console.log('Trying dedicated me function');
+      const response = await fetch('/.netlify/functions/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error fetching profile: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return { data, status: response.status };
+    } catch (error) {
+      console.log('Me function failed, trying regular API route');
+      console.error('Me function error:', error.message);
+      return await API.get('/auth/me');
+    }
+  },
   register: (userData) => API.post('/auth/register', userData),
 };
 
 // Projects API
 export const projectsAPI = {
-  getAllProjects: (params) => API.get('/projects', { params }),
+  getAllProjects: async (params) => {
+    // Use the dedicated projects function implementation
+    return await ProjectAPI.getProjects(params);
+  },
   getProject: (id) => API.get(`/projects/${id}`),
   createProject: (projectData) => API.post('/projects', projectData),
   updateProject: (id, projectData) => API.put(`/projects/${id}`, projectData),
@@ -169,6 +193,41 @@ export const uploadAPI = {
       'Content-Type': 'multipart/form-data',
     },
   }),
+};
+
+export const ProjectAPI = {
+  getProjects: async (params = {}) => {
+    try {
+      console.log('Trying dedicated projects function');
+      const queryParams = new URLSearchParams();
+      
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.page) queryParams.append('page', params.page);
+      if (params.tags) {
+        if (Array.isArray(params.tags)) {
+          params.tags.forEach(tag => queryParams.append('tags', tag));
+        } else {
+          queryParams.append('tags', params.tags);
+        }
+      }
+      
+      const url = `/.netlify/functions/projects?${queryParams.toString()}`;
+      console.log('Fetching from URL:', url);
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Error fetching projects: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return { data, status: response.status };
+    } catch (error) {
+      console.log('Projects function failed, trying regular API route');
+      console.error('Projects function error:', error.message);
+      return await API.get('/projects', { params });
+    }
+  },
 };
 
 export default API; 
