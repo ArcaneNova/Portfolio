@@ -19,7 +19,7 @@ const timelineEvents = [
   {
     year: "2021",
     title: "Passed 12th",
-    description: "Passed my 12th examination and got 71% marks.",
+    description: "Passed my 12th examination and got 73% marks.",
     icon: "🎓",
     color: "from-indigo-500 to-blue-400"
   },
@@ -213,7 +213,7 @@ const About = () => {
             <CyberpunkInterface title="BIOGRAPHY">
               <div className="space-y-6 p-6">
                 <p className="bio-text text-blue-50 leading-relaxed">
-                  I'm a software engineer with a passion for building innovative applications that solve real-world problems. My journey in tech began in 2016 when I got my first computer and discovered the world of programming.
+                  I'm a software engineer with a passion for building innovative applications that solve real-world problems. My journey in tech began in 2016 when I created my first website and discovered the world of programming.
                 </p>
                 
                 <p className="bio-text text-blue-50 leading-relaxed">

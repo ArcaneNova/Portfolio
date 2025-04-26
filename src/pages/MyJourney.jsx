@@ -3,7 +3,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from "../components/NavBar.jsx";
+import Navbar from "../components/Navbar.jsx";
 import Footer from '../components/Footer';
 // Lazy load heavy components
 const CyberpunkInterface = lazy(() => import('../components/CyberpunkInterface'));
@@ -373,7 +373,7 @@ const SkillBar = ({ name, level, color, index }) => {
 };
 
 // Interactive TimeLine Component - Make it mobile responsive
-const InteractiveTimeline = ({ data, onSelect }) => {
+const InteractiveTimeline = ({ data, onSelect, selectedJourney }) => {
   const [hoveredYear, setHoveredYear] = useState(null);
   const timelineRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -423,7 +423,7 @@ const InteractiveTimeline = ({ data, onSelect }) => {
               key={entry.year}
               year={entry.year}
               color={entry.color}
-              active={hoveredYear === entry.year}
+              active={index === selectedJourney}
               onClick={() => {
                 setHoveredYear(entry.year);
                 onSelect(index);
@@ -508,20 +508,35 @@ const FlipCard = ({ entry }) => {
 };
 
 // 3D Interactive Journey Card
-const Journey3DCard = ({ entry, index, isActive }) => {
+const Journey3DCard = ({ entry }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ 
-        opacity: isActive ? 1 : 0, 
-        y: isActive ? 0 : 50,
-        scale: isActive ? 1 : 0.9 
-      }}
-      transition={{ duration: 0.5 }}
-      className={`w-full ${isActive ? 'block' : 'hidden'}`}
-    >
-      <FlipCard entry={entry} />
-    </motion.div>
+    <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+      <GlowEffect color="blue" intensity="low">
+        <div className="h-full rounded-xl overflow-hidden bg-black-200/80 backdrop-blur-sm border border-blue-600/30 p-5 md:p-6 flex flex-col">
+          <div className="flex items-center mb-4">
+            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r ${entry.color} flex items-center justify-center text-xl`}>
+              {entry.icon}
+            </div>
+            <div className="ml-3 md:ml-4">
+              <h3 className={`text-xl md:text-2xl font-bold bg-gradient-to-r ${entry.color} bg-clip-text text-transparent`}>
+                {entry.year}
+              </h3>
+              <h4 className="text-white font-semibold">{entry.title}</h4>
+            </div>
+          </div>
+          
+          <div className="flex-1 overflow-auto custom-scrollbar pr-2">
+            <p className="text-gray-300 text-sm line-clamp-6 md:line-clamp-none">{entry.description}</p>
+          </div>
+          
+          <div className="mt-4 text-center">
+            <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-blue-900/30 text-blue-300 border border-blue-700/50">
+              {entry.achievement}
+            </span>
+          </div>
+        </div>
+      </GlowEffect>
+    </Suspense>
   );
 };
 
@@ -721,58 +736,39 @@ const QuoteSlider = () => {
   );
 };
 
-const MyJourney = () => {
-  // Check for mobile performance optimization
-  const [isMobile, setIsMobile] = useState(false);
+function MyJourney() {
+  // State for loaded sections - all set to true by default to ensure visibility
   const [loadedSections, setLoadedSections] = useState({
-    hero: false,
-    timeline: false,
-    quotes: false,
-    skills: false
+    hero: true,
+    timeline: true,
+    quotes: true,
+    skills: true,
+    journey: true
   });
-  
-  // Refs and state from original component
-  const [selectedJourney, setSelectedJourney] = useState(0);
+
+  // References
+  const journeyRef = useRef(null);
+  const timelineRef = useRef(null);
+  const quotesRef = useRef(null);
+  const skillsRef = useRef(null);
+  const heroRef = useRef(null);
   const parallax = useRef({ x: 0, y: 0 });
-  const sectionRef = useRef(null);
-  const statsRef = useRef(null);
-  
-  // Optimize performance for mobile devices
+
+  const [activeDot, setActiveDot] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
+    // Check if device is mobile
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth <= 768);
     };
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    // Lazy load sections as they become visible
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.1
-    };
-    
-    const sectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const sectionId = entry.target.id;
-          if (sectionId) {
-            setLoadedSections(prev => ({ ...prev, [sectionId]: true }));
-          }
-        }
-      });
-    }, observerOptions);
-    
-    // Observe main sections
-    document.querySelectorAll('section[id]').forEach(section => {
-      sectionObserver.observe(section);
-    });
-    
-    // Set up simpler parallax effect for mobile
+    // Set up parallax effect
     const handleMouseMove = (e) => {
       if (isMobile) return; // Skip parallax on mobile
-      
       const x = (window.innerWidth / 2 - e.clientX) * 0.01;
       const y = (window.innerHeight / 2 - e.clientY) * 0.01;
       parallax.current = { x, y };
@@ -783,39 +779,26 @@ const MyJourney = () => {
     return () => {
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('mousemove', handleMouseMove);
-      sectionObserver.disconnect();
     };
-  }, []);
-
-  useGSAP(() => {
-    // Use simpler animations for mobile
-    const duration = isMobile ? 0.8 : 1.2;
-    const staggerAmount = isMobile ? 0.1 : 0.2;
-    
-    // Initial hero animations - simplified for mobile
-    gsap.fromTo(
-      ".hero-title",
-      { opacity: 0, y: 20 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: duration,
-        ease: "power2.out",
-      }
-    );
-
-    gsap.fromTo(
-      ".hero-subtitle",
-      { opacity: 0, y: 15 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: duration * 0.8,
-        delay: 0.2,
-        ease: "power2.out",
-      }
-    );
   }, [isMobile]);
+
+  // Register ScrollTrigger plugin
+  gsap.registerPlugin(ScrollTrigger);
+
+  // GSAP animations
+  useGSAP(() => {
+    // Set up animations for different sections
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: journeyRef.current,
+        start: "top 80%",
+        toggleActions: "play none none none"
+      }
+    });
+
+    // Other animations remain the same
+    // ... existing code ...
+  }, { scope: journeyRef });
 
   return (
     <div className="bg-black text-white min-h-screen overflow-hidden">
@@ -887,80 +870,192 @@ const MyJourney = () => {
           </div>
         </section>
         
-        {/* Load only when visible */}
-        {loadedSections.journey && (
-          <>
-            {/* Interactive Journey Section */}
-            <section id="journey" className="mb-16 md:mb-24">
-              <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-                <CyberpunkInterface 
-                  title="TIMELINE" 
-                  subtitle="EXPERIENCE.LOG" 
-                  className="mb-8"
-                  variant={isMobile ? "simple" : "detailed"}
-                />
-              </Suspense>
-              
-              <div className="max-w-6xl mx-auto mt-8 md:mt-12">
-                {/* Render simplified timeline for better performance */}
-                {isMobile ? (
-                  <div className="px-2">
-                    <h3 className="text-xl md:text-2xl font-bold mb-4 text-center text-white">
-                      My Journey <span className="text-blue-100">Timeline</span>
-                    </h3>
-                    <div className="flex overflow-x-auto pb-4 hide-scrollbar">
-                      {journeyData.map((entry, index) => (
-                        <div 
-                          key={entry.year}
-                          className={`cursor-pointer min-w-[80px] text-center mx-2 p-2 rounded-lg ${selectedJourney === index ? 'bg-blue-900/50 border border-blue-500' : 'bg-black-300/50'}`}
-                          onClick={() => setSelectedJourney(index)}
-                        >
-                          <div className={`text-sm font-bold bg-gradient-to-r ${entry.color} bg-clip-text text-transparent`}>
-                            {entry.year}
-                          </div>
-                        </div>
-                      ))}
+        {/* Interactive Journey Section - Always show */}
+        <section id="journey" className="mb-16 md:mb-24">
+          <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+            <CyberpunkInterface 
+              title="TIMELINE" 
+              subtitle="EXPERIENCE.LOG" 
+              className="mb-8"
+              variant={isMobile ? "simple" : "detailed"}
+            />
+          </Suspense>
+          
+          <div className="max-w-6xl mx-auto mt-8 md:mt-12">
+            {/* Render simplified timeline for better performance */}
+            {isMobile ? (
+              <div className="px-2">
+                <h3 className="text-xl md:text-2xl font-bold mb-4 text-center text-white">
+                  My Journey <span className="text-blue-100">Timeline</span>
+                </h3>
+                <div className="flex overflow-x-auto pb-4 hide-scrollbar">
+                  {journeyData.map((entry, index) => (
+                    <div 
+                      key={entry.year}
+                      className={`cursor-pointer min-w-[80px] text-center mx-2 p-2 rounded-lg ${activeDot === index ? 'bg-blue-900/50 border border-blue-500' : 'bg-black-300/50'}`}
+                      onClick={() => setActiveDot(index)}
+                    >
+                      <div className={`text-sm font-bold bg-gradient-to-r ${entry.color} bg-clip-text text-transparent`}>
+                        {entry.year}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  // Full timeline for desktop
-                  <InteractiveTimeline 
-                    data={journeyData} 
-                    onSelect={setSelectedJourney} 
-                  />
-                )}
-                
-                {/* Journey Content - Show only selected item */}
-                <div className="mt-6 md:mt-10 px-2">
-                  <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-                    <Journey3DCard 
-                      entry={journeyData[selectedJourney]}
-                      index={selectedJourney}
-                      isActive={true}
-                    />
-                  </Suspense>
-                </div>
-                
-                {/* Simple Navigation Arrows */}
-                <div className="flex justify-between mt-6 px-2">
-                  <button
-                    className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400"
-                    onClick={() => setSelectedJourney(prev => (prev === 0 ? journeyData.length - 1 : prev - 1))}
-                  >
-                    <FaChevronLeft />
-                  </button>
-                  
-                  <button
-                    className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400"
-                    onClick={() => setSelectedJourney(prev => (prev === journeyData.length - 1 ? 0 : prev + 1))}
-                  >
-                    <FaChevronRight />
-                  </button>
+                  ))}
                 </div>
               </div>
-            </section>
-          </>
-        )}
+            ) : (
+              // Full timeline for desktop
+              <InteractiveTimeline 
+                data={journeyData} 
+                onSelect={setActiveDot} 
+                selectedJourney={activeDot}
+              />
+            )}
+            
+            {/* Journey Content - Show only selected item */}
+            <div className="mt-6 md:mt-10 px-2">
+              <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+                <Journey3DCard 
+                  entry={journeyData[activeDot]}
+                />
+              </Suspense>
+            </div>
+            
+            {/* Simple Navigation Arrows */}
+            <div className="flex justify-between mt-6 px-2">
+              <button
+                className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400"
+                onClick={() => setActiveDot(prev => (prev === 0 ? journeyData.length - 1 : prev - 1))}
+              >
+                <FaChevronLeft />
+              </button>
+              
+              <button
+                className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400"
+                onClick={() => setActiveDot(prev => (prev === journeyData.length - 1 ? 0 : prev + 1))}
+              >
+                <FaChevronRight />
+              </button>
+            </div>
+          </div>
+        </section>
+        
+        {/* Quote Section */}
+        <section className="mb-16 md:mb-20">
+          <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+            <CyberpunkInterface 
+              title="INSPIRATIONAL_QUOTES" 
+              subtitle="WISDOM.DATABASE" 
+              className="mb-6"
+              variant={isMobile ? "simple" : "detailed"}
+            />
+          </Suspense>
+          
+          <div className="max-w-4xl mx-auto px-2">
+            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+              <GlowEffect color="blue" intensity="low">
+                <div className="bg-black-300/30 backdrop-blur-sm p-5 md:p-8 rounded-xl border border-blue-500/20">
+                  <div className="text-3xl md:text-4xl text-blue-500/30 font-serif mb-4">"</div>
+                  <blockquote className="text-lg md:text-2xl italic font-light text-center mb-5 text-blue-50">
+                    You got a dream, you gotta protect it. People can't do something themselves, they wanna tell you you can't do it.
+                  </blockquote>
+                  <div className="text-center">
+                    <span className="inline-block px-4 py-2 rounded-full bg-blue-900/40 text-blue-300 font-semibold text-sm">
+                      The Pursuit of Happyness
+                    </span>
+                  </div>
+                </div>
+              </GlowEffect>
+            </Suspense>
+          </div>
+        </section>
+        
+        {/* Skills Section */}
+        <section className="mb-16 md:mb-20">
+          <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+            <CyberpunkInterface 
+              title="SKILL MATRIX" 
+              subtitle="ABILITY.DATA" 
+              className="mb-6"
+              variant={isMobile ? "simple" : "detailed"}
+            />
+          </Suspense>
+          
+          <div className="max-w-4xl mx-auto px-2">
+            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+              <GlowEffect color="purple" intensity="low">
+                <div className="bg-black-300/30 backdrop-blur-sm p-5 md:p-8 rounded-xl border border-purple-500/20">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {skills.slice(0, 6).map((skill) => (
+                      <div key={skill.name} className="mb-4">
+                        <div className="flex justify-between mb-1">
+                          <span className="text-white font-medium">{skill.name}</span>
+                          <span className="text-blue-300">{skill.level}%</span>
+                        </div>
+                        <div className="h-2 bg-black-300 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full bg-gradient-to-r ${skill.color} rounded-full`}
+                            style={{ width: `${skill.level}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </GlowEffect>
+            </Suspense>
+          </div>
+        </section>
+        
+        {/* Lessons Learned Section */}
+        <section className="mb-16 md:mb-20">
+          <h2 className="text-xl md:text-2xl font-bold text-center mb-6 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+            Key Lessons From My Journey
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto px-2">
+            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+              <GlowEffect color="purple" intensity="low">
+                <div className="bg-black-300/30 backdrop-blur-sm p-4 md:p-6 rounded-lg border border-purple-600/20">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 mb-4 flex items-center justify-center text-xl">
+                    🔄
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Consistency is Key</h3>
+                  <p className="text-gray-300 text-sm">
+                    Working consistently for two years led to my first payment. Progress compounds over time.
+                  </p>
+                </div>
+              </GlowEffect>
+            </Suspense>
+            
+            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+              <GlowEffect color="blue" intensity="low">
+                <div className="bg-black-300/30 backdrop-blur-sm p-4 md:p-6 rounded-lg border border-blue-600/20">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-4 flex items-center justify-center text-xl">
+                    💡
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Balance Education & Skills</h3>
+                  <p className="text-gray-300 text-sm">
+                    The foundation of formal education combined with practical skills is powerful.
+                  </p>
+                </div>
+              </GlowEffect>
+            </Suspense>
+            
+            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+              <GlowEffect color="pink" intensity="low">
+                <div className="bg-black-300/30 backdrop-blur-sm p-4 md:p-6 rounded-lg border border-pink-600/20">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-600 to-red-600 mb-4 flex items-center justify-center text-xl">
+                    🚀
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Embrace Failure</h3>
+                  <p className="text-gray-300 text-sm">
+                    Failure is a stepping stone to success, not the end of the journey.
+                  </p>
+                </div>
+              </GlowEffect>
+            </Suspense>
+          </div>
+        </section>
         
         {/* Call to Action - Always load (simplified) */}
         <section className="mb-16">
@@ -1023,6 +1118,6 @@ const MyJourney = () => {
       `}</style>
     </div>
   );
-};
+}
 
 export default MyJourney;
