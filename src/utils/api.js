@@ -1,18 +1,9 @@
 import axios from 'axios';
 
 // Determine the base URL based on environment
-const isProduction = import.meta.env.PROD;
 let baseURL;
-
-if (isProduction) {
   // For production, use the current domain
   baseURL = '/api';
-} else {
-  // For development, use localhost
-  baseURL = 'http://localhost:8888/api';
-}
-
-console.log('API BaseURL:', baseURL, 'Production mode:', isProduction);
 
 // Create an axios instance
 const API = axios.create({
