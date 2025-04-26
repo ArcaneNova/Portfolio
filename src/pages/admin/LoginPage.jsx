@@ -79,6 +79,52 @@ const LoginPage = () => {
     }
   };
 
+  const testIndexFunctionLogin = async () => {
+    setDebugInfo(prev => ({
+      ...prev,
+      indexTesting: true,
+      indexResult: 'Testing index function...'
+    }));
+    
+    try {
+      // Test direct call to index function
+      const response = await axios.post('/.netlify/functions/index/api/auth/login', { 
+        email, 
+        password 
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      setDebugInfo(prev => ({
+        ...prev,
+        indexTesting: false,
+        indexResult: `Success: ${JSON.stringify(response.data).slice(0, 100)}...`,
+        indexStatus: response.status,
+        lastSuccessfulMethod: 'index function'
+      }));
+      
+      // If successful, store the token and redirect
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        
+        // Navigate to the admin panel
+        const from = location.state?.from?.pathname || '/admin';
+        navigate(from, { replace: true });
+      }
+    } catch (error) {
+      setDebugInfo(prev => ({
+        ...prev,
+        indexTesting: false,
+        indexResult: `Error: ${error.message}`,
+        indexStatus: error.response?.status || 'No response',
+        indexError: error.response?.data || error.message
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -310,6 +356,32 @@ const LoginPage = () => {
                       {debugInfo.directApiError && (
                         <pre className="mt-1 p-2 bg-gray-800 rounded max-h-40 overflow-auto">
                           {JSON.stringify(debugInfo.directApiError, null, 2)}
+                        </pre>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                <h3 className="font-semibold mb-2">Debug Actions</h3>
+                
+                <div className="space-y-2">
+                  <button
+                    onClick={testIndexFunctionLogin}
+                    disabled={debugInfo.indexTesting}
+                    className="ml-2 px-3 py-1 bg-green-800 hover:bg-green-700 text-white rounded-md text-xs disabled:opacity-50"
+                  >
+                    {debugInfo.indexTesting ? 'Testing...' : 'Test Index Function Login'}
+                  </button>
+                  
+                  {debugInfo.indexResult && (
+                    <div className="mt-2 text-xs border-t border-gray-700 pt-2">
+                      <div><strong>Index Function Status:</strong> {debugInfo.indexStatus}</div>
+                      <div><strong>Result:</strong> {debugInfo.indexResult}</div>
+                      {debugInfo.indexError && (
+                        <pre className="mt-1 p-2 bg-gray-800 rounded max-h-40 overflow-auto">
+                          {JSON.stringify(debugInfo.indexError, null, 2)}
                         </pre>
                       )}
                     </div>

@@ -12,10 +12,31 @@
   [headers.values]
     X-Netlify-Debug = "true"
 
-# Special case for the login endpoint
+# Try the index function first for login (most likely to work)
+[[redirects]]
+  from = "/api/auth/login"
+  to = "/.netlify/functions/index/api/auth/login"
+  status = 200
+  force = true
+
+# Fallback to other login routes if needed
 [[redirects]]
   from = "/api/auth/login"
   to = "/.netlify/functions/auth/login"
+  status = 200
+  force = true
+
+# Third alternative for login endpoint
+[[redirects]]
+  from = "/api/auth/login"
+  to = "/.netlify/functions/auth"
+  status = 200
+  force = true
+
+# Final fallback for login endpoint
+[[redirects]]
+  from = "/.netlify/functions/auth/login"
+  to = "/.netlify/functions/auth"
   status = 200
   force = true
 
@@ -26,6 +47,13 @@
   status = 200
   force = true
 
+# Health check through index function
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/index/api/health"
+  status = 200
+  force = true
+
 # Redirect for auth endpoints specifically to auth function
 [[redirects]]
   from = "/api/auth/*"
@@ -33,17 +61,17 @@
   status = 200
   force = true
 
-# Redirect for health check endpoints
-[[redirects]]
-  from = "/api/health"
-  to = "/.netlify/functions/server/api/health"
-  status = 200
-  force = true
-
-# Redirect for all other API endpoints to server function
+# Redirect for all other API endpoints to server function or index as backup
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/server/:splat"
+  status = 200
+  force = true
+
+# Final API fallback to index function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/index/:splat"
   status = 200
   force = true
 

@@ -2,79 +2,77 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
-// Routes
+import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.js';
-import projectRoutes from './routes/projects.js';
-import blogRoutes from './routes/blogs.js';
-import motivationRoutes from './routes/motivations.js';
-import buildInPublicRoutes from './routes/buildInPublic.js';
-import taskRoutes from './routes/tasks.js';
-import uploadRoutes from './routes/upload.js';
 
 // Load environment variables
 dotenv.config();
 
+// Set up Express app
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8888;
+
+// Get directory paths
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const rootDir = path.resolve(__dirname, '..');
+const distDir = path.join(rootDir, 'dist');
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
-app.use(express.json({ limit: '30mb' }));
-app.use(bodyParser.json({ limit: '30mb' }));
-app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }));
+app.use(express.json());
 app.use(cookieParser());
+
+// Log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  if (req.method !== 'GET') {
+    console.log('Request Body:', JSON.stringify(req.body));
+  }
+  next();
+});
 
 // API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/blogs', blogRoutes);
-app.use('/api/motivations', motivationRoutes);
-app.use('/api/build-in-public', buildInPublicRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/upload', uploadRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'API is running' });
+  res.status(200).json({ status: 'ok', message: 'Server is running' });
 });
 
-// Serve static assets if in production
+// Serve static files in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist')));
-
+  app.use(express.static(distDir));
+  
+  // Serve index.html for all routes not handled by API
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../dist', 'index.html'));
+    if (!req.path.startsWith('/api/')) {
+      res.sendFile(path.join(distDir, 'index.html'));
+    } else {
+      res.status(404).json({ message: 'API endpoint not found' });
+    }
   });
 }
 
-// Connect to MongoDB and start server
+// Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
+    console.log('Connected to MongoDB');
+    
+    // Start the server
     app.listen(PORT, () => {
-      console.log(`Server running on port: ${PORT}`);
-      console.log('Connected to MongoDB');
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('Error connecting to MongoDB:', error.message);
+    console.error('MongoDB connection error:', error.message);
   });
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-}); 
+export default app; 
