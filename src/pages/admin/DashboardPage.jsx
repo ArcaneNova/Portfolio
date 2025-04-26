@@ -31,47 +31,99 @@ const DashboardPage = () => {
       try {
         setLoading(true);
         
-        // Projects count
+        // Projects count and recent projects
         const projectsResponse = await projectsAPI.getAllProjects({ limit: 5 });
-        setStats(prev => ({ ...prev, projects: { count: projectsResponse.data.count || 6, loading: false, change: 2 } }));
-        setRecentProjects(projectsResponse.data.data || []);
+        if (projectsResponse.data?.success) {
+          setStats(prev => ({ 
+            ...prev, 
+            projects: { 
+              count: projectsResponse.data.count, 
+              loading: false, 
+              change: calculateChange(projectsResponse.data.count, prev.projects.count) 
+            } 
+          }));
+          setRecentProjects(projectsResponse.data.data);
+        }
         
         // Blogs count
         const blogsResponse = await blogsAPI.getAllBlogs({ limit: 1 });
-        setStats(prev => ({ ...prev, blogs: { count: blogsResponse.data.count || 12, loading: false, change: -1 } }));
+        if (blogsResponse.data?.success) {
+          setStats(prev => ({ 
+            ...prev, 
+            blogs: { 
+              count: blogsResponse.data.count, 
+              loading: false, 
+              change: calculateChange(blogsResponse.data.count, prev.blogs.count) 
+            } 
+          }));
+        }
         
         // Tasks count and recent tasks
-        const tasksResponse = await tasksAPI.getAllTasks({ limit: 5, sort: '-createdAt' });
+        const tasksResponse = await tasksAPI.getAllTasks({ limit: 5, sort: 'createdAt:desc' });
+        if (tasksResponse.data?.success) {
+          setStats(prev => ({ 
+            ...prev, 
+            tasks: { 
+              count: tasksResponse.data.count, 
+              loading: false, 
+              change: calculateChange(tasksResponse.data.count, prev.tasks.count) 
+            } 
+          }));
+        }
+        
+        // Today's tasks
         const todaysTasks = await tasksAPI.getTodaysTasks();
-        setStats(prev => ({ ...prev, tasks: { count: tasksResponse.data.count || 8, loading: false, change: 5 } }));
-        setRecentTasks(todaysTasks.data.data || []);
+        if (todaysTasks.data?.success) {
+          setRecentTasks(todaysTasks.data.data);
+        }
         
         // Motivations count
         const motivationsResponse = await motivationsAPI.getAllMotivations({ limit: 1 });
-        setStats(prev => ({ ...prev, motivations: { count: motivationsResponse.data.count || 15, loading: false, change: 0 } }));
+        if (motivationsResponse.data?.success) {
+          setStats(prev => ({ 
+            ...prev, 
+            motivations: { 
+              count: motivationsResponse.data.count, 
+              loading: false, 
+              change: calculateChange(motivationsResponse.data.count, prev.motivations.count) 
+            } 
+          }));
+        }
         
         // Build in Public count
         const buildInPublicResponse = await buildInPublicAPI.getAllPosts({ limit: 1 });
-        setStats(prev => ({ ...prev, buildInPublic: { count: buildInPublicResponse.data.count || 7, loading: false, change: 3 } }));
+        if (buildInPublicResponse.data?.success) {
+          setStats(prev => ({ 
+            ...prev, 
+            buildInPublic: { 
+              count: buildInPublicResponse.data.count, 
+              loading: false, 
+              change: calculateChange(buildInPublicResponse.data.count, prev.buildInPublic.count) 
+            } 
+          }));
+        }
         
       } catch (err) {
         console.error('Error fetching dashboard stats:', err);
-        // Fallback to dummy data in case of errors
-        setStats({
-          projects: { count: 6, loading: false, change: 2 },
-          blogs: { count: 12, loading: false, change: -1 },
-          tasks: { count: 8, loading: false, change: 5 },
-          motivations: { count: 15, loading: false, change: 0 },
-          buildInPublic: { count: 7, loading: false, change: 3 }
-        });
-        
-        setError('Failed to load some dashboard data. Showing available information.');
+        setError('Failed to load some dashboard data. Please refresh to try again.');
       } finally {
         setLoading(false);
       }
     };
 
+    // Helper function to calculate percentage change
+    const calculateChange = (newValue, oldValue) => {
+      if (oldValue === 0 || oldValue === undefined) return 0;
+      const change = ((newValue - oldValue) / oldValue) * 100;
+      return Math.round(change);
+    };
+
     fetchStats();
+    
+    // Refresh data every 5 minutes
+    const refreshInterval = setInterval(fetchStats, 5 * 60 * 1000);
+    
+    return () => clearInterval(refreshInterval);
   }, []);
   
   // Dashboard stat cards

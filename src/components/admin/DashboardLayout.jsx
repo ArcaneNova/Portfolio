@@ -88,7 +88,7 @@ const DashboardLayout = ({ children }) => {
     <div className={`min-h-screen ${themeClasses.bg} ${themeClasses.text} flex transition-colors duration-200`}>
       {/* Mobile sidebar toggle */}
       <button 
-        className={`lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md ${themeClasses.card} text-indigo-500`}
+        className={`lg:hidden fixed top-4 left-4 z-[60] p-2 rounded-md ${themeClasses.card} text-indigo-500`}
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         {sidebarOpen ? <FaTimes /> : <FaBars />}
@@ -98,7 +98,7 @@ const DashboardLayout = ({ children }) => {
       <aside 
         className={`fixed lg:static inset-y-0 left-0 w-72 ${themeClasses.sidebar} border-r ${themeClasses.border} transform ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 flex flex-col shadow-lg`}
+        } lg:translate-x-0 transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-lg`}
       >
         {/* Logo/Title */}
         <div className={`p-6 border-b ${themeClasses.border}`}>
@@ -201,7 +201,7 @@ const DashboardLayout = ({ children }) => {
       </aside>
       
       {/* Main content */}
-      <div className="flex-1 flex flex-col">
+      <div className={`flex-1 flex flex-col ${sidebarOpen ? 'lg:ml-0 ml-0' : 'ml-0'}`}>
         {/* Header */}
         <header className={`${themeClasses.card} border-b ${themeClasses.border} p-4 flex justify-between items-center shadow-sm`}>
           <h2 className="text-xl font-semibold ml-2">
@@ -324,6 +324,14 @@ const DashboardLayout = ({ children }) => {
           </div>
         </footer>
       </div>
+      
+      {/* Overlay for mobile when sidebar is open */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
     </div>
   );
 };

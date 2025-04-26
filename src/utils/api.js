@@ -3,12 +3,29 @@ import axios from 'axios';
 // Get the base URL from environment variables or use default
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
+// Determine if we're running in development mode
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const SERVER_URL = isDevelopment ? 'http://localhost:8888' : '';
+
 // Create an axios instance
 const API = axios.create({
-  baseURL: BASE_URL,
+  baseURL: isDevelopment ? `${SERVER_URL}${BASE_URL}` : BASE_URL,
   withCredentials: true,
   timeout: 15000 // Increase timeout for Netlify functions
 });
+
+// Log the current environment and base URL for debugging
+console.log(`API Environment: ${isDevelopment ? 'Development' : 'Production'}`);
+console.log(`API Base URL: ${API.defaults.baseURL}`);
+
+// Helper function to get the correct API URL based on environment
+const getApiUrl = (netlifyPath, regularPath) => {
+  if (isDevelopment) {
+    return `${SERVER_URL}${regularPath}`;
+  } else {
+    return netlifyPath;
+  }
+};
 
 // Add a request interceptor to include the token from localStorage
 API.interceptors.request.use(
@@ -76,8 +93,15 @@ export const authAPI = {
         password: credentials.password ? '***' : 'missing' 
       });
       
+      // Determine which URL to use based on environment
+      const loginUrl = isDevelopment 
+        ? `${SERVER_URL}/api/auth/login`  // Use local server in development
+        : '/.netlify/functions/login';    // Use Netlify function in production
+      
+      console.log('Login URL:', loginUrl);
+      
       // Use fetch API directly for more control
-      const response = await fetch('/.netlify/functions/login', {
+      const response = await fetch(loginUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -85,7 +109,8 @@ export const authAPI = {
         body: JSON.stringify({
           email: credentials.email,
           password: credentials.password
-        })
+        }),
+        credentials: 'include'
       });
       
       const data = await response.json();
@@ -111,11 +136,20 @@ export const authAPI = {
   getProfile: async () => {
     try {
       console.log('Trying dedicated me function');
-      const response = await fetch('/.netlify/functions/me', {
+      
+      // Determine which URL to use based on environment
+      const profileUrl = isDevelopment 
+        ? `${SERVER_URL}/api/auth/me`   // Use local server in development
+        : '/.netlify/functions/me';     // Use Netlify function in production
+      
+      console.log('Profile URL:', profileUrl);
+      
+      const response = await fetch(profileUrl, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        },
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -228,7 +262,10 @@ export const ProjectAPI = {
         }
       }
       
-      const url = `/.netlify/functions/projects?${queryParams.toString()}`;
+      const url = getApiUrl(
+        `/.netlify/functions/projects?${queryParams.toString()}`,
+        `/api/projects?${queryParams.toString()}`
+      );
       console.log('Fetching from URL:', url);
       
       const response = await fetch(url);
@@ -269,7 +306,10 @@ export const BlogAPI = {
         }
       }
       
-      const url = `/.netlify/functions/blogs?${queryParams.toString()}`;
+      const url = getApiUrl(
+        `/.netlify/functions/blogs?${queryParams.toString()}`,
+        `/api/blogs?${queryParams.toString()}`
+      );
       console.log('Fetching from URL:', url);
       
       const response = await fetch(url);
@@ -372,7 +412,10 @@ export const TaskAPI = {
       if (params.priority) queryParams.append('priority', params.priority);
       if (params.completed !== undefined) queryParams.append('completed', params.completed.toString());
       
-      const url = `/.netlify/functions/tasks?${queryParams.toString()}`;
+      const url = getApiUrl(
+        `/.netlify/functions/tasks?${queryParams.toString()}`,
+        `/api/tasks?${queryParams.toString()}`
+      );
       console.log('Fetching from URL:', url);
       
       const response = await fetch(url);
@@ -441,7 +484,10 @@ export const TaskAPI = {
   getTodaysTasks: async () => {
     try {
       console.log('Trying dedicated tasks/today function');
-      const url = `/.netlify/functions/tasks/today`;
+      const url = getApiUrl(
+        '/.netlify/functions/tasks/today',
+        '/api/tasks/today'
+      );
       console.log('Fetching from URL:', url);
       
       const response = await fetch(url);
@@ -510,7 +556,10 @@ export const MotivationAPI = {
       if (params.sort) queryParams.append('sort', params.sort);
       if (params.category) queryParams.append('category', params.category);
       
-      const url = `/.netlify/functions/motivations?${queryParams.toString()}`;
+      const url = getApiUrl(
+        `/.netlify/functions/motivations?${queryParams.toString()}`,
+        `/api/motivations?${queryParams.toString()}`
+      );
       console.log('Fetching from URL:', url);
       
       const response = await fetch(url);
@@ -593,7 +642,10 @@ export const BuildInPublicAPI = {
       if (params.sort) queryParams.append('sort', params.sort);
       if (params.category) queryParams.append('category', params.category);
       
-      const url = `/.netlify/functions/build-in-public?${queryParams.toString()}`;
+      const url = getApiUrl(
+        `/.netlify/functions/build-in-public?${queryParams.toString()}`,
+        `/api/build-in-public?${queryParams.toString()}`
+      );
       console.log('Fetching from URL:', url);
       
       const response = await fetch(url);
