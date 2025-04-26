@@ -240,48 +240,55 @@ export const uploadAPI = {
   }),
 };
 
+// Define ProjectAPI
 export const ProjectAPI = {
   getProjects: async (params = {}) => {
     try {
-      console.log('Trying dedicated projects function');
-      const queryParams = new URLSearchParams();
+      console.log('Attempting to use dedicated projects function');
       
+      // Build query params
+      const queryParams = new URLSearchParams();
       if (params.limit) queryParams.append('limit', params.limit);
       if (params.page) queryParams.append('page', params.page);
-      if (params.sort) queryParams.append('sort', params.sort);
-      
-      // Handle tag parameter - the Netlify function expects 'tag' not 'tags'
-      if (params.tag) {
-        queryParams.append('tag', params.tag);
-      } else if (params.tags) {
-        // For backward compatibility - use the first tag
-        if (Array.isArray(params.tags) && params.tags.length > 0) {
-          queryParams.append('tag', params.tags[0]);
-        } else if (typeof params.tags === 'string') {
-          queryParams.append('tag', params.tags);
-        }
+      if (params.tags && params.tags.length > 0) {
+        queryParams.append('tags', params.tags.join(','));
       }
       
+      // Get the URL using the helper function
       const url = getApiUrl(
-        `/.netlify/functions/projects?${queryParams.toString()}`,
-        `/api/projects?${queryParams.toString()}`
+        '/.netlify/functions/projects', 
+        '/api/projects'
       );
-      console.log('Fetching from URL:', url);
       
-      const response = await fetch(url);
+      // Add query parameters if they exist
+      const fullUrl = queryParams.toString() 
+        ? `${url}?${queryParams.toString()}` 
+        : url;
+      
+      console.log('Fetching from URL:', fullUrl);
+      
+      const response = await fetch(fullUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       
       if (!response.ok) {
-        throw new Error(`Error fetching projects: ${response.status}`);
+        throw new Error(`Projects function returned ${response.status}: ${response.statusText}`);
       }
       
       const data = await response.json();
-      return { data, status: response.status };
+      console.log('Projects function response:', data);
+      return data;
     } catch (error) {
-      console.log('Projects function failed, trying regular API route');
+      console.log('Projects function failed, falling back to regular API route');
       console.error('Projects function error:', error.message);
-      return await API.get('/projects', { params });
+      
+      // Fall back to regular API route
+      return API.get('/projects', { params }).then(res => res.data);
     }
-  },
+  }
 };
 
 export const BlogAPI = {

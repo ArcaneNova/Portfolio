@@ -85,7 +85,7 @@ const DashboardLayout = ({ children }) => {
       };
 
   return (
-    <div className={`min-h-screen ${themeClasses.bg} ${themeClasses.text} flex transition-colors duration-200`}>
+    <div className={`min-h-screen ${themeClasses.bg} ${themeClasses.text} flex flex-col lg:flex-row transition-colors duration-200 relative`}>
       {/* Mobile sidebar toggle */}
       <button 
         className={`lg:hidden fixed top-4 left-4 z-[60] p-2 rounded-md ${themeClasses.card} text-indigo-500`}
@@ -96,9 +96,9 @@ const DashboardLayout = ({ children }) => {
       
       {/* Sidebar */}
       <aside 
-        className={`fixed lg:static inset-y-0 left-0 w-72 ${themeClasses.sidebar} border-r ${themeClasses.border} transform ${
+        className={`fixed lg:sticky top-0 inset-y-0 left-0 w-72 h-screen ${themeClasses.sidebar} border-r ${themeClasses.border} transform ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-lg`}
+        } lg:translate-x-0 transition-transform duration-300 ease-in-out z-50 flex flex-col shadow-lg overflow-hidden`}
       >
         {/* Logo/Title */}
         <div className={`p-6 border-b ${themeClasses.border}`}>
@@ -201,129 +201,131 @@ const DashboardLayout = ({ children }) => {
       </aside>
       
       {/* Main content */}
-      <div className={`flex-1 flex flex-col ${sidebarOpen ? 'lg:ml-0 ml-0' : 'ml-0'}`}>
-        {/* Header */}
-        <header className={`${themeClasses.card} border-b ${themeClasses.border} p-4 flex justify-between items-center shadow-sm`}>
-          <h2 className="text-xl font-semibold ml-2">
-            {navItems.find(item => 
-              item.path === location.pathname || 
-              (item.path !== '/admin' && location.pathname.startsWith(item.path))
-            )?.name || 'Dashboard'}
-          </h2>
-          
-          <div className="flex items-center space-x-3">
-            {/* Notifications */}
-            <div className="relative">
-              <button 
-                className={`p-2 rounded-full relative ${themeClasses.cardHover}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setNotificationDropdownOpen(!notificationDropdownOpen);
-                  setProfileDropdownOpen(false);
-                }}
-              >
-                <FaBell />
-                {notifications.some(n => !n.read) && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                )}
-              </button>
-              
-              {notificationDropdownOpen && (
-                <div className={`absolute right-0 mt-2 w-80 ${themeClasses.card} rounded-lg shadow-lg border ${themeClasses.border} z-50 py-2`}>
-                  <div className="px-4 py-2 border-b border-gray-700 flex justify-between items-center">
-                    <h3 className="font-medium">Notifications</h3>
-                    <button className="text-xs text-indigo-500 hover:text-indigo-400">Mark all as read</button>
-                  </div>
-                  <div className="max-h-96 overflow-y-auto">
-                    {notifications.length > 0 ? (
-                      notifications.map(notification => (
-                        <div 
-                          key={notification.id} 
-                          className={`px-4 py-3 ${notification.read ? '' : 'bg-indigo-900/10'} hover:bg-gray-700/30 border-b border-gray-700/50`}
-                        >
-                          <div className="flex justify-between items-start">
-                            <p className={`text-sm ${notification.read ? 'text-gray-400' : 'text-white'}`}>{notification.text}</p>
-                            {!notification.read && <span className="w-2 h-2 bg-indigo-500 rounded-full mt-1"></span>}
+      <main className="flex-1 w-full">
+        <div className="flex flex-col min-h-screen">
+          {/* Header */}
+          <header className={`${themeClasses.card} border-b ${themeClasses.border} p-4 flex justify-between items-center shadow-sm`}>
+            <h2 className="text-xl font-semibold ml-2 lg:ml-0 pl-8 lg:pl-0">
+              {navItems.find(item => 
+                item.path === location.pathname || 
+                (item.path !== '/admin' && location.pathname.startsWith(item.path))
+              )?.name || 'Dashboard'}
+            </h2>
+            
+            <div className="flex items-center space-x-3">
+              {/* Notifications */}
+              <div className="relative">
+                <button 
+                  className={`p-2 rounded-full relative ${themeClasses.cardHover}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setNotificationDropdownOpen(!notificationDropdownOpen);
+                    setProfileDropdownOpen(false);
+                  }}
+                >
+                  <FaBell />
+                  {notifications.some(n => !n.read) && (
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
+                </button>
+                
+                {notificationDropdownOpen && (
+                  <div className={`absolute right-0 mt-2 w-80 ${themeClasses.card} rounded-lg shadow-lg border ${themeClasses.border} z-50 py-2`}>
+                    <div className="px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                      <h3 className="font-medium">Notifications</h3>
+                      <button className="text-xs text-indigo-500 hover:text-indigo-400">Mark all as read</button>
+                    </div>
+                    <div className="max-h-96 overflow-y-auto">
+                      {notifications.length > 0 ? (
+                        notifications.map(notification => (
+                          <div 
+                            key={notification.id} 
+                            className={`px-4 py-3 ${notification.read ? '' : 'bg-indigo-900/10'} hover:bg-gray-700/30 border-b border-gray-700/50`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <p className={`text-sm ${notification.read ? 'text-gray-400' : 'text-white'}`}>{notification.text}</p>
+                              {!notification.read && <span className="w-2 h-2 bg-indigo-500 rounded-full mt-1"></span>}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
                           </div>
-                          <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
-                        </div>
-                      ))
+                        ))
+                      ) : (
+                        <p className="text-center py-4 text-gray-500">No notifications</p>
+                      )}
+                    </div>
+                    <div className="px-4 py-2 border-t border-gray-700">
+                      <button className="text-xs text-indigo-500 hover:text-indigo-400 w-full text-center">View all notifications</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* User dropdown */}
+              <div className="relative">
+                <button 
+                  className={`flex items-center space-x-2 ${themeClasses.cardHover} rounded-lg px-3 py-2`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setProfileDropdownOpen(!profileDropdownOpen);
+                    setNotificationDropdownOpen(false);
+                  }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">
+                    {user?.profileImage ? (
+                      <img src={user.profileImage} alt={user.username} className="w-full h-full rounded-full object-cover" />
                     ) : (
-                      <p className="text-center py-4 text-gray-500">No notifications</p>
+                      <FaUser size={14} className="text-white" />
                     )}
                   </div>
-                  <div className="px-4 py-2 border-t border-gray-700">
-                    <button className="text-xs text-indigo-500 hover:text-indigo-400 w-full text-center">View all notifications</button>
+                  <span className="text-sm hidden md:block">{user?.username || 'Admin'}</span>
+                  <FaChevronDown size={12} className="text-gray-400" />
+                </button>
+                
+                {profileDropdownOpen && (
+                  <div className={`absolute right-0 mt-2 w-48 ${themeClasses.card} rounded-lg shadow-lg py-2 border ${themeClasses.border} z-50`}>
+                    <div className="px-4 py-2 border-b border-gray-700">
+                      <p className="text-sm font-medium">{user?.username || 'Admin User'}</p>
+                      <p className="text-xs text-gray-400">{user?.email || 'admin@example.com'}</p>
+                    </div>
+                    <a href="/admin/profile" className="block px-4 py-2 text-sm hover:bg-gray-700">Profile</a>
+                    <a href="/admin/settings" className="block px-4 py-2 text-sm hover:bg-gray-700">Settings</a>
+                    <div className="border-t border-gray-700 mt-2 pt-2">
+                      <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700">
+                        Logout
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-            
-            {/* User dropdown */}
-            <div className="relative">
-              <button 
-                className={`flex items-center space-x-2 ${themeClasses.cardHover} rounded-lg px-3 py-2`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setProfileDropdownOpen(!profileDropdownOpen);
-                  setNotificationDropdownOpen(false);
-                }}
-              >
-                <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">
-                  {user?.profileImage ? (
-                    <img src={user.profileImage} alt={user.username} className="w-full h-full rounded-full object-cover" />
-                  ) : (
-                    <FaUser size={14} className="text-white" />
-                  )}
-                </div>
-                <span className="text-sm hidden md:block">{user?.username || 'Admin'}</span>
-                <FaChevronDown size={12} className="text-gray-400" />
-              </button>
+                )}
+              </div>
               
-              {profileDropdownOpen && (
-                <div className={`absolute right-0 mt-2 w-48 ${themeClasses.card} rounded-lg shadow-lg py-2 border ${themeClasses.border} z-50`}>
-                  <div className="px-4 py-2 border-b border-gray-700">
-                    <p className="text-sm font-medium">{user?.username || 'Admin User'}</p>
-                    <p className="text-xs text-gray-400">{user?.email || 'admin@example.com'}</p>
-                  </div>
-                  <a href="/admin/profile" className="block px-4 py-2 text-sm hover:bg-gray-700">Profile</a>
-                  <a href="/admin/settings" className="block px-4 py-2 text-sm hover:bg-gray-700">Settings</a>
-                  <div className="border-t border-gray-700 mt-2 pt-2">
-                    <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700">
-                      Logout
-                    </button>
-                  </div>
-                </div>
-              )}
+              <a 
+                href="/" 
+                target="_blank" 
+                className={`hidden md:block px-4 py-2 text-sm ${themeClasses.button} ${themeClasses.buttonText} rounded-lg shadow-sm transition-colors`}
+              >
+                View Site
+              </a>
             </div>
-            
-            <a 
-              href="/" 
-              target="_blank" 
-              className={`hidden md:block px-4 py-2 text-sm ${themeClasses.button} ${themeClasses.buttonText} rounded-lg shadow-sm transition-colors`}
-            >
-              View Site
-            </a>
+          </header>
+          
+          {/* Page content */}
+          <div className="flex-1 overflow-y-auto p-6 pl-6 lg:pl-6">
+            {children}
           </div>
-        </header>
-        
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
-        
-        {/* Footer */}
-        <footer className={`border-t ${themeClasses.border} py-4 px-6`}>
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">© 2023 Portfolio Admin Dashboard</p>
-            <div className="flex items-center space-x-4">
-              <a href="#" className="text-sm text-gray-500 hover:text-indigo-500">Help</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-indigo-500">Privacy</a>
-              <a href="#" className="text-sm text-gray-500 hover:text-indigo-500">Terms</a>
+          
+          {/* Footer */}
+          <footer className={`border-t ${themeClasses.border} py-4 px-6`}>
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-500">© 2023 Portfolio Admin Dashboard</p>
+              <div className="flex items-center space-x-4">
+                <a href="#" className="text-sm text-gray-500 hover:text-indigo-500">Help</a>
+                <a href="#" className="text-sm text-gray-500 hover:text-indigo-500">Privacy</a>
+                <a href="#" className="text-sm text-gray-500 hover:text-indigo-500">Terms</a>
+              </div>
             </div>
-          </div>
-        </footer>
-      </div>
+          </footer>
+        </div>
+      </main>
       
       {/* Overlay for mobile when sidebar is open */}
       {sidebarOpen && (

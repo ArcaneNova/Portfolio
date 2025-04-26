@@ -35,8 +35,14 @@ export const handler = async (event, context) => {
   console.log('Query params:', event.queryStringParameters);
   
   try {
-    // Parse query params
-    const { limit = 5, page = 1, sort, tag } = event.queryStringParameters || {};
+    // Parse query params with defaults
+    const queryParams = event.queryStringParameters || {};
+    const limit = parseInt(queryParams.limit || '5', 10);
+    const page = parseInt(queryParams.page || '1', 10);
+    const sort = queryParams.sort;
+    const tag = queryParams.tag;
+    
+    console.log('Parsed params:', { limit, page, sort, tag });
     
     // In a real app, you would fetch projects from a database
     // For now, we'll return mock data
@@ -106,13 +112,16 @@ export const handler = async (event, context) => {
     // Filter by tag if provided
     let filteredProjects = mockProjects;
     if (tag) {
+      console.log(`Filtering projects by tag: ${tag}`);
       filteredProjects = filteredProjects.filter(project => 
         project.tags.some(t => t.toLowerCase() === tag.toLowerCase())
       );
+      console.log(`Found ${filteredProjects.length} projects with tag: ${tag}`);
     }
     
     // Sort projects if sort is provided
     if (sort) {
+      console.log(`Sorting projects by: ${sort}`);
       const [field, order] = sort.split(':');
       filteredProjects.sort((a, b) => {
         if (field === 'createdAt') {
@@ -129,12 +138,23 @@ export const handler = async (event, context) => {
     }
     
     // Paginate results
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    const startIndex = (pageNum - 1) * limitNum;
-    const endIndex = pageNum * limitNum;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    
+    // Check for valid pagination parameters
+    if (page < 1 || limit < 1) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Invalid pagination parameters. Page and limit must be positive integers.'
+        })
+      };
+    }
     
     const paginatedProjects = filteredProjects.slice(startIndex, endIndex);
+    console.log(`Returning ${paginatedProjects.length} projects (page ${page}, limit ${limit})`);
     
     // Prepare response
     const response = {
@@ -142,9 +162,9 @@ export const handler = async (event, context) => {
       count: filteredProjects.length,
       data: paginatedProjects,
       pagination: {
-        page: pageNum,
-        limit: limitNum,
-        totalPages: Math.ceil(filteredProjects.length / limitNum)
+        page: page,
+        limit: limit,
+        totalPages: Math.ceil(filteredProjects.length / limit)
       }
     };
     
