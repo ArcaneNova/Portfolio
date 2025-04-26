@@ -149,10 +149,10 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-// Timeline Marker Component with 3D Effect
+// Timeline Marker Component with 3D Effect - Make it more responsive
 const TimelineMarker = ({ year, color, active, onClick }) => (
   <motion.div 
-    className={`cursor-pointer relative z-20 w-20 h-20 flex items-center justify-center rounded-full 
+    className={`cursor-pointer relative z-20 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full 
       ${active 
         ? 'scale-110 shadow-lg shadow-blue-500/30' 
         : 'opacity-70 hover:opacity-100 hover:scale-105'}`}
@@ -161,9 +161,9 @@ const TimelineMarker = ({ year, color, active, onClick }) => (
     onClick={onClick}
   >
     <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${color} opacity-20 blur-sm`}></div>
-    <div className={`w-16 h-16 rounded-full bg-black border-2 border-white/10 flex items-center justify-center
+    <div className={`w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-black border-2 border-white/10 flex items-center justify-center
       ${active ? 'shadow-inner shadow-blue-500/50' : ''}`}>
-      <div className={`text-sm font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
+      <div className={`text-xs sm:text-sm font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
         {year}
       </div>
     </div>
@@ -207,29 +207,66 @@ const SkillBar = ({ name, level, color, index }) => {
   );
 };
 
-// Interactive TimeLine Component
+// Interactive TimeLine Component - Make it mobile responsive
 const InteractiveTimeline = ({ data, onSelect }) => {
   const [hoveredYear, setHoveredYear] = useState(null);
   const timelineRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    // Check if we're on mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   return (
-    <div ref={timelineRef} className="relative mb-8 px-4">
+    <div ref={timelineRef} className="relative mb-8 px-2">
+      {/* Timeline bar */}
       <div className="absolute left-0 right-0 top-1/2 h-1 bg-gradient-to-r from-blue-800/50 via-purple-800/50 to-blue-800/50 transform -translate-y-1/2"></div>
       
-      <div className="flex justify-between items-center relative">
-        {data.map((entry, index) => (
-          <TimelineMarker 
-            key={entry.year}
-            year={entry.year}
-            color={entry.color}
-            active={hoveredYear === entry.year}
-            onClick={() => {
-              setHoveredYear(entry.year);
-              onSelect(index);
-            }}
-          />
-        ))}
-      </div>
+      {isMobile ? (
+        // Mobile scrollable timeline
+        <div className="flex items-center relative py-4 overflow-x-auto hide-scrollbar pb-6">
+          <div className="flex space-x-6 px-4">
+            {data.map((entry, index) => (
+              <TimelineMarker 
+                key={entry.year}
+                year={entry.year}
+                color={entry.color}
+                active={hoveredYear === entry.year}
+                onClick={() => {
+                  setHoveredYear(entry.year);
+                  onSelect(index);
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        // Desktop timeline
+        <div className="flex justify-between items-center relative">
+          {data.map((entry, index) => (
+            <TimelineMarker 
+              key={entry.year}
+              year={entry.year}
+              color={entry.color}
+              active={hoveredYear === entry.year}
+              onClick={() => {
+                setHoveredYear(entry.year);
+                onSelect(index);
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -374,7 +411,7 @@ const MyJourney = () => {
   const sectionRef = useRef(null);
   const statsRef = useRef(null);
   
-  // Add style for 3D card effect
+  // Add style for 3D card effect and responsiveness
   useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
@@ -385,6 +422,8 @@ const MyJourney = () => {
       .custom-scrollbar::-webkit-scrollbar { width: 4px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
       .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.5); border-radius: 2px; }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
@@ -462,7 +501,7 @@ const MyJourney = () => {
       {/* Navigation */}
       <Navbar />
 
-      <main className="container mx-auto px-4 py-12 relative">
+      <main className="container mx-auto px-2 sm:px-4 py-12 relative">
         {/* Hero Section */}
         <section className="min-h-screen flex flex-col justify-center items-center py-20">
           <motion.div 
@@ -519,17 +558,17 @@ const MyJourney = () => {
           </div>
         </section>
         
-        {/* Quote Section */}
-        <section className="mb-32">
+        {/* Quote Section - Make more responsive */}
+        <section className="mb-20 md:mb-32">
           <div className="quote-card max-w-4xl mx-auto">
             <GlowEffect color="blue" intensity="high">
-              <div className="bg-black-300/30 backdrop-blur-md p-10 rounded-2xl border border-blue-500/20">
-                <div className="text-6xl text-blue-500/30 font-serif mb-4">"</div>
-                <blockquote className="text-2xl md:text-3xl italic font-light text-center mb-6 text-blue-50">
+              <div className="bg-black-300/30 backdrop-blur-md p-6 md:p-10 rounded-2xl border border-blue-500/20">
+                <div className="text-4xl md:text-6xl text-blue-500/30 font-serif mb-4">"</div>
+                <blockquote className="text-xl md:text-3xl italic font-light text-center mb-6 text-blue-50">
                 You got a dream, you gotta protect it. People can't do something themselves, they wanna tell you you can't do it.
                 </blockquote>
                 <div className="text-center">
-                  <span className="inline-block px-4 py-2 rounded-full bg-blue-900/40 text-blue-300 font-semibold">
+                  <span className="inline-block px-4 py-2 rounded-full bg-blue-900/40 text-blue-300 font-semibold text-sm md:text-base">
                   The Pursuit of Happyness
                   </span>
                 </div>
@@ -538,14 +577,14 @@ const MyJourney = () => {
           </div>
         </section>
         
-        {/* Stats Section */}
-        <section ref={statsRef} className="mb-32">
+        {/* Stats Section - Improve mobile layout */}
+        <section ref={statsRef} className="mb-20 md:mb-32">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-16 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
               Journey in Numbers
             </h2>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
               <div className="stats-counter">
                 <StatCounter value="11" label="Years of Tech Journey" />
               </div>
@@ -562,23 +601,25 @@ const MyJourney = () => {
           </div>
         </section>
       
-        {/* Interactive Journey Section */}
-        <section id="journey" className="mb-32">
+        {/* Interactive Journey Section - Fix mobile view */}
+        <section id="journey" className="mb-20 md:mb-32">
           <CyberpunkInterface 
             title="TIMELINE" 
             subtitle="EXPERIENCE.LOG" 
-            className="mb-12"
+            className="mb-8 md:mb-12"
           />
           
           <div className="max-w-6xl mx-auto">
             {/* Timeline Navigation */}
-            <InteractiveTimeline 
-              data={journeyData} 
-              onSelect={setSelectedJourney} 
-            />
+            <div className="px-0 md:px-6">
+              <InteractiveTimeline 
+                data={journeyData} 
+                onSelect={setSelectedJourney} 
+              />
+            </div>
             
             {/* Journey Content */}
-            <div className="mt-16">
+            <div className="mt-8 md:mt-16 px-2">
               <AnimatePresence mode="wait">
                 {journeyData.map((entry, index) => (
                   <Journey3DCard 
@@ -591,16 +632,15 @@ const MyJourney = () => {
               </AnimatePresence>
             </div>
             
-            {/* Navigation Arrows */}
-            <div className="flex justify-between mt-8">
-            <motion.button
+            {/* Navigation Arrows - Improve mobile placement */}
+            <div className="flex justify-between mt-6 md:mt-8 px-2 md:px-8">
+              <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="w-12 h-12 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400 hover:bg-blue-800/50 transition-colors"
+                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400 hover:bg-blue-800/50 transition-colors"
                 onClick={() => setSelectedJourney(prev => (prev === 0 ? journeyData.length - 1 : prev - 1))}
-                disabled={selectedJourney === 0}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </motion.button>
@@ -608,11 +648,10 @@ const MyJourney = () => {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="w-12 h-12 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400 hover:bg-blue-800/50 transition-colors"
+                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400 hover:bg-blue-800/50 transition-colors"
                 onClick={() => setSelectedJourney(prev => (prev === journeyData.length - 1 ? 0 : prev + 1))}
-                disabled={selectedJourney === journeyData.length - 1}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </motion.button>
@@ -620,16 +659,16 @@ const MyJourney = () => {
           </div>
         </section>
         
-        {/* Skills Section */}
-        <section className="mb-32">
+        {/* Skills Section - Better mobile layout */}
+        <section className="mb-20 md:mb-32 px-2">
           <CyberpunkInterface 
             title="SKILL MATRIX" 
             subtitle="ABILITY.DATA" 
-            className="mb-12"
+            className="mb-8 md:mb-12"
           />
           
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-6 md:gap-y-2">
               {skills.map((skill, index) => (
                 <SkillBar 
                   key={skill.name}
@@ -643,44 +682,44 @@ const MyJourney = () => {
           </div>
         </section>
         
-        {/* Lessons Learned Section */}
-        <section className="mb-32">
-          <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+        {/* Lessons Learned Section - Mobile friendly */}
+        <section className="mb-20 md:mb-32 px-2">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
             Key Lessons From My Journey
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
             <GlowEffect color="purple" intensity="low">
-              <div className="h-full bg-black-200/50 backdrop-blur-sm p-6 rounded-xl border border-purple-600/20">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 mb-6 flex items-center justify-center text-2xl">
+              <div className="h-full bg-black-200/50 backdrop-blur-sm p-5 md:p-6 rounded-xl border border-purple-600/20">
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 mb-4 md:mb-6 flex items-center justify-center text-xl md:text-2xl">
                   🔄
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Consistency is Key</h3>
-                <p className="text-gray-300">
+                <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">Consistency is Key</h3>
+                <p className="text-gray-300 text-sm md:text-base">
                   Working consistently for two years led to my first payment. Progress compounds over time. Stay persistent even when results aren't immediate.
                 </p>
               </div>
             </GlowEffect>
             
             <GlowEffect color="blue" intensity="low">
-              <div className="h-full bg-black-200/50 backdrop-blur-sm p-6 rounded-xl border border-blue-600/20">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-6 flex items-center justify-center text-2xl">
+              <div className="h-full bg-black-200/50 backdrop-blur-sm p-5 md:p-6 rounded-xl border border-blue-600/20">
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-4 md:mb-6 flex items-center justify-center text-xl md:text-2xl">
                   💡
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Balance Education & Skills</h3>
-                <p className="text-gray-300">
+                <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">Balance Education & Skills</h3>
+                <p className="text-gray-300 text-sm md:text-base">
                   I didn't give up on education despite earning well from my websites. The foundation of formal education combined with practical skills is powerful.
                 </p>
               </div>
             </GlowEffect>
             
             <GlowEffect color="pink" intensity="low">
-              <div className="h-full bg-black-200/50 backdrop-blur-sm p-6 rounded-xl border border-pink-600/20">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-600 to-red-600 mb-6 flex items-center justify-center text-2xl">
+              <div className="h-full bg-black-200/50 backdrop-blur-sm p-5 md:p-6 rounded-xl border border-pink-600/20">
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-pink-600 to-red-600 mb-4 md:mb-6 flex items-center justify-center text-xl md:text-2xl">
                   🚀
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Embrace Failure</h3>
-                <p className="text-gray-300">
+                <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">Embrace Failure</h3>
+                <p className="text-gray-300 text-sm md:text-base">
                   My startup attempt didn't succeed, but I gained invaluable experience. Failure is a stepping stone to success, not the end of the journey.
                 </p>
               </div>
@@ -688,21 +727,21 @@ const MyJourney = () => {
           </div>
         </section>
         
-        {/* Call to Action */}
-        <section className="mb-20">
+        {/* Call to Action - Improve mobile layout */}
+        <section className="mb-16 md:mb-20 px-2">
           <div className="max-w-4xl mx-auto">
             <GlowEffect color="blue" intensity="medium">
-              <div className="bg-black-300/70 p-10 rounded-2xl border border-blue-600/30 backdrop-blur-md relative overflow-hidden">
+              <div className="bg-black-300/70 p-6 md:p-10 rounded-2xl border border-blue-600/30 backdrop-blur-md relative overflow-hidden">
                 {/* Decorative elements */}
                 <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-blue-600/10 blur-2xl"></div>
                 <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-purple-600/10 blur-xl"></div>
                 
                 <div className="relative">
-                  <h2 className="text-3xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
                     What's Next on My Journey?
                   </h2>
                   
-                  <div className="text-blue-50 mb-8 space-y-4">
+                  <div className="text-blue-50 mb-6 md:mb-8 space-y-3 md:space-y-4 text-sm md:text-base">
                     <p>
                       I'm continuously learning DSA to build stronger programming foundations. Working on innovative ideas while
                       preparing for dream opportunities. The journey continues.
@@ -724,7 +763,7 @@ const MyJourney = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       href="#contact"
-                      className="inline-block px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/20 w-full sm:w-auto text-center"
+                      className="inline-block px-6 md:px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/20 w-full sm:w-auto text-center text-sm md:text-base"
                     >
                       Get in Touch
                     </motion.a>
@@ -733,7 +772,7 @@ const MyJourney = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       href="#projects"
-                      className="inline-block px-8 py-3 bg-transparent border-2 border-blue-600/50 text-blue-400 font-bold rounded-full hover:bg-blue-900/20 transition-all duration-300 w-full sm:w-auto text-center"
+                      className="inline-block px-6 md:px-8 py-3 bg-transparent border-2 border-blue-600/50 text-blue-400 font-bold rounded-full hover:bg-blue-900/20 transition-all duration-300 w-full sm:w-auto text-center text-sm md:text-base"
                     >
                       See My Projects
                     </motion.a>
@@ -766,6 +805,13 @@ const MyJourney = () => {
           -webkit-line-clamp: 6;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </div>
