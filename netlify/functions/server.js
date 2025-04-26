@@ -68,6 +68,34 @@ app.all('/api/auth/*', (req, res) => {
   res.status(307).redirect(`/.netlify/functions/auth/${req.path.replace('/api/auth/', '')}`);
 });
 
+// Add error handling middleware 
+app.use((err, req, res, next) => {
+  console.error('Server function error:', err.stack);
+  
+  // Handle specific error types
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({
+      success: false,
+      message: 'Validation Error',
+      errors: Object.values(err.errors).map(val => val.message)
+    });
+  }
+  
+  if (err.name === 'MongoError' && err.code === 11000) {
+    return res.status(400).json({
+      success: false,
+      message: 'Duplicate field value entered'
+    });
+  }
+  
+  // Generic error response
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || 'Server Error',
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
