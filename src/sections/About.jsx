@@ -221,8 +221,10 @@ const About = () => {
                 </p>
                 
                 <p className="bio-text text-blue-50 leading-relaxed">
-                  When I'm not coding, I enjoy participating in hackathons, contributing to open-source projects, and mentoring aspiring developers. I'm constantly learning and exploring new technologies to stay at the cutting edge.
+                  When I'm not coding, I enjoy participating in hackathons, contributing to open-source projects, sleeping, and reading books. I'm constantly learning and exploring new technologies to stay at the cutting edge.
                 </p>
+
+                <p>I'm quite boring person and not interested in socializing too much. I love reading books and usually I'm watch movies. Some movies lasttime watched are The Social Network, The pursuit of happiness, Bhag Milkha Bhag :)</p>
                 
                 <div className="bio-text pt-4 border-t border-blue-100/10">
                   <div className="grid grid-cols-2 gap-4">
