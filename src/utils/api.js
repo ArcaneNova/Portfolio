@@ -2,7 +2,9 @@ import axios from 'axios';
 
 // Determine the base URL based on environment
 const isProduction = import.meta.env.PROD;
-const baseURL = isProduction ? '/api' : 'http://localhost:5000/api';
+const baseURL = isProduction 
+  ? import.meta.env.VITE_API_BASE_URL || '/api'
+  : 'http://localhost:8888/api';
 
 // Create an axios instance
 const API = axios.create({

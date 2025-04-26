@@ -28,15 +28,15 @@ if (fs.existsSync(serverDestDir)) {
 copyDirectory(serverDir, serverDestDir);
 console.log('Copied server files to netlify/functions/server');
 
-// Copy .env.local to netlify/functions/.env if it exists
-const envFile = path.join(rootDir, '.env.local');
+// Copy .env file to netlify/functions/.env if it exists
+const envFile = path.join(rootDir, '.env');
 const envDestFile = path.join(functionsDir, '.env');
 
 if (fs.existsSync(envFile)) {
   fs.copyFileSync(envFile, envDestFile);
-  console.log('Copied .env.local to netlify/functions/.env');
+  console.log('Copied .env to netlify/functions/.env');
 } else {
-  console.warn('.env.local file not found. Make sure to set environment variables in Netlify dashboard.');
+  console.warn('.env file not found. Make sure to set environment variables in Netlify dashboard.');
 }
 
 console.log('Build preparation for Netlify deployment completed successfully');

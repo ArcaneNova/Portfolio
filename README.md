@@ -107,12 +107,13 @@ A modern, cyberpunk-themed portfolio website with interactive 3D elements, holog
 - Cloudinary account (for image uploads)
 
 ### Environment Variables
-Create a `.env.local` file in the root directory with the following variables:
+Create a `.env` file in the root directory with the following variables:
 
 ```
 # Server configuration
 PORT=8888
-NODE_ENV=production
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
 
 # Database configuration
 MONGODB_URI=mongodb+srv://your_mongodb_connection_string
@@ -126,7 +127,18 @@ COOKIE_EXPIRE=30
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# Email configuration (optional)
+EMAIL_SERVICE=gmail
+EMAIL_USERNAME=your-email@gmail.com
+EMAIL_PASSWORD=your-email-app-password
+EMAIL_FROM=your-email@gmail.com
+
+# Vite environment variables (must be prefixed with VITE_)
+VITE_API_BASE_URL=/api
 ```
+
+> **Note**: This project uses a single `.env` file for both frontend and backend configuration.
 
 ### Installation
 1. Clone the repository
@@ -162,7 +174,18 @@ This project is configured for easy deployment to Netlify, with integrated backe
 ### Netlify Deployment Steps
 1. Push your code to a GitHub repository
 2. Connect the repository to Netlify
-3. Add the necessary environment variables in Netlify's dashboard
+3. Add the necessary environment variables in Netlify's dashboard:
+   - `PORT`: 8888
+   - `NODE_ENV`: production
+   - `CLIENT_URL`: https://yourdomain.com (your custom domain)
+   - `MONGODB_URI`: your MongoDB connection string
+   - `JWT_SECRET`: your JWT secret key
+   - `JWT_EXPIRE`: 30d
+   - `COOKIE_EXPIRE`: 30
+   - `CLOUDINARY_CLOUD_NAME`: your Cloudinary cloud name
+   - `CLOUDINARY_API_KEY`: your Cloudinary API key
+   - `CLOUDINARY_API_SECRET`: your Cloudinary API secret
+   - `VITE_API_BASE_URL`: /api
 4. Deploy with the following settings:
    - Build command: `npm run netlify:build`
    - Publish directory: `dist`
@@ -184,6 +207,8 @@ This project is configured for easy deployment to Netlify, with integrated backe
 ├── netlify/
 │   └── functions/            # Netlify serverless functions
 ├── public/                   # Static assets
+├── scripts/                  # Build scripts
+│   └── prepare-netlify.js    # Script to prepare files for Netlify deployment
 ├── server/                   # Backend API code
 │   ├── controllers/          # API controllers
 │   ├── middleware/           # Express middleware
@@ -202,7 +227,7 @@ This project is configured for easy deployment to Netlify, with integrated backe
 │   ├── utils/                # Utility functions
 │   ├── App.jsx               # Main app component
 │   └── main.jsx              # Entry point
-├── .env.local                # Environment variables
+├── .env                      # Environment variables (both frontend and backend)
 ├── netlify.toml              # Netlify configuration
 ├── package.json              # Dependencies and scripts
 └── README.md                 # Project documentation
