@@ -11,14 +11,18 @@ const sendTokenResponse = (user, statusCode, res) => {
   // Set cookie options
   const cookieOptions = {
     expires: new Date(
-      Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+      Date.now() + (parseInt(process.env.COOKIE_EXPIRE) || 30) * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   };
 
   // Remove password from response
   user.password = undefined;
+
+  // Log the token generation (avoiding logging the actual token in production)
+  console.log(`Token generated for user: ${user._id}, expires in ${process.env.JWT_EXPIRE || '30d'}`);
 
   res
     .status(statusCode)

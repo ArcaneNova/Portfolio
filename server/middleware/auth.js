@@ -17,6 +17,9 @@ export const protect = async (req, res, next) => {
     token = req.cookies.token;
   }
   
+  // Log the auth attempt for debugging
+  console.log('Auth middleware - token present:', !!token);
+  
   // If no token found
   if (!token) {
     return res.status(401).json({
@@ -27,7 +30,10 @@ export const protect = async (req, res, next) => {
   
   try {
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      token, 
+      process.env.JWT_SECRET || 'your_jwt_secret_key_change_this_in_production'
+    );
     
     // Find user by id in token
     const user = await User.findById(decoded.id);
@@ -43,6 +49,7 @@ export const protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.error('JWT verification error:', error.message);
     return res.status(401).json({
       success: false,
       message: 'Not authorized to access this route'

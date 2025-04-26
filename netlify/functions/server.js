@@ -8,7 +8,6 @@ import serverless from 'serverless-http';
 import path from 'path';
 
 // Routes
-import authRoutes from '../../server/routes/auth.js';
 import projectRoutes from '../../server/routes/projects.js';
 import blogRoutes from '../../server/routes/blogs.js';
 import motivationRoutes from '../../server/routes/motivations.js';
@@ -17,7 +16,7 @@ import taskRoutes from '../../server/routes/tasks.js';
 import uploadRoutes from '../../server/routes/upload.js';
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
@@ -39,14 +38,15 @@ app.use(bodyParser.json({ limit: '30mb' }));
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }));
 app.use(cookieParser());
 
-// Add logging middleware
+// Add detailed logging middleware
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
+  console.log(`SERVER FUNCTION: ${req.method} ${req.path}`);
+  console.log('Request Headers:', JSON.stringify(req.headers));
+  console.log('Request Body:', JSON.stringify(req.body));
   next();
 });
 
 // API Routes
-app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/motivations', motivationRoutes);
@@ -57,6 +57,12 @@ app.use('/api/upload', uploadRoutes);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'API is running' });
+});
+
+// Route for auth-related paths that somehow reach this function
+app.all('/api/auth/*', (req, res) => {
+  console.log('Auth request received in server function, redirecting to auth function');
+  res.status(307).redirect(`/.netlify/functions/auth/${req.path.replace('/api/auth/', '')}`);
 });
 
 // Connect to MongoDB

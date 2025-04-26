@@ -6,8 +6,12 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import path from 'path';
 
-dotenv.config();
+// Import auth routes from server directory
+import authRoutes from '../../server/routes/auth.js';
+
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 // Set up Express app
 const app = express();
@@ -21,6 +25,15 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+// Log request for debugging
+app.use((req, res, next) => {
+  console.log(`AUTH FUNCTION: ${req.method} ${req.path}`);
+  next();
+});
+
+// Use the auth routes from server directory
+app.use('/', authRoutes);
 
 // Simple User schema for auth (replace with your actual User model)
 const userSchema = new mongoose.Schema({

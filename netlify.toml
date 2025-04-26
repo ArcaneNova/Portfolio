@@ -13,6 +13,13 @@
   status = 200
   force = true
 
+# Special case for the specific login endpoint
+[[redirects]]
+  from = "/api/auth/login"
+  to = "/.netlify/functions/auth/login"
+  status = 200
+  force = true
+
 # Redirect for all other API endpoints to server function
 [[redirects]]
   from = "/api/*"
