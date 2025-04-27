@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -16,6 +16,75 @@ const profileImage = "/profile.png";
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+
+// Advanced role typing effect component
+const RoleTypingEffect = () => {
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [typingSpeed, setTypingSpeed] = useState(80);
+  
+  const roles = [
+    "Software Engineer",
+    "Web Developer",
+    "Machine Learning Engineer",
+    "App Developer",
+    "Solo Preneur",
+    "Indie Hacker",
+    "Learner"
+  ];
+  
+  useEffect(() => {
+    let timer;
+    const currentRole = roles[roleIndex];
+    
+    // Handle typing and deleting logic
+    if (!isDeleting && displayText === currentRole) {
+      // Pause at complete word
+      timer = setTimeout(() => {
+        setIsDeleting(true);
+        setTypingSpeed(50); // Faster when deleting
+      }, 1500);
+    } else if (isDeleting && displayText === '') {
+      // Move to next role after complete deletion
+      setIsDeleting(false);
+      setTypingSpeed(120); // Slower when starting new word
+      setRoleIndex((prevIndex) => (prevIndex + 1) % roles.length);
+    } else {
+      // Handle typing or deleting characters
+      timer = setTimeout(() => {
+        setDisplayText(prev => {
+          if (isDeleting) {
+            // Remove last character
+            return prev.substring(0, prev.length - 1);
+          } else {
+            // Add next character
+            return currentRole.substring(0, prev.length + 1);
+          }
+        });
+        
+        // Random typing speed variation for realism
+        if (!isDeleting) {
+          setTypingSpeed(100 + Math.random() * 60);
+        } else {
+          setTypingSpeed(30 + Math.random() * 30);
+        }
+      }, typingSpeed);
+    }
+    
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, roleIndex, roles, typingSpeed]);
+  
+  return (
+    <div className="h-20 flex items-center">
+      <span className="text-xl md:text-2xl text-white opacity-90">I am a </span>
+      <span className="text-xl md:text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500 ml-2">
+        {displayText}
+        <span className={`inline-block w-2 h-6 bg-cyan-400 ml-1 ${isDeleting ? 'animate-blink-fast' : 'animate-blink'}`}></span>
+      </span>
+    </div>
+  );
+};
 
 const Hero = () => {
   const sectionRef = useRef(null);
@@ -90,14 +159,8 @@ const Hero = () => {
             Md Arshad Noor
           </h1>
           
-          <div className="h-20 opacity-100">
-            {/* Reduce typewriter delay for faster visual feedback */}
-            <TypewriterEffect 
-              text="Software Engineer specializing in web development, machine learning, and app development."
-              delay={30} // Reduced delay for faster typing
-              className="text-xl md:text-2xl text-white opacity-90"
-            />
-          </div>
+          {/* Replace static TypewriterEffect with dynamic role typing effect */}
+          <RoleTypingEffect />
           
           {/* Buttons */}
           <div ref={buttonsRef} className="flex flex-wrap gap-4 justify-center lg:justify-start mt-8 opacity-100">

@@ -3,7 +3,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion } from 'framer-motion';
-import { FaGithub, FaCodepen, FaLaptopCode, FaAward, FaStar, FaCodeBranch, FaUsers } from 'react-icons/fa';
+import { FaGithub, FaCodepen, FaLaptopCode, FaAward, FaStar, FaCodeBranch, FaUsers, FaCode } from 'react-icons/fa';
 import { SiLeetcode, SiCodewars } from 'react-icons/si';
 import CyberpunkInterface from '../components/CyberpunkInterface';
 import GlowEffect from '../components/GlowEffect';
@@ -58,8 +58,8 @@ const platformData = [
       { label: 'Contributions', value: '90+', icon: <FaCodeBranch /> }
     ],
     url: 'https://github.com/ArcaneNova',
-    color: 'from-gray-700 to-gray-900',
-    badgeColor: 'bg-gray-800'
+    color: 'from-blue-600 to-blue-900',
+    badgeColor: 'bg-blue-800'
   },
   {
     name: 'LeetCode',
@@ -87,14 +87,28 @@ const platformData = [
    }
 ];
 
-// Simplified GitHub-like contribution visualization
+// Enhanced GitHub-like contribution visualization with more realistic data
 const contributionData = [
-  [0, 1, 3, 2, 4, 2, 0],
-  [1, 2, 3, 4, 2, 1, 2],
-  [0, 1, 4, 3, 2, 3, 1],
-  [2, 3, 4, 4, 3, 2, 0],
-  [1, 3, 2, 1, 4, 2, 1]
+  [1, 3, 2, 4, 2, 2, 0],
+  [2, 3, 5, 4, 1, 2, 0],
+  [0, 2, 6, 5, 3, 1, 2],
+  [3, 5, 7, 4, 2, 3, 1],
+  [2, 4, 6, 3, 1, 2, 3],
+  [1, 3, 2, 4, 6, 3, 2],
+  [0, 1, 3, 5, 4, 2, 1]
 ];
+
+// Days of the week for the contribution graph
+const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+// Months for contribution graph
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// Function to get current date for the contribution graph
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+};
 
 const Stats = () => {
   const sectionRef = useRef(null);
@@ -105,6 +119,7 @@ const Stats = () => {
   const [activePlatform, setActivePlatform] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [hoveredCell, setHoveredCell] = useState(null);
   
   // Check for mobile device
   useEffect(() => {
@@ -189,12 +204,12 @@ const Stats = () => {
         }
       });
       
-      // Simplified contribution grid animation
+      // Enhanced contribution grid animation
       gsap.from('.contribution-cell', {
         scale: 0.8,
         opacity: 0,
-        stagger: 0.01,
-        duration: 0.3,
+        stagger: 0.005, // Faster stagger for smoother animation
+        duration: 0.4,
         scrollTrigger: {
           trigger: contributionRef.current,
           start: 'top 90%',
@@ -205,16 +220,30 @@ const Stats = () => {
     
   }, [isVisible, isMobile]);
   
-  // Get intensity color based on value (0-4)
+  // Get intensity color based on value (0-7)
   const getContributionColor = (value) => {
     const colors = [
-      'bg-blue-900/20',
-      'bg-blue-600/30',
-      'bg-blue-500/50',
-      'bg-blue-400/70',
-      'bg-blue-300'
+      'bg-blue-900/30 hover:bg-blue-900/50',
+      'bg-blue-800/40 hover:bg-blue-800/60',
+      'bg-blue-700/50 hover:bg-blue-700/70',
+      'bg-blue-600/60 hover:bg-blue-600/80',
+      'bg-blue-500/70 hover:bg-blue-500/90',
+      'bg-blue-400/80 hover:bg-blue-400',
+      'bg-blue-300/90 hover:bg-blue-300',
+      'bg-blue-200 hover:bg-blue-100'
     ];
-    return colors[value];
+    return colors[Math.min(value, colors.length - 1)];
+  };
+  
+  // Calculate total contributions
+  const totalContributions = contributionData.flat().reduce((sum, val) => sum + val, 0);
+  
+  // Generate random dates for contribution tooltips
+  const getRandomDate = (index) => {
+    const now = new Date();
+    const pastDate = new Date(now);
+    pastDate.setDate(now.getDate() - (49 - index)); // Last 7 weeks
+    return pastDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
   
   // Render optimized stats section
@@ -291,44 +320,110 @@ const Stats = () => {
           ))}
         </div>
         
-        {/* Enhanced Contribution Graph with reduced complexity */}
+        {/* Enhanced Contribution Graph with interactive elements */}
         <div ref={contributionRef} className="mb-20">
           <h3 className="text-xl md:text-2xl font-bold mb-6 text-center text-white">
             GitHub <span className="text-blue-100">Contribution Graph</span>
           </h3>
           
-          <GlowEffect intensity="low">
-            <CyberpunkInterface variant="simple">
-              <div className="p-4 md:p-6">
-                <div className="grid grid-cols-7 gap-2 mb-4">
-                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                    <div key={day} className="text-center text-xs text-blue-50 font-medium">{day}</div>
-                  ))}
-                </div>
-                
-                <div className="grid grid-cols-7 gap-1 md:gap-2">
-                  {contributionData.flat().map((value, index) => (
-                    <div
-                      key={index}
-                      className={`contribution-cell w-full aspect-square rounded-sm ${getContributionColor(value)} border border-blue-400/10 flex items-center justify-center`}
-                    >
-                      {!isMobile && <span className="text-xs font-mono text-blue-100/80">{value}</span>}
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-blue-50 gap-3">
+          <GlowEffect intensity="medium">
+            <CyberpunkInterface variant="modern">
+              <div className="p-4 md:p-6 bg-black-100/60">
+                {/* GitHub header with logo and profile link */}
+                <div className="flex justify-between items-center mb-6 border-b border-blue-900/30 pb-4">
                   <div className="flex items-center">
-                    <span>Less</span>
-                    <div className="flex space-x-1 mx-2">
-                      {[0, 1, 2, 3, 4].map((value) => (
-                        <div key={value} className={`w-3 h-3 rounded-sm ${getContributionColor(value)}`}></div>
+                    <FaGithub className="text-blue-100 mr-3" size={28} />
+                    <div>
+                      <h4 className="text-white font-bold text-lg">ArcaneNova</h4>
+                      <p className="text-blue-50 text-xs">@ArcaneNova</p>
+                    </div>
+                  </div>
+                  <a 
+                    href="https://github.com/ArcaneNova"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-700 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-semibold transition-colors flex items-center"
+                  >
+                    <span>View Profile</span>
+                    <svg className="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+                
+                {/* Current date and contribution summary */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 text-blue-50">
+                  <div className="flex items-center space-x-2 mb-3 md:mb-0">
+                    <span className="text-xs font-mono bg-blue-900/40 py-1 px-2 rounded border border-blue-800/30">
+                      {getCurrentDate()}
+                    </span>
+                    <span className="text-xs">Contribution activity</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center">
+                      <FaCode className="text-blue-400 mr-1.5" size={14} />
+                      <span className="text-white font-medium">{totalContributions}</span>
+                      <span className="text-blue-50 text-xs ml-1">contributions in the last year</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Days of week header */}
+                <div className="grid grid-cols-7 gap-2 mb-2 ml-8">
+                  {daysOfWeek.map((day, i) => (
+                    <div key={day} className="text-center text-xs text-blue-50/80 font-medium">{day}</div>
+                  ))}
+                </div>
+                
+                {/* Month labels */}
+                <div className="flex">
+                  {/* Month labels column */}
+                  <div className="flex flex-col justify-between pr-2 py-2">
+                    {months.slice(0, 6).map((month, i) => (
+                      i % 2 === 0 && <div key={month} className="text-xs text-blue-50/80 h-8">{month}</div>
+                    ))}
+                  </div>
+                  
+                  {/* Contribution grid */}
+                  <div className="flex-1">
+                    <div className="grid grid-cols-7 gap-1 md:gap-1.5">
+                      {contributionData.flat().map((value, index) => (
+                        <motion.div
+                          key={index}
+                          className={`contribution-cell relative w-full aspect-square rounded-sm ${getContributionColor(value)} cursor-pointer transition-all duration-200 border border-blue-400/10`}
+                          whileHover={{ scale: 1.2, zIndex: 10 }}
+                          onHoverStart={() => setHoveredCell(index)}
+                          onHoverEnd={() => setHoveredCell(null)}
+                        >
+                          {/* Tooltip */}
+                          {hoveredCell === index && (
+                            <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black-100 border border-blue-400/30 text-white text-xs py-1 px-2 rounded shadow-lg z-20 whitespace-nowrap">
+                              <strong>{value} contributions</strong> on {getRandomDate(index)}
+                            </div>
+                          )}
+                        </motion.div>
                       ))}
                     </div>
-                    <span>More</span>
                   </div>
-                  <div className="font-mono bg-blue-900/20 py-1 px-3 rounded-md border border-blue-400/10">
-                    TOTAL: <span className="text-blue-100 font-bold">142</span>
+                </div>
+                
+                <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-blue-900/30 pt-4">
+                  <div className="flex items-center">
+                    <span className="text-xs text-blue-50/80 mr-2">Contribution level:</span>
+                    <div className="flex space-x-1">
+                      {[0, 2, 4, 6].map((value) => (
+                        <div 
+                          key={value} 
+                          className={`w-3 h-3 rounded-sm ${getContributionColor(value)}`}
+                          title={`${value} contributions`}
+                        ></div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="font-mono bg-blue-900/30 py-1.5 px-3 rounded-md border border-blue-800/40 flex items-center">
+                    <FaGithub className="mr-2 text-blue-300" size={14} />
+                    <span className="text-xs">TOTAL: </span>
+                    <span className="text-blue-100 font-bold ml-1">{totalContributions}</span>
                   </div>
                 </div>
               </div>
@@ -342,32 +437,34 @@ const Stats = () => {
             Coding <span className="text-blue-100">Platforms</span>
           </h3>
           
-          {/* Simplified Platform selection tabs */}
+          {/* Improved Platform selection tabs */}
           <div className="flex flex-wrap justify-center mb-8 gap-3">
             {platformData.map((platform, index) => (
-              <button
+              <motion.button
                 key={index}
-                className={`px-3 py-2 rounded-lg flex items-center space-x-2 transition-colors ${
+                className={`px-4 py-2.5 rounded-lg flex items-center space-x-2.5 transition-all ${
                   activePlatform === index 
-                    ? `${platform.badgeColor} text-white` 
-                    : 'bg-black-100 text-blue-50 hover:bg-black-100/80'
+                    ? `${platform.badgeColor} text-white shadow-lg shadow-${platform.badgeColor}/20 border border-blue-400/30` 
+                    : 'bg-black-100/80 text-blue-50 hover:bg-black-100 border border-blue-900/40'
                 }`}
                 onClick={() => setActivePlatform(index)}
+                whileHover={{ y: -3 }}
+                whileTap={{ y: 0 }}
               >
                 <span>{platform.icon}</span>
                 <span className="font-medium">{platform.name}</span>
-              </button>
+              </motion.button>
             ))}
           </div>
           
-          {/* Simplified Platform details */}
+          {/* Enhanced Platform details */}
           <div className="platform-card">
-            <GlowEffect intensity="low">
-              <CyberpunkInterface variant="simple">
-                <div className="p-4 md:p-6">
+            <GlowEffect intensity="medium">
+              <CyberpunkInterface variant="modern">
+                <div className="p-5 md:p-6 bg-black-100/60">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                     <div className="flex items-center mb-4 md:mb-0">
-                      <div className={`w-14 h-14 rounded-lg bg-gradient-to-br ${platformData[activePlatform].color} flex items-center justify-center mr-4`}>
+                      <div className={`w-16 h-16 rounded-lg bg-gradient-to-br ${platformData[activePlatform].color} flex items-center justify-center mr-4 shadow-lg shadow-${platformData[activePlatform].badgeColor}/20 border border-blue-400/20`}>
                         {platformData[activePlatform].icon}
                       </div>
                       <div>
@@ -380,7 +477,7 @@ const Stats = () => {
                       href={platformData[activePlatform].url} 
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-100 hover:text-white text-sm flex items-center transition-colors bg-blue-900/20 py-1.5 px-3 rounded-md border border-blue-400/10 hover:bg-blue-800/30"
+                      className="text-white hover:text-white text-sm flex items-center bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded-md transition-colors shadow-md"
                     >
                       View Profile 
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -389,18 +486,19 @@ const Stats = () => {
                     </a>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     {platformData[activePlatform].stats.map((stat, index) => (
-                      <div
+                      <motion.div
                         key={index}
-                        className={`${platformData[activePlatform].badgeColor} rounded-lg p-4`}
+                        className={`${platformData[activePlatform].badgeColor} rounded-lg p-4 border border-blue-400/20 shadow-lg`}
+                        whileHover={{ y: -5, scale: 1.02 }}
                       >
-                        <div className="text-blue-50 mb-1 flex items-center text-xs md:text-sm">
-                          <span className="mr-1.5">{stat.icon}</span>
+                        <div className="text-blue-50 mb-2 flex items-center text-sm">
+                          <span className="mr-2 text-blue-200">{stat.icon}</span>
                           <span>{stat.label}</span>
                         </div>
-                        <div className="text-white text-xl md:text-2xl font-bold">{stat.value}</div>
-                      </div>
+                        <div className="text-white text-2xl md:text-3xl font-bold">{stat.value}</div>
+                      </motion.div>
                     ))}
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -7,6 +7,36 @@ import CyberpunkInterface from '../components/CyberpunkInterface';
 import GlowEffect from '../components/GlowEffect';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Typing effect component for about section
+const TypingEffect = ({ text, delay = 40, className }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDone, setIsDone] = useState(false);
+  
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        // Random speed variation to make typing feel more realistic
+        const randomDelay = delay * (0.8 + Math.random() * 0.5);
+        setDisplayedText(prevText => prevText + text[currentIndex]);
+        setCurrentIndex(prevIndex => prevIndex + 1);
+      }, delay);
+      
+      return () => clearTimeout(timeout);
+    } else {
+      setIsDone(true);
+    }
+  }, [currentIndex, text, delay]);
+  
+  // Add cursor blink effect
+  return (
+    <div className={`font-mono ${className}`}>
+      {displayedText}
+      <span className={`inline-block w-2.5 h-5 bg-blue-100 ml-0.5 ${isDone ? 'animate-cursor-blink' : ''}`}></span>
+    </div>
+  );
+};
 
 const timelineEvents = [
   {
@@ -79,6 +109,26 @@ const About = () => {
   const sectionRef = useRef(null);
   const profileRef = useRef(null);
   const achievementsRef = useRef(null);
+  const [visibleBio, setVisibleBio] = useState(0);
+  
+  // Bio paragraphs
+  const bioTexts = [
+    "I'm a software engineer with a passion for building innovative applications that solve real-world problems. My journey in tech began in 2016 when I created my first website and discovered the world of programming.",
+    "With expertise spanning web development, machine learning, and app development, I bring a diverse skill set to every project. I believe in writing clean, efficient code and creating intuitive user experiences.",
+    "When I'm not coding, I enjoy participating in hackathons, contributing to open-source projects, sleeping, and reading books. I'm constantly learning and exploring new technologies to stay at the cutting edge.",
+    "I'm quite boring person and not interested in socializing too much, never smoke or drink. I love reading books and usually I don't watch movies. Some good movies I watched are - The Social Network, The pursuit of happiness, Bhag Milkha Bhag :)"
+  ];
+  
+  // Show next bio paragraph when typing is complete
+  useEffect(() => {
+    if (visibleBio < bioTexts.length - 1) {
+      const timer = setTimeout(() => {
+        setVisibleBio(prev => prev + 1);
+      }, bioTexts[visibleBio].length * 40 + 800); // Wait for typing to finish plus a small delay
+      
+      return () => clearTimeout(timer);
+    }
+  }, [visibleBio, bioTexts]);
   
   useGSAP(() => {
     // Animate section title
@@ -111,15 +161,14 @@ const About = () => {
       }
     );
     
-    // Animate bio text
+    // Animation for the bio container instead of individual paragraphs
     gsap.fromTo(
-      ".bio-text",
+      ".bio-container",
       { opacity: 0, y: 20 },
       { 
         opacity: 1, 
         y: 0, 
         duration: 0.8,
-        stagger: 0.2,
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top 70%"
@@ -210,23 +259,22 @@ const About = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           {/* Left Column - Bio */}
           <div className="lg:col-span-2">
-            <CyberpunkInterface title="BIOGRAPHY">
-              <div className="space-y-6 p-6">
-                <p className="bio-text text-blue-50 leading-relaxed">
-                  I'm a software engineer with a passion for building innovative applications that solve real-world problems. My journey in tech began in 2016 when I created my first website and discovered the world of programming.
-                </p>
+            <CyberpunkInterface title="WHO I AM">
+              <div className="space-y-6 p-6 bio-container">
+                {bioTexts.slice(0, visibleBio + 1).map((text, index) => (
+                  <div key={index} className="min-h-6">
+                    {index === visibleBio ? (
+                      <TypingEffect 
+                        text={text} 
+                        className="text-blue-50 leading-relaxed"
+                      />
+                    ) : (
+                      <p className="text-blue-50 leading-relaxed">{text}</p>
+                    )}
+                  </div>
+                ))}
                 
-                <p className="bio-text text-blue-50 leading-relaxed">
-                  With expertise spanning web development, machine learning, and app development, I bring a diverse skill set to every project. I believe in writing clean, efficient code and creating intuitive user experiences.
-                </p>
-                
-                <p className="bio-text text-blue-50 leading-relaxed">
-                  When I'm not coding, I enjoy participating in hackathons, contributing to open-source projects, sleeping, and reading books. I'm constantly learning and exploring new technologies to stay at the cutting edge.
-                </p>
-
-                <p>I'm quite boring person and not interested in socializing too much, never smoke or drink. I love reading books and usually I don't watch movies. Some good movies I watched are - The Social Network, The pursuit of happiness, Bhag Milkha Bhag :)</p>
-                
-                <div className="bio-text pt-4 border-t border-blue-100/10">
+                <div className="pt-4 border-t border-blue-100/10">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <h4 className="text-blue-100 text-sm font-semibold mb-2">Location</h4>

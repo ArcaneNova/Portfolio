@@ -77,7 +77,7 @@ const ChallengeCard = ({ challenge }) => {
             </span>
           </div>
           
-          <p className="text-gray-200 text-opacity-80 text-sm md:text-base leading-relaxed mb-4">
+          <p className="text-blue-50/90 text-sm md:text-base leading-relaxed mb-4">
             {challenge.description}
           </p>
           
@@ -88,7 +88,7 @@ const ChallengeCard = ({ challenge }) => {
                 style={{ width: `${(challenge.progress / (challenge.title.includes('100') ? 100 : 30)) * 100}%` }}
               ></div>
             </div>
-            <span className="text-xs text-gray-400 font-mono">
+            <span className="text-xs text-blue-50/70 font-mono">
               Day {challenge.progress} of {challenge.title.includes('100') ? '100' : '30'}
             </span>
           </div>
@@ -112,8 +112,8 @@ const ChallengeCard = ({ challenge }) => {
                         className="w-full h-[150px] object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                       />
                     </div>
-                    <p className="text-gray-200 text-sm leading-relaxed">{post.caption}</p>
-                    <span className="text-gray-500 text-xs font-mono">{post.date}</span>
+                    <p className="text-blue-50/90 text-sm leading-relaxed">{post.caption}</p>
+                    <span className="text-blue-200/60 text-xs font-mono">{post.date}</span>
                   </div>
                 </div>
               ))}
@@ -162,7 +162,7 @@ const Challenge = () => {
         <CyberpunkInterface title="NEW_CHALLENGE">
           <div className="text-center">
             <h3 className="text-xl md:text-2xl font-bold text-indigo-400 uppercase tracking-wider mb-2">Start a New Challenge</h3>
-            <p className="text-gray-300 text-opacity-70 max-w-md mx-auto">Challenge yourself to learn and grow consistently!</p>
+            <p className="text-blue-50/90 max-w-md mx-auto">Challenge yourself to learn and grow consistently!</p>
             <div className="mt-6">
               <Button 
                 text="Create Challenge" 

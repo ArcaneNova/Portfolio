@@ -19,6 +19,9 @@ export default {
         'scan': 'scan 3s ease-in-out infinite',
         'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'blink': 'blink 1s steps(1) infinite',
+        'blink-fast': 'blink 0.7s steps(1) infinite',
+        'cursor-blink': 'cursor-blink 0.8s steps(2) infinite',
+        'scan-reverse': 'scan-reverse 4s ease-in-out infinite',
         'loading': 'loading 1.5s ease-in-out forwards',
       },
       keyframes: {
@@ -35,8 +38,17 @@ export default {
           '50%': { top: '95%' },
           '100%': { top: '0%' },
         },
+        'scan-reverse': {
+          '0%': { top: '95%' },
+          '50%': { top: '0%' },
+          '100%': { top: '95%' },
+        },
         blink: {
           '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0 },
+        },
+        'cursor-blink': {
+          '0%': { opacity: 1 },
           '50%': { opacity: 0 },
         },
         loading: {

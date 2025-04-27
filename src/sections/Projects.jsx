@@ -313,7 +313,7 @@ const Projects = () => {
           <h3 className="text-xl font-bold text-white mb-1 line-clamp-1">{project.title}</h3>
           <p className="text-blue-100/80 text-sm mb-3 line-clamp-1">{project.subtitle}</p>
           
-          <p className="text-gray-300 text-sm mb-4 line-clamp-3">{project.description}</p>
+          <p className="text-blue-50/90 text-sm mb-4 line-clamp-3">{project.description}</p>
           
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-4">
@@ -333,7 +333,7 @@ const Projects = () => {
           </div>
           
           {/* Date */}
-          <div className="flex items-center text-gray-400 text-xs mb-4">
+          <div className="flex items-center text-blue-50/70 text-xs mb-4">
             <FaCalendarAlt className="mr-1" /> {project.date}
           </div>
           
@@ -419,7 +419,7 @@ const Projects = () => {
             <h3 className="text-2xl font-bold text-white mb-1">{project.title}</h3>
             <p className="text-blue-100 text-lg mb-4">{project.subtitle}</p>
             
-            <p className="text-gray-300 mb-6">{project.description}</p>
+            <p className="text-blue-50/90 mb-6">{project.description}</p>
             
             {/* Project highlights */}
             {project.highlights && (
@@ -429,7 +429,7 @@ const Projects = () => {
                   {project.highlights.map((highlight, index) => (
                     <li key={index} className="flex items-start">
                       <span className="text-blue-400 mr-2">▹</span>
-                      <span className="text-gray-300 text-sm">{highlight}</span>
+                      <span className="text-blue-50/90 text-sm">{highlight}</span>
                     </li>
                   ))}
                 </ul>
@@ -451,7 +451,7 @@ const Projects = () => {
             </div>
             
             {/* Date */}
-            <div className="flex items-center text-gray-400 text-sm mb-6">
+            <div className="flex items-center text-blue-50/70 text-sm mb-6">
               <FaCalendarAlt className="mr-2" /> {project.date}
             </div>
             
@@ -618,7 +618,7 @@ const Projects = () => {
         {filteredProjects.length === 0 && (
           <div className="text-center py-16">
             <h4 className="text-xl text-blue-100 mb-4">No projects found in this category</h4>
-            <p className="text-gray-400">Try selecting a different filter</p>
+            <p className="text-blue-50/80">Try selecting a different filter</p>
           </div>
         )}
         
