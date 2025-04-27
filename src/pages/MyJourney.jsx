@@ -442,6 +442,11 @@ const InteractiveTimeline = ({ data, onSelect, selectedJourney }) => {
 const FlipCard = ({ entry }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   
+  // Function to handle scroll events inside the card without triggering flip
+  const handleCardScroll = (e) => {
+    e.stopPropagation(); // Prevent event bubbling
+  };
+  
   return (
     <div 
       className="w-full h-auto min-h-[450px] sm:min-h-[400px] relative perspective-1000"
@@ -493,8 +498,13 @@ const FlipCard = ({ entry }) => {
                 {entry.title} - {entry.year}
               </h4>
               
-              {/* Fixed scrollable area for mobile and desktop */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 mb-4 max-h-[300px] sm:max-h-[250px]">
+              {/* Scrollable area with event handler to prevent flipping */}
+              <div 
+                className="flex-1 overflow-y-auto custom-scrollbar pr-2 mb-4"
+                onClick={(e) => e.stopPropagation()} 
+                onScroll={handleCardScroll}
+                style={{ maxHeight: 'calc(100vh - 250px)' }}
+              >
                 <p className="text-gray-200 text-sm sm:text-base">{entry.description}</p>
               </div>
               
