@@ -3,7 +3,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from "../components/Navbar.jsx";
+import Navbar from "../components/NavBar.jsx";
 import Footer from '../components/Footer';
 // Lazy load heavy components
 const CyberpunkInterface = lazy(() => import('../components/CyberpunkInterface'));
