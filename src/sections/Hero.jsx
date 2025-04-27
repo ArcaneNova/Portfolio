@@ -101,14 +101,14 @@ const Hero = () => {
             />
           </div>
           
-          <div className="backdrop-blur-md bg-slate-950/80 border border-cyan-900/50 p-5 rounded-lg shadow-lg">
+          {/* <div className="backdrop-blur-md bg-slate-950/80 border border-cyan-900/50 p-5 rounded-lg shadow-lg">
             <p className="text-gray-300 text-lg">
               Creating futuristic digital experiences with cutting-edge technologies and innovative solutions.
             </p>
-          </div>
+          </div> */}
           
           {/* Buttons */}
-          <div ref={buttonsRef} className="flex flex-wrap gap-4 justify-center lg:justify-start mt-6">
+          <div ref={buttonsRef} className="flex flex-wrap gap-4 justify-center lg:justify-start mt-8">
             <Button 
               type="filled" 
               title="GitHub" 
