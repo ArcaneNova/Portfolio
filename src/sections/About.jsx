@@ -224,7 +224,7 @@ const About = () => {
                   When I'm not coding, I enjoy participating in hackathons, contributing to open-source projects, sleeping, and reading books. I'm constantly learning and exploring new technologies to stay at the cutting edge.
                 </p>
 
-                <p>I'm quite boring person and not interested in socializing too much. I love reading books and usually I don't watch movies. Some movies lasttime watched are - The Social Network, The pursuit of happiness, Bhag Milkha Bhag :)</p>
+                <p>I'm quite boring person and not interested in socializing too much, never smoke or drink. I love reading books and usually I don't watch movies. Some good movies I watched are - The Social Network, The pursuit of happiness, Bhag Milkha Bhag :)</p>
                 
                 <div className="bio-text pt-4 border-t border-blue-100/10">
                   <div className="grid grid-cols-2 gap-4">
@@ -238,7 +238,7 @@ const About = () => {
                     </div>
                     <div>
                       <h4 className="text-blue-100 text-sm font-semibold mb-2">Experience</h4>
-                      <p className="text-white">3+ Years</p>
+                      <p className="text-white">5+ Years</p>
                     </div>
                     <div>
                       <h4 className="text-blue-100 text-sm font-semibold mb-2">Languages</h4>

@@ -314,28 +314,28 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-// Timeline Marker Component with 3D Effect - Make it more responsive
+// Timeline Marker Component with 3D Effect - Improved mobile responsiveness
 const TimelineMarker = ({ year, color, active, onClick }) => (
   <motion.div 
-    className={`cursor-pointer relative z-20 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full 
+    className={`cursor-pointer relative z-20 w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full 
       ${active 
-        ? 'scale-110 shadow-lg shadow-blue-500/30' 
-        : 'opacity-70 hover:opacity-100 hover:scale-105'}`}
+        ? 'scale-110 shadow-lg shadow-blue-500/50' 
+        : 'opacity-80 hover:opacity-100 hover:scale-105'}`}
     whileHover={{ scale: 1.1 }}
     whileTap={{ scale: 0.95 }}
     onClick={onClick}
   >
-    <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${color} opacity-20 blur-sm`}></div>
-    <div className={`w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-black border border-white/10 flex items-center justify-center
+    <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${color} opacity-30 blur-sm`}></div>
+    <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-black border-2 border-white/20 flex items-center justify-center
       ${active ? 'shadow-inner shadow-blue-500/50' : ''}`}>
-      <div className={`text-xs sm:text-sm font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
+      <div className={`text-sm sm:text-base font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
         {year}
       </div>
     </div>
   </motion.div>
 );
 
-// SkillBar Component with Animation
+// SkillBar Component with Animation - Enhanced for better visibility
 const SkillBar = ({ name, level, color, index }) => {
   const barRef = useRef(null);
   
@@ -358,11 +358,11 @@ const SkillBar = ({ name, level, color, index }) => {
 
   return (
     <div className="mb-6">
-      <div className="flex justify-between mb-1">
-        <span className="text-white font-medium">{name}</span>
-        <span className="text-blue-300">{level}%</span>
+      <div className="flex justify-between mb-2">
+        <span className="text-white font-medium text-base">{name}</span>
+        <span className="text-blue-300 font-bold">{level}%</span>
       </div>
-      <div className="h-3 bg-black-300 rounded-full overflow-hidden">
+      <div className="h-4 bg-black/60 rounded-full overflow-hidden border border-white/10">
         <div 
           ref={barRef}
           className={`h-full bg-gradient-to-r ${color} rounded-full w-0`}
@@ -372,7 +372,7 @@ const SkillBar = ({ name, level, color, index }) => {
   );
 };
 
-// Interactive TimeLine Component - Make it mobile responsive
+// Interactive TimeLine Component - Enhanced mobile responsive
 const InteractiveTimeline = ({ data, onSelect, selectedJourney }) => {
   const [hoveredYear, setHoveredYear] = useState(null);
   const timelineRef = useRef(null);
@@ -394,19 +394,19 @@ const InteractiveTimeline = ({ data, onSelect, selectedJourney }) => {
   
   return (
     <div ref={timelineRef} className="relative mb-8 px-2">
-      {/* Timeline bar */}
-      <div className="absolute left-0 right-0 top-1/2 h-1 bg-gradient-to-r from-blue-800/50 via-purple-800/50 to-blue-800/50 transform -translate-y-1/2"></div>
+      {/* Timeline bar - Enhanced visibility */}
+      <div className="absolute left-0 right-0 top-1/2 h-2 bg-gradient-to-r from-blue-800/70 via-purple-800/70 to-blue-800/70 transform -translate-y-1/2 rounded-full"></div>
       
       {isMobile ? (
-        // Mobile scrollable timeline
-        <div className="flex items-center relative py-4 overflow-x-auto hide-scrollbar pb-6">
-          <div className="flex space-x-6 px-4">
+        // Mobile scrollable timeline - Improved visibility
+        <div className="flex items-center relative py-6 overflow-x-auto hide-scrollbar pb-6">
+          <div className="flex space-x-6 px-4 min-w-max">
             {data.map((entry, index) => (
               <TimelineMarker 
                 key={entry.year}
                 year={entry.year}
                 color={entry.color}
-                active={hoveredYear === entry.year}
+                active={index === selectedJourney}
                 onClick={() => {
                   setHoveredYear(entry.year);
                   onSelect(index);
@@ -436,15 +436,16 @@ const InteractiveTimeline = ({ data, onSelect, selectedJourney }) => {
   );
 };
 
-// Card flip component for journey entries
+// Card flip component for journey entries - Enhanced for mobile
 const FlipCard = ({ entry }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   
   return (
     <div 
-      className="w-full h-96 relative perspective-1000"
+      className="w-full h-[450px] sm:h-96 relative perspective-1000"
       onMouseEnter={() => setIsFlipped(true)}
       onMouseLeave={() => setIsFlipped(false)}
+      onClick={() => setIsFlipped(!isFlipped)} // Added for mobile
     >
       <motion.div 
         className="w-full h-full relative preserve-3d transition-all duration-500"
@@ -454,7 +455,7 @@ const FlipCard = ({ entry }) => {
         {/* Front of card */}
         <div className="absolute inset-0 backface-hidden">
           <GlowEffect color="blue" intensity="medium">
-            <div className="h-full rounded-xl overflow-hidden bg-black-200/80 backdrop-blur-sm border border-blue-600/30 p-6 flex flex-col">
+            <div className="h-full rounded-xl overflow-hidden bg-black/80 backdrop-blur-sm border border-blue-600/30 p-6 flex flex-col">
               <div className="flex items-center mb-4">
                 <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${entry.color} flex items-center justify-center text-xl`}>
                   {entry.icon}
@@ -468,15 +469,15 @@ const FlipCard = ({ entry }) => {
               </div>
               
               <div className="flex-1 overflow-hidden relative">
-                <div className="bg-gradient-to-b from-transparent via-black-300/0 to-black-300/90 absolute bottom-0 left-0 right-0 h-16 z-10"></div>
-                <p className="text-gray-300 text-sm line-clamp-6">{entry.description.substring(0, 150)}...</p>
+                <div className="bg-gradient-to-b from-transparent via-black/0 to-black/90 absolute bottom-0 left-0 right-0 h-16 z-10"></div>
+                <p className="text-gray-200 text-base line-clamp-6">{entry.description.substring(0, 150)}...</p>
               </div>
               
               <div className="mt-4 text-center">
-                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-blue-900/30 text-blue-300 border border-blue-700/50">
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-blue-900/50 text-blue-300 border border-blue-700/50">
                   {entry.achievement}
                 </span>
-                <p className="text-blue-400 mt-3 text-sm">Flip for full story</p>
+                <p className="text-blue-400 mt-3 text-sm">Tap/Click for full story</p>
               </div>
             </div>
           </GlowEffect>
@@ -485,19 +486,20 @@ const FlipCard = ({ entry }) => {
         {/* Back of card */}
         <div className="absolute inset-0 backface-hidden rotateY-180">
           <GlowEffect color="purple" intensity="low">
-            <div className="h-full rounded-xl overflow-hidden bg-black-200/80 backdrop-blur-sm border border-purple-600/30 p-6 flex flex-col">
+            <div className="h-full rounded-xl overflow-hidden bg-black/80 backdrop-blur-sm border border-purple-600/30 p-6 flex flex-col">
               <h4 className={`text-xl font-bold mb-3 bg-gradient-to-r ${entry.color} bg-clip-text text-transparent`}>
                 {entry.title} - {entry.year}
               </h4>
               
               <div className="flex-1 overflow-auto custom-scrollbar pr-2">
-                <p className="text-gray-300 text-sm">{entry.description}</p>
+                <p className="text-gray-200 text-base">{entry.description}</p>
               </div>
               
               <div className="mt-4 text-center">
-                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-purple-900/30 text-purple-300 border border-purple-700/50">
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-purple-900/50 text-purple-300 border border-purple-700/50">
                   {entry.achievement}
                 </span>
+                <p className="text-purple-400 mt-2 text-sm">Tap/Click to flip back</p>
               </div>
             </div>
           </GlowEffect>
@@ -507,14 +509,14 @@ const FlipCard = ({ entry }) => {
   );
 };
 
-// 3D Interactive Journey Card
+// 3D Interactive Journey Card - Enhanced for better text visibility
 const Journey3DCard = ({ entry }) => {
   return (
     <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-      <GlowEffect color="blue" intensity="low">
-        <div className="h-full rounded-xl overflow-hidden bg-black-200/80 backdrop-blur-sm border border-blue-600/30 p-5 md:p-6 flex flex-col">
+      <GlowEffect color="blue" intensity="medium">
+        <div className="h-full rounded-xl overflow-hidden bg-black/80 backdrop-blur-sm border-2 border-blue-600/50 p-5 md:p-6 flex flex-col">
           <div className="flex items-center mb-4">
-            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r ${entry.color} flex items-center justify-center text-xl`}>
+            <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${entry.color} flex items-center justify-center text-xl`}>
               {entry.icon}
             </div>
             <div className="ml-3 md:ml-4">
@@ -525,12 +527,12 @@ const Journey3DCard = ({ entry }) => {
             </div>
           </div>
           
-          <div className="flex-1 overflow-auto custom-scrollbar pr-2">
-            <p className="text-gray-300 text-sm line-clamp-6 md:line-clamp-none">{entry.description}</p>
+          <div className="flex-1 overflow-auto custom-scrollbar px-1">
+            <p className="text-gray-200 text-base">{entry.description}</p>
           </div>
           
           <div className="mt-4 text-center">
-            <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-blue-900/30 text-blue-300 border border-blue-700/50">
+            <span className="inline-flex items-center px-3 py-1 text-base font-medium rounded-full bg-blue-900/50 text-blue-300 border border-blue-700/50">
               {entry.achievement}
             </span>
           </div>
@@ -585,7 +587,7 @@ const StatCounter = ({ value, label, duration = 2 }) => {
   );
 };
 
-// Sliding Quote Component
+// Sliding Quote Component - Enhanced for better visibility
 const QuoteSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(null);
@@ -667,7 +669,7 @@ const QuoteSlider = () => {
             className="flex flex-col items-center"
           >
             <GlowEffect color="blue" intensity="medium">
-              <div className={`relative bg-black-300/50 backdrop-blur-md p-8 rounded-2xl border border-${allQuotes[currentIndex].color.split(' ')[0].replace('from-', '')}-500/30 overflow-hidden`}>
+              <div className={`relative bg-black/70 backdrop-blur-md p-6 md:p-8 rounded-2xl border-2 border-${allQuotes[currentIndex].color.split(' ')[0].replace('from-', '')}-500/50 overflow-hidden`}>
                 <div className="absolute -top-10 -left-10 text-7xl opacity-10">
                   <FaQuoteLeft />
                 </div>
@@ -676,7 +678,7 @@ const QuoteSlider = () => {
                 </div>
                 
                 <div className="relative z-10">
-                  <blockquote className="text-xl md:text-2xl text-center font-light mb-6 text-blue-50">
+                  <blockquote className="text-lg md:text-2xl text-center font-medium mb-6 text-blue-50">
                     "{allQuotes[currentIndex].quote}"
                   </blockquote>
                   
@@ -684,7 +686,7 @@ const QuoteSlider = () => {
                     <h3 className={`text-lg md:text-xl font-semibold bg-gradient-to-r ${allQuotes[currentIndex].color} bg-clip-text text-transparent mb-1`}>
                       {allQuotes[currentIndex].author}
                     </h3>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-300 text-base">
                       {allQuotes[currentIndex].source}
                     </p>
                   </div>
@@ -695,26 +697,26 @@ const QuoteSlider = () => {
         </AnimatePresence>
       </div>
       
-      {/* Navigation buttons */}
-      <div className="absolute inset-y-0 left-0 flex items-center">
+      {/* Navigation buttons - Enhanced for mobile */}
+      <div className="absolute inset-y-0 left-0 flex items-center z-10">
         <button
           onClick={() => handleManualNav(prevQuote)}
-          className="bg-black/50 backdrop-blur-sm text-white rounded-full p-2 transform -translate-x-1/2 hover:bg-black/70 transition-colors focus:outline-none"
+          className="bg-black/70 backdrop-blur-sm text-white rounded-full p-3 transform -translate-x-1/3 hover:bg-black/90 transition-colors focus:outline-none border border-blue-500/30"
         >
           <FaChevronLeft className="w-5 h-5" />
         </button>
       </div>
       
-      <div className="absolute inset-y-0 right-0 flex items-center">
+      <div className="absolute inset-y-0 right-0 flex items-center z-10">
         <button
           onClick={() => handleManualNav(nextQuote)}
-          className="bg-black/50 backdrop-blur-sm text-white rounded-full p-2 transform translate-x-1/2 hover:bg-black/70 transition-colors focus:outline-none"
+          className="bg-black/70 backdrop-blur-sm text-white rounded-full p-3 transform translate-x-1/3 hover:bg-black/90 transition-colors focus:outline-none border border-blue-500/30"
         >
           <FaChevronRight className="w-5 h-5" />
         </button>
       </div>
       
-      {/* Progress indicators */}
+      {/* Progress indicators - Enhanced visibility */}
       <div className="mt-4 flex justify-center gap-2">
         {allQuotes.map((_, index) => (
           <button
@@ -723,9 +725,9 @@ const QuoteSlider = () => {
               setDirection(index > currentIndex ? 'next' : 'prev');
               setCurrentIndex(index);
             }}
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
+            className={`w-3 h-3 rounded-full transition-all ${
               index === currentIndex 
-                ? 'bg-blue-500 w-5' 
+                ? 'bg-blue-500 w-6' 
                 : 'bg-gray-600 hover:bg-gray-500'
             }`}
             aria-label={`Go to quote ${index + 1}`}
@@ -802,22 +804,65 @@ function MyJourney() {
 
   return (
     <div className="bg-black text-white min-h-screen overflow-hidden">
-      {/* Background Elements - Lazy loaded with simpler version for mobile */}
-      <div className="fixed inset-0 -z-10">
+      {/* Professional background with footer-style network lines */}
+      <div className="fixed inset-0 -z-10 bg-gradient-to-b from-black to-slate-950">
+        {/* Neural network lines in background */}
+        <div className="absolute inset-0 opacity-10">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div 
+              key={`h-line-${i}`}
+              className="absolute h-px bg-cyan-400"
+              style={{ 
+                top: `${i * 10}%`, 
+                left: 0, 
+                right: 0,
+                opacity: Math.random() * 0.5 + 0.2,
+                boxShadow: '0 0 8px rgba(6, 182, 212, 0.5)'
+              }}
+            />
+          ))}
+          
+          {Array.from({ length: 15 }).map((_, i) => (
+            <div 
+              key={`v-line-${i}`}
+              className="absolute w-px bg-cyan-400"
+              style={{ 
+                left: `${i * 7}%`, 
+                top: 0, 
+                bottom: 0,
+                opacity: Math.random() * 0.5 + 0.2,
+                boxShadow: '0 0 8px rgba(6, 182, 212, 0.5)'
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Glow spots */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-cyan-500/5 blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
+        
+        {/* Circuit paths animation */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent top-[15%] animate-scan"></div>
+          <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent top-[45%] animate-scan-reverse"></div>
+          <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent top-[75%] animate-scan"></div>
+        </div>
+        
+        {/* Add holographic effect with reduced intensity for additional depth */}
         <Suspense fallback={<div className="bg-black"></div>}>
-          <HolographicBackground intensity={isMobile ? 0.1 : 0.2} />
-          {!isMobile && (
-            <TechParticlesGrid count={isMobile ? 20 : 50} />
-          )}
+          <HolographicBackground intensity={0.05} />
         </Suspense>
+        
+        {/* Subtle gradient overlay for better contrast */}
+        <div className="fixed inset-0 bg-gradient-to-b from-slate-950/50 via-slate-950/30 to-slate-950/50" style={{ zIndex: -1 }}></div>
       </div>
 
       {/* Navigation */}
       <Navbar />
 
-      <main className="container mx-auto px-2 sm:px-4 py-12 relative">
-        {/* Hero Section - Always load */}
-        <section id="hero" className="min-h-[80vh] flex flex-col justify-center items-center py-16 md:py-20">
+      <main className="container mx-auto px-4 py-12 relative">
+        {/* Minimal Hero Section */}
+        <section id="hero" className="min-h-[90vh] flex flex-col justify-center items-center py-16 md:py-20">
           <div 
             className="max-w-5xl mx-auto text-center"
             style={{ 
@@ -829,20 +874,26 @@ function MyJourney() {
                 title="PERSONAL ODYSSEY" 
                 subtitle="SYS.JOURNEY.LOG" 
                 className="mb-8"
-                variant={isMobile ? "simple" : "detailed"}
+                variant="minimal" // Use minimal variant for a cleaner look
               />
             </Suspense>
             
-            <h1 className="hero-title text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                My Digital Evolution
-              </span>
-            </h1>
-            
-            <p className="hero-subtitle text-lg md:text-xl lg:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto">
-              From a curious child with a dream to a software engineer building the future.
-              This is my journey of growth, challenges, and constant evolution.
-            </p>
+            <div className="relative">
+              {/* Simplified decorative elements */}
+              <div className="absolute -top-8 -left-8 w-16 h-16 border-t border-l border-blue-500/30 rounded-tl-lg"></div>
+              <div className="absolute -bottom-8 -right-8 w-16 h-16 border-b border-r border-purple-500/30 rounded-br-lg"></div>
+              
+              <h1 className="hero-title text-4xl md:text-6xl lg:text-7xl font-bold mb-6 relative">
+                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                  My Digital Evolution
+                </span>
+              </h1>
+              
+              <p className="hero-subtitle text-lg md:text-xl lg:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto">
+                From a curious child with a dream to a software engineer building the future.
+                This is my journey of growth, challenges, and constant evolution.
+              </p>
+            </div>
             
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -850,245 +901,254 @@ function MyJourney() {
             >
               <a 
                 href="#journey"
-                className="inline-block px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/20"
+                className="inline-block px-7 py-4 md:px-8 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-md shadow-blue-500/10 border border-white/10"
               >
                 Explore My Journey
               </a>
             </motion.div>
           </div>
           
-          {/* Simplified Scroll Indicator */}
+          {/* Simple Scroll Indicator */}
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-            <span className="text-blue-400 text-sm mb-2">Scroll Down</span>
-            <div className="w-5 h-8 rounded-full border border-blue-400 flex justify-center pt-1">
+            <span className="text-blue-400 text-sm mb-2 font-medium">Scroll Down</span>
+            <div className="w-5 h-10 rounded-full border border-blue-400/50 flex justify-center pt-1">
               <motion.div 
-                animate={{ y: [0, 8, 0] }}
+                animate={{ y: [0, 10, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
-                className="w-1 h-2 bg-blue-400 rounded-full opacity-75"
+                className="w-2 h-2 bg-blue-400 rounded-full opacity-75"
               />
             </div>
           </div>
         </section>
         
-        {/* Interactive Journey Section - Always show */}
-        <section id="journey" className="mb-16 md:mb-24">
-          <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-            <CyberpunkInterface 
-              title="TIMELINE" 
-              subtitle="EXPERIENCE.LOG" 
-              className="mb-8"
-              variant={isMobile ? "simple" : "detailed"}
-            />
-          </Suspense>
-          
-          <div className="max-w-6xl mx-auto mt-8 md:mt-12">
-            {/* Render simplified timeline for better performance */}
-            {isMobile ? (
-              <div className="px-2">
-                <h3 className="text-xl md:text-2xl font-bold mb-4 text-center text-white">
-                  My Journey <span className="text-blue-100">Timeline</span>
-                </h3>
-                <div className="flex overflow-x-auto pb-4 hide-scrollbar">
-                  {journeyData.map((entry, index) => (
-                    <div 
-                      key={entry.year}
-                      className={`cursor-pointer min-w-[80px] text-center mx-2 p-2 rounded-lg ${activeDot === index ? 'bg-blue-900/50 border border-blue-500' : 'bg-black-300/50'}`}
-                      onClick={() => setActiveDot(index)}
-                    >
-                      <div className={`text-sm font-bold bg-gradient-to-r ${entry.color} bg-clip-text text-transparent`}>
-                        {entry.year}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              // Full timeline for desktop
-              <InteractiveTimeline 
-                data={journeyData} 
-                onSelect={setActiveDot} 
-                selectedJourney={activeDot}
-              />
-            )}
-            
-            {/* Journey Content - Show only selected item */}
-            <div className="mt-6 md:mt-10 px-2">
-              <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-                <Journey3DCard 
-                  entry={journeyData[activeDot]}
-                />
-              </Suspense>
-            </div>
-            
-            {/* Simple Navigation Arrows */}
-            <div className="flex justify-between mt-6 px-2">
-              <button
-                className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400"
-                onClick={() => setActiveDot(prev => (prev === 0 ? journeyData.length - 1 : prev - 1))}
-              >
-                <FaChevronLeft />
-              </button>
-              
-              <button
-                className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-600/30 flex items-center justify-center text-blue-400"
-                onClick={() => setActiveDot(prev => (prev === journeyData.length - 1 ? 0 : prev + 1))}
-              >
-                <FaChevronRight />
-              </button>
-            </div>
-          </div>
-        </section>
-        
-        {/* Quote Section */}
-        <section className="mb-16 md:mb-20">
-          <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-            <CyberpunkInterface 
-              title="INSPIRATIONAL_QUOTES" 
-              subtitle="WISDOM.DATABASE" 
-              className="mb-6"
-              variant={isMobile ? "simple" : "detailed"}
-            />
-          </Suspense>
-          
-          <div className="max-w-4xl mx-auto px-2">
+        {/* Clean Interactive Journey Section */}
+        <section id="journey" ref={journeyRef} className="mb-20 md:mb-28">
+          <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-blue-500/10 p-6 md:p-8">
             <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-              <GlowEffect color="blue" intensity="low">
-                <div className="bg-black-300/30 backdrop-blur-sm p-5 md:p-8 rounded-xl border border-blue-500/20">
-                  <div className="text-3xl md:text-4xl text-blue-500/30 font-serif mb-4">"</div>
-                  <blockquote className="text-lg md:text-2xl italic font-light text-center mb-5 text-blue-50">
-                    You got a dream, you gotta protect it. People can't do something themselves, they wanna tell you you can't do it.
-                  </blockquote>
-                  <div className="text-center">
-                    <span className="inline-block px-4 py-2 rounded-full bg-blue-900/40 text-blue-300 font-semibold text-sm">
-                      The Pursuit of Happyness
-                    </span>
-                  </div>
-                </div>
-              </GlowEffect>
+              <CyberpunkInterface 
+                title="TIMELINE" 
+                subtitle="EXPERIENCE.LOG" 
+                className="mb-8"
+                variant="minimal"
+              />
             </Suspense>
-          </div>
-        </section>
-        
-        {/* Skills Section */}
-        <section className="mb-16 md:mb-20">
-          <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-            <CyberpunkInterface 
-              title="SKILL MATRIX" 
-              subtitle="ABILITY.DATA" 
-              className="mb-6"
-              variant={isMobile ? "simple" : "detailed"}
-            />
-          </Suspense>
-          
-          <div className="max-w-4xl mx-auto px-2">
-            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-              <GlowEffect color="purple" intensity="low">
-                <div className="bg-black-300/30 backdrop-blur-sm p-5 md:p-8 rounded-xl border border-purple-500/20">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {skills.slice(0, 6).map((skill) => (
-                      <div key={skill.name} className="mb-4">
-                        <div className="flex justify-between mb-1">
-                          <span className="text-white font-medium">{skill.name}</span>
-                          <span className="text-blue-300">{skill.level}%</span>
+            
+            <div className="max-w-6xl mx-auto mt-8 md:mt-12">
+              {/* Improved timeline for better mobile experience */}
+              {isMobile ? (
+                <div className="px-2">
+                  <h3 className="text-xl md:text-2xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                    My Journey Timeline
+                  </h3>
+                  <div className="flex overflow-x-auto pb-6 hide-scrollbar">
+                    {journeyData.map((entry, index) => (
+                      <div 
+                        key={entry.year}
+                        className={`cursor-pointer min-w-[100px] text-center mx-3 p-3 rounded-xl 
+                          ${activeDot === index 
+                            ? 'bg-gradient-to-r from-blue-900/70 to-purple-900/70 border border-blue-500/70 shadow-lg shadow-blue-500/30' 
+                            : 'bg-black/50 border border-white/10'}`}
+                        onClick={() => setActiveDot(index)}
+                      >
+                        <div className={`text-base font-bold bg-gradient-to-r ${entry.color} bg-clip-text text-transparent`}>
+                          {entry.year}
                         </div>
-                        <div className="h-2 bg-black-300 rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full bg-gradient-to-r ${skill.color} rounded-full`}
-                            style={{ width: `${skill.level}%` }}
-                          ></div>
+                        <div className="text-white/70 text-xs mt-1 truncate">
+                          {entry.title}
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </GlowEffect>
-            </Suspense>
+              ) : (
+                // Full timeline for desktop
+                <InteractiveTimeline 
+                  data={journeyData} 
+                  onSelect={setActiveDot} 
+                  selectedJourney={activeDot}
+                />
+              )}
+              
+              {/* Improved Journey Content display */}
+              <div className="mt-8 md:mt-12 px-2">
+                <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+                  <FlipCard entry={journeyData[activeDot]} />
+                </Suspense>
+              </div>
+              
+              {/* Enhanced Navigation Arrows */}
+              <div className="flex justify-between mt-6 px-2">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-900/90 to-indigo-900/90 border-2 border-blue-500/40 flex items-center justify-center text-blue-400 shadow-md shadow-blue-900/30"
+                  onClick={() => setActiveDot(prev => (prev === 0 ? journeyData.length - 1 : prev - 1))}
+                >
+                  <FaChevronLeft className="w-5 h-5" />
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-900/90 to-purple-900/90 border-2 border-purple-500/40 flex items-center justify-center text-purple-400 shadow-md shadow-purple-900/30"
+                  onClick={() => setActiveDot(prev => (prev === journeyData.length - 1 ? 0 : prev + 1))}
+                >
+                  <FaChevronRight className="w-5 h-5" />
+                </motion.button>
+              </div>
+            </div>
           </div>
         </section>
         
-        {/* Lessons Learned Section */}
-        <section className="mb-16 md:mb-20">
-          <h2 className="text-xl md:text-2xl font-bold text-center mb-6 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
-            Key Lessons From My Journey
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto px-2">
+        {/* Minimal Quote Section */}
+        <section className="mb-20 md:mb-28">
+          <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-purple-500/10 p-6 md:p-8">
             <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-              <GlowEffect color="purple" intensity="low">
-                <div className="bg-black-300/30 backdrop-blur-sm p-4 md:p-6 rounded-lg border border-purple-600/20">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 mb-4 flex items-center justify-center text-xl">
-                    🔄
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Consistency is Key</h3>
-                  <p className="text-gray-300 text-sm">
-                    Working consistently for two years led to my first payment. Progress compounds over time.
-                  </p>
-                </div>
-              </GlowEffect>
+              <CyberpunkInterface 
+                title="INSPIRATIONAL_QUOTES" 
+                subtitle="WISDOM.DATABASE" 
+                className="mb-8"
+                variant="minimal"
+              />
             </Suspense>
             
-            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-              <GlowEffect color="blue" intensity="low">
-                <div className="bg-black-300/30 backdrop-blur-sm p-4 md:p-6 rounded-lg border border-blue-600/20">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 mb-4 flex items-center justify-center text-xl">
-                    💡
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Balance Education & Skills</h3>
-                  <p className="text-gray-300 text-sm">
-                    The foundation of formal education combined with practical skills is powerful.
-                  </p>
-                </div>
-              </GlowEffect>
-            </Suspense>
-            
-            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
-              <GlowEffect color="pink" intensity="low">
-                <div className="bg-black-300/30 backdrop-blur-sm p-4 md:p-6 rounded-lg border border-pink-600/20">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-600 to-red-600 mb-4 flex items-center justify-center text-xl">
-                    🚀
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Embrace Failure</h3>
-                  <p className="text-gray-300 text-sm">
-                    Failure is a stepping stone to success, not the end of the journey.
-                  </p>
-                </div>
-              </GlowEffect>
-            </Suspense>
+            <div className="max-w-4xl mx-auto px-2">
+              <QuoteSlider />
+            </div>
           </div>
         </section>
         
-        {/* Call to Action - Always load (simplified) */}
+        {/* Minimal Skills Section */}
+        <section className="mb-20 md:mb-28">
+          <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-blue-500/10 p-6 md:p-8">
+            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+              <CyberpunkInterface 
+                title="SKILL MATRIX" 
+                subtitle="ABILITY.DATA" 
+                className="mb-8"
+                variant="minimal"
+              />
+            </Suspense>
+            
+            <div className="max-w-4xl mx-auto px-2">
+              <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+                <GlowEffect color="purple" intensity="low">
+                  <div className="bg-black/50 backdrop-blur-sm p-6 md:p-8 rounded-xl border border-purple-500/20">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {skills.map((skill, index) => (
+                        <SkillBar key={skill.name} {...skill} index={index} />
+                      ))}
+                    </div>
+                  </div>
+                </GlowEffect>
+              </Suspense>
+            </div>
+          </div>
+        </section>
+        
+        {/* Minimal Lessons Learned Section */}
+        <section className="mb-20 md:mb-28">
+          <div className="bg-black/30 backdrop-blur-sm rounded-xl border border-pink-500/10 p-6 md:p-8">
+            <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+              <CyberpunkInterface 
+                title="KEY_LESSONS" 
+                subtitle="EXPERIENCE.INSIGHTS" 
+                className="mb-8"
+                variant="minimal"
+              />
+            </Suspense>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto px-2">
+              <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+                <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 200 }}>
+                  <GlowEffect color="purple" intensity="low">
+                    <div className="h-full bg-black/50 backdrop-blur-sm p-6 rounded-xl border border-purple-600/20">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600/80 to-pink-600/80 mb-5 flex items-center justify-center text-2xl">
+                        🔄
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-3">Consistency is Key</h3>
+                      <p className="text-gray-200 text-base">
+                        Working consistently for two years led to my first payment. Progress compounds over time.
+                      </p>
+                    </div>
+                  </GlowEffect>
+                </motion.div>
+              </Suspense>
+              
+              <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+                <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 200 }}>
+                  <GlowEffect color="blue" intensity="low">
+                    <div className="h-full bg-black/50 backdrop-blur-sm p-6 rounded-xl border border-blue-600/20">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600/80 to-indigo-600/80 mb-5 flex items-center justify-center text-2xl">
+                        💡
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-3">Balance Education & Skills</h3>
+                      <p className="text-gray-200 text-base">
+                        The foundation of formal education combined with practical skills is powerful.
+                      </p>
+                    </div>
+                  </GlowEffect>
+                </motion.div>
+              </Suspense>
+              
+              <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
+                <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 200 }}>
+                  <GlowEffect color="pink" intensity="low">
+                    <div className="h-full bg-black/50 backdrop-blur-sm p-6 rounded-xl border border-pink-600/20">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-600/80 to-red-600/80 mb-5 flex items-center justify-center text-2xl">
+                        🚀
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-3">Embrace Failure</h3>
+                      <p className="text-gray-200 text-base">
+                        Failure is a stepping stone to success, not the end of the journey.
+                      </p>
+                    </div>
+                  </GlowEffect>
+                </motion.div>
+              </Suspense>
+            </div>
+          </div>
+        </section>
+        
+        {/* Minimal Call to Action */}
         <section className="mb-16">
           <div className="max-w-4xl mx-auto px-2">
             <Suspense fallback={<div className="animate-pulse bg-blue-900/20 rounded-lg min-h-[100px] w-full"></div>}>
               <GlowEffect color="blue" intensity="low">
-                <div className="bg-black-300/70 p-5 md:p-8 rounded-xl border border-blue-600/30 backdrop-blur-sm relative overflow-hidden">
+                <div className="bg-black/50 p-6 md:p-8 rounded-xl border border-blue-600/20 backdrop-blur-sm relative overflow-hidden">
+                  {/* Simple decorative element */}
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
+                  
                   <div className="relative">
-                    <h2 className="text-xl md:text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+                    <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
                       Thank You For Exploring My Journey
                     </h2>
                     
-                    <div className="text-blue-50 mb-5 space-y-3 text-sm md:text-base">
+                    <div className="text-blue-50 mb-8 space-y-3 text-base md:text-lg text-center">
                       <p>
                         If you're working on any idea and need a partner, feel free to connect. 
                         I would love to collaborate on great ideas.
                       </p>
                     </div>
                     
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                      <a
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+                      <motion.a
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         href="#contact"
-                        className="inline-block px-5 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 w-full sm:w-auto text-center text-sm md:text-base"
+                        className="inline-block px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 w-full sm:w-auto text-center text-base shadow-md border border-white/10"
                       >
                         Get in Touch
-                      </a>
+                      </motion.a>
                       
-                      <a
+                      <motion.a
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         href="#projects"
-                        className="inline-block px-5 py-2 md:px-6 md:py-3 bg-transparent border border-blue-600/50 text-blue-400 font-bold rounded-full hover:bg-blue-900/20 transition-all duration-300 w-full sm:w-auto text-center text-sm md:text-base"
+                        className="inline-block px-6 py-3 md:px-8 md:py-4 bg-transparent border border-blue-500/40 text-blue-400 font-bold rounded-full hover:bg-blue-900/10 transition-all duration-300 w-full sm:w-auto text-center text-base"
                       >
                         See My Projects
-                      </a>
+                      </motion.a>
                     </div>
                   </div>
                 </div>
@@ -1100,7 +1160,7 @@ function MyJourney() {
 
       <Footer />
       
-      {/* Custom CSS for performance optimization */}
+      {/* Simplified Custom CSS */}
       <style jsx global>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
@@ -1108,6 +1168,36 @@ function MyJourney() {
         .hide-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+          border-radius: 10px;
+        }
+        
+        .rotateY-180 {
+          transform: rotateY(180deg);
+        }
+        
+        .preserve-3d {
+          transform-style: preserve-3d;
+        }
+        
+        .backface-hidden {
+          backface-visibility: hidden;
+        }
+        
+        .perspective-1000 {
+          perspective: 1000px;
         }
         
         @media (max-width: 768px) {
