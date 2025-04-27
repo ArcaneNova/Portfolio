@@ -131,7 +131,35 @@ const About = () => {
   }, [visibleBio, bioTexts]);
   
   useGSAP(() => {
-    // Animate section title
+    // Check if mobile and set different behavior
+    const isMobile = window.innerWidth < 768;
+    
+    // Make all elements visible by default on mobile
+    if (isMobile) {
+      // Set initial states to visible on mobile
+      gsap.set('#about-title, .bio-container, .timeline-item, .achievement-card', { 
+        opacity: 1,
+        y: 0,
+        x: 0,
+        scale: 1
+      });
+      
+      // Minimal animation for profile image
+      gsap.fromTo(
+        profileRef.current,
+        { opacity: 0.5, scale: 0.95 },
+        { 
+          opacity: 1, 
+          scale: 1, 
+          duration: 0.5,
+          delay: 0.1
+        }
+      );
+      
+      return; // Skip the rest of the animations on mobile
+    }
+    
+    // Desktop animations with better scroll triggers
     gsap.fromTo(
       "#about-title",
       { opacity: 0, y: 30 },
@@ -141,7 +169,8 @@ const About = () => {
         duration: 0.8,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 80%"
+          start: "top 95%", // Start earlier to ensure visibility
+          toggleActions: 'play none none none'
         }
       }
     );
@@ -156,7 +185,8 @@ const About = () => {
         duration: 1,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 70%"
+          start: "top 95%", // Start earlier
+          toggleActions: 'play none none none'
         }
       }
     );
@@ -171,7 +201,8 @@ const About = () => {
         duration: 0.8,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 70%"
+          start: "top 90%", // Start earlier
+          toggleActions: 'play none none none'
         }
       }
     );
@@ -187,7 +218,8 @@ const About = () => {
         stagger: 0.15,
         scrollTrigger: {
           trigger: timelineRef.current,
-          start: "top 80%"
+          start: "top 90%", // Start earlier
+          toggleActions: 'play none none none'
         }
       }
     );
@@ -203,7 +235,8 @@ const About = () => {
         stagger: 0.2,
         scrollTrigger: {
           trigger: achievementsRef.current,
-          start: "top 80%"
+          start: "top 90%", // Start earlier
+          toggleActions: 'play none none none'
         }
       }
     );

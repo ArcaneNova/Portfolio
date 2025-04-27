@@ -340,20 +340,22 @@ const SkillBar = ({ name, level, color, index }) => {
   const barRef = useRef(null);
   
   useGSAP(() => {
-    gsap.fromTo(
-      barRef.current,
-      { width: 0 },
-      { 
-        width: `${level}%`, 
-        duration: 1.5,
-        delay: 0.1 * index,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: barRef.current,
-          start: "top 90%",
+    if (barRef.current) {
+      gsap.fromTo(
+        barRef.current,
+        { width: 0 },
+        { 
+          width: `${level}%`, 
+          duration: 1.5,
+          delay: 0.1 * index,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: barRef.current,
+            start: "top 90%",
+          }
         }
-      }
-    );
+      );
+    }
   }, []);
 
   return (
@@ -442,10 +444,10 @@ const FlipCard = ({ entry }) => {
   
   return (
     <div 
-      className="w-full h-[450px] sm:h-96 relative perspective-1000"
+      className="w-full h-auto min-h-[450px] sm:min-h-[400px] relative perspective-1000"
       onMouseEnter={() => setIsFlipped(true)}
       onMouseLeave={() => setIsFlipped(false)}
-      onClick={() => setIsFlipped(!isFlipped)} // Added for mobile
+      onClick={() => setIsFlipped(!isFlipped)} // Toggle flip state on click for mobile
     >
       <motion.div 
         className="w-full h-full relative preserve-3d transition-all duration-500"
@@ -483,23 +485,24 @@ const FlipCard = ({ entry }) => {
           </GlowEffect>
         </div>
         
-        {/* Back of card */}
+        {/* Back of card - Fixed for mobile with better scroll handling */}
         <div className="absolute inset-0 backface-hidden rotateY-180">
           <GlowEffect color="purple" intensity="low">
-            <div className="h-full rounded-xl overflow-hidden bg-black/80 backdrop-blur-sm border border-purple-600/30 p-6 flex flex-col">
+            <div className="h-full rounded-xl bg-black/80 backdrop-blur-sm border border-purple-600/30 p-6 flex flex-col">
               <h4 className={`text-xl font-bold mb-3 bg-gradient-to-r ${entry.color} bg-clip-text text-transparent`}>
                 {entry.title} - {entry.year}
               </h4>
               
-              <div className="flex-1 overflow-auto custom-scrollbar pr-2">
-                <p className="text-gray-200 text-base">{entry.description}</p>
+              {/* Fixed scrollable area for mobile and desktop */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 mb-4 max-h-[300px] sm:max-h-[250px]">
+                <p className="text-gray-200 text-sm sm:text-base">{entry.description}</p>
               </div>
               
-              <div className="mt-4 text-center">
+              <div className="mt-auto text-center">
                 <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-purple-900/50 text-purple-300 border border-purple-700/50">
                   {entry.achievement}
                 </span>
-                <p className="text-purple-400 mt-2 text-sm">Tap/Click to flip back</p>
+                <p className="text-purple-400 mt-2 text-xs sm:text-sm">Tap/Click to flip back</p>
               </div>
             </div>
           </GlowEffect>

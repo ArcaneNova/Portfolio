@@ -216,6 +216,40 @@ const Projects = () => {
   };
   
   useGSAP(() => {
+    // Check if mobile
+    const isMobile = window.innerWidth < 768;
+    
+    // On mobile devices, make everything visible immediately with minimal animations
+    if (isMobile) {
+      // Set all components to be visible immediately
+      gsap.set(".projects-title, .projects-subtitle, .filter-buttons button, .project-card", {
+        opacity: 1,
+        y: 0
+      });
+      
+      // Add minimal animations that don't depend on scroll for better user experience
+      gsap.fromTo(
+        ".featured-carousel",
+        { opacity: 0.8, y: 10 },
+        { opacity: 1, y: 0, duration: 0.5, delay: 0.1 }
+      );
+      
+      gsap.fromTo(
+        ".filter-buttons button",
+        { opacity: 0.8, y: 5 },
+        { opacity: 1, y: 0, duration: 0.3, stagger: 0.05, delay: 0.2 }
+      );
+      
+      gsap.fromTo(
+        ".project-card",
+        { opacity: 0.8, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, delay: 0.3 }
+      );
+      
+      return;
+    }
+    
+    // Desktop animations with scroll triggers
     // Animation for the section title and subtitle
     gsap.fromTo(
       ".projects-title, .projects-subtitle",
@@ -227,7 +261,8 @@ const Projects = () => {
         stagger: 0.2,
         scrollTrigger: {
           trigger: projectsRef.current,
-          start: "top 80%"
+          start: "top 95%", // Start earlier to ensure visibility
+          toggleActions: 'play none none none'
         }
       }
     );
@@ -243,7 +278,8 @@ const Projects = () => {
         stagger: 0.1,
         scrollTrigger: {
           trigger: ".filter-buttons",
-          start: "top 85%"
+          start: "top 95%", // Start earlier
+          toggleActions: 'play none none none'
         }
       }
     );
@@ -259,7 +295,8 @@ const Projects = () => {
         stagger: 0.1,
         scrollTrigger: {
           trigger: ".projects-grid",
-          start: "top 85%"
+          start: "top 95%", // Start earlier
+          toggleActions: 'play none none none'
         }
       }
     );

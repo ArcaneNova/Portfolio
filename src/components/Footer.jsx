@@ -39,52 +39,61 @@ const Footer = () => {
   useGSAP(() => {
     if (!footerRef.current) return;
     
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: footerRef.current,
-        start: 'top 90%',
-        toggleActions: 'play none none none'
-      }
-    });
-    
-    tl.fromTo(
-      contentRef.current,
-      { y: 50, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
-    );
-    
-    // Animate social icons
-    gsap.fromTo(
-      '.social-icon',
-      { scale: 0, opacity: 0 },
-      { 
-        scale: 1, 
-        opacity: 1, 
-        stagger: 0.1, 
-        duration: 0.5, 
-        ease: 'back.out(1.7)',
+    // Ensure contentRef exists
+    if (contentRef.current) {
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: footerRef.current,
-          start: 'top 85%'
+          start: 'top 90%',
+          toggleActions: 'play none none none'
         }
-      }
-    );
+      });
+      
+      tl.fromTo(
+        contentRef.current,
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
+      );
+    }
     
-    // Animate the links
-    gsap.fromTo(
-      '.footer-link',
-      { x: -20, opacity: 0 },
-      { 
-        x: 0, 
-        opacity: 1, 
-        stagger: 0.05, 
-        duration: 0.4,
-        scrollTrigger: {
-          trigger: footerRef.current,
-          start: 'top 85%'
+    // Check if social icons exist before animating
+    const socialIcons = footerRef.current.querySelectorAll('.social-icon');
+    if (socialIcons.length > 0) {
+      gsap.fromTo(
+        '.social-icon',
+        { scale: 0, opacity: 0 },
+        { 
+          scale: 1, 
+          opacity: 1, 
+          stagger: 0.1, 
+          duration: 0.5, 
+          ease: 'back.out(1.7)',
+          scrollTrigger: {
+            trigger: footerRef.current,
+            start: 'top 85%'
+          }
         }
-      }
-    );
+      );
+    }
+    
+    // Check if footer links exist before animating
+    const footerLinks = footerRef.current.querySelectorAll('.footer-link');
+    if (footerLinks.length > 0) {
+      gsap.fromTo(
+        '.footer-link',
+        { x: -20, opacity: 0 },
+        { 
+          x: 0, 
+          opacity: 1, 
+          stagger: 0.05, 
+          duration: 0.4,
+          scrollTrigger: {
+            trigger: footerRef.current,
+            start: 'top 85%'
+          }
+        }
+      );
+    }
   }, []);
   
   // Get current year for copyright

@@ -59,57 +59,71 @@ const Skills = () => {
   const titleRef = useRef(null);
   
   useGSAP(() => {
-    // Animate section title with more dramatic effect
-    gsap.fromTo(
-      "#skills-title",
-      { opacity: 0, y: 50 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        duration: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%"
-        }
-      }
-    );
+    // Check if necessary DOM elements exist before animating
+    if (!sectionRef.current) return;
     
-    // Animate category buttons with staggered appearance
-    gsap.fromTo(
-      ".skill-category",
-      { opacity: 0, y: 30, scale: 0.9 },
-      { 
-        opacity: 1, 
-        y: 0, 
-        scale: 1,
-        duration: 0.6,
-        stagger: 0.15,
-        ease: "back.out(1.5)",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 70%"
+    const skillsTitle = document.getElementById('skills-title');
+    if (skillsTitle) {
+      // Animate section title with more dramatic effect
+      gsap.fromTo(
+        "#skills-title",
+        { opacity: 0, y: 50 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%"
+          }
         }
-      }
-    );
+      );
+    }
     
-    // Animate tools with a more playful animation
-    gsap.fromTo(
-      ".tool-item",
-      { opacity: 0, scale: 0.8, y: 20 },
-      { 
-        opacity: 1, 
-        scale: 1,
-        y: 0,
-        duration: 0.7,
-        stagger: 0.1,
-        ease: "elastic.out(1, 0.5)",
-        scrollTrigger: {
-          trigger: toolsRef.current,
-          start: "top 85%"
+    const categoryButtons = document.querySelectorAll('.skill-category');
+    if (categoryButtons.length > 0) {
+      // Animate category buttons with staggered appearance
+      gsap.fromTo(
+        ".skill-category",
+        { opacity: 0, y: 30, scale: 0.9 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          scale: 1,
+          duration: 0.6,
+          stagger: 0.15,
+          ease: "back.out(1.5)",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 70%"
+          }
         }
+      );
+    }
+    
+    if (toolsRef.current) {
+      const toolItems = toolsRef.current.querySelectorAll('.tool-item');
+      if (toolItems.length > 0) {
+        // Animate tools with a more playful animation
+        gsap.fromTo(
+          ".tool-item",
+          { opacity: 0, scale: 0.8, y: 20 },
+          { 
+            opacity: 1, 
+            scale: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.1,
+            ease: "elastic.out(1, 0.5)",
+            scrollTrigger: {
+              trigger: toolsRef.current,
+              start: "top 85%"
+            }
+          }
+        );
       }
-    );
+    }
     
     // Initial animation for skill bars
     animateSkillBars();
@@ -117,28 +131,34 @@ const Skills = () => {
 
   // Animate skill bars when category changes with improved timing
   const animateSkillBars = () => {
-    gsap.fromTo(
-      ".skill-bar-fill",
-      { width: 0 },
-      { 
-        width: "var(--skill-level)", 
-        duration: 1.2,
-        ease: "power2.out",
-        stagger: 0.15,
-      }
-    );
+    const skillBarFills = document.querySelectorAll('.skill-bar-fill');
+    if (skillBarFills.length > 0) {
+      gsap.fromTo(
+        ".skill-bar-fill",
+        { width: 0 },
+        { 
+          width: "var(--skill-level)", 
+          duration: 1.2,
+          ease: "power2.out",
+          stagger: 0.15,
+        }
+      );
+    }
     
-    gsap.fromTo(
-      ".skill-item",
-      { opacity: 0, x: -30 },
-      { 
-        opacity: 1, 
-        x: 0, 
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "back.out(1.2)",
-      }
-    );
+    const skillItems = document.querySelectorAll('.skill-item');
+    if (skillItems.length > 0) {
+      gsap.fromTo(
+        ".skill-item",
+        { opacity: 0, x: -30 },
+        { 
+          opacity: 1, 
+          x: 0, 
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "back.out(1.2)",
+        }
+      );
+    }
   };
   
   const handleCategoryChange = (category) => {

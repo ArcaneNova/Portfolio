@@ -133,8 +133,15 @@ const Stats = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
   
-  // Observer for lazy loading
+  // Update the useEffect for visibility detection to instantly set visible on mobile
   useEffect(() => {
+    // Set immediately visible on mobile
+    if (window.innerWidth < 768) {
+      setIsVisible(true);
+      return;
+    }
+    
+    // Normal intersection observer for desktop
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -156,11 +163,37 @@ const Stats = () => {
     };
   }, []);
   
+  // Modify the GSAP animation function to make components load faster on mobile
   useGSAP(() => {
+    // Set everything immediately visible on mobile with minimal animations
+    if (isMobile) {
+      // Make sure all elements are visible even without scrolling
+      gsap.set('.stats-title, .stat-card, .platform-card, .contribution-cell', {
+        opacity: 1,
+        y: 0,
+        scale: 1
+      });
+      
+      // Add minimal animations for better user experience
+      gsap.fromTo(
+        '.stat-card',
+        { y: 10, opacity: 0.8 },
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: 'power1.out' }
+      );
+      
+      gsap.fromTo(
+        '.contribution-cell',
+        { scale: 0.95, opacity: 0.8 },
+        { scale: 1, opacity: 1, duration: 0.3, stagger: 0.001 }
+      );
+      
+      return;
+    }
+    
+    // Desktop animations with optimized scroll triggers
     // Only run animations if section is visible
     if (!isVisible) return;
     
-    // Use lighter animations on mobile
     const animationDuration = isMobile ? 0.5 : 0.8;
     const staggerAmount = isMobile ? 0.1 : 0.2;
     
@@ -171,7 +204,7 @@ const Stats = () => {
       duration: animationDuration,
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top 85%',
+        start: 'top 95%', // Start earlier
         toggleActions: 'play none none none'
       }
     });
@@ -185,7 +218,7 @@ const Stats = () => {
       ease: 'power2.out',
       scrollTrigger: {
         trigger: statsGridRef.current,
-        start: 'top 90%',
+        start: 'top 95%', // Start earlier
         toggleActions: 'play none none none'
       }
     });
@@ -199,7 +232,7 @@ const Stats = () => {
         duration: 0.6,
         scrollTrigger: {
           trigger: platformsRef.current,
-          start: 'top 85%',
+          start: 'top 90%', // Start earlier
           toggleActions: 'play none none none'
         }
       });
@@ -212,12 +245,11 @@ const Stats = () => {
         duration: 0.4,
         scrollTrigger: {
           trigger: contributionRef.current,
-          start: 'top 90%',
+          start: 'top 95%', // Start earlier
           toggleActions: 'play none none none'
         }
       });
     }
-    
   }, [isVisible, isMobile]);
   
   // Get intensity color based on value (0-7)

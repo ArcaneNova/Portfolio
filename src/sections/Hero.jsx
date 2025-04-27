@@ -98,41 +98,44 @@ const Hero = () => {
   const profileImageRef = useRef(null);
   
   useEffect(() => {
-    // Animation timeline with minimal delays
+    // Animation timeline with no delays for immediate loading
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
     
-    // Reduced animation delays for faster loading
-    tl.fromTo(textContentRef.current, 
-      { opacity: 0, y: 10 }, 
-      { opacity: 1, y: 0, duration: 0.4, delay: 0.1 } // Reduced duration and delay
-    );
-    
-    tl.fromTo(profileRef.current, 
-      { opacity: 0, scale: 0.95 }, 
-      { opacity: 1, scale: 1, duration: 0.4 }, 
-      "-=0.2" // Reduced stagger
-    );
-    
-    tl.fromTo(buttonsRef.current, 
-      { opacity: 0, y: 10 }, 
-      { opacity: 1, y: 0, duration: 0.3 }, 
-      "-=0.2" // Reduced stagger
-    );
-    
-    tl.fromTo(scrollIndicatorRef.current, 
-      { opacity: 0 }, 
-      { opacity: 1, duration: 0.3 },
-      "-=0.1" // Show quickly
-    );
-    
-    // Simple scroll indicator animation
-    gsap.to(scrollIndicatorRef.current, {
-      y: 8,
-      duration: 1.8,
-      repeat: -1,
-      yoyo: true
-    });
-    
+    // Only run animations if the refs are actually attached to DOM elements
+    if (textContentRef.current && profileRef.current && buttonsRef.current && scrollIndicatorRef.current) {
+      // For immediate visibility on first load
+      gsap.set([textContentRef.current, profileRef.current, buttonsRef.current, scrollIndicatorRef.current], { 
+        opacity: 1,
+        y: 0,
+        scale: 1
+      });
+      
+      // Super minimal animations with no delays
+      tl.fromTo(textContentRef.current, 
+        { opacity: 0.9, y: 5 }, 
+        { opacity: 1, y: 0, duration: 0.3 } // Very short duration
+      );
+      
+      tl.fromTo(profileRef.current, 
+        { opacity: 0.9, scale: 0.98 }, 
+        { opacity: 1, scale: 1, duration: 0.3 }, 
+        "-=0.2" // Overlap timing
+      );
+      
+      tl.fromTo(buttonsRef.current, 
+        { opacity: 0.9, y: 5 }, 
+        { opacity: 1, y: 0, duration: 0.2 }, 
+        "-=0.1"
+      );
+      
+      // Simple scroll indicator animation
+      gsap.to(scrollIndicatorRef.current, {
+        y: 8,
+        duration: 1.8,
+        repeat: -1,
+        yoyo: true
+      });
+    }
   }, []);
 
   return (

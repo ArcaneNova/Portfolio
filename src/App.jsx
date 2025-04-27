@@ -20,18 +20,35 @@ import { useEffect, useState, Component } from "react";
 import CVSection from "./sections/CV.jsx";
 
 const App = () => {
-  const [loading, setLoading] = useState(false); // Set initial loading to false to prevent blank screen
-  const [loadingProgress, setLoadingProgress] = useState(100); // Start with 100% progress
+  // Set all initial states to skip loading
+  const [loading, setLoading] = useState(false); // Keep false to never show loading screen
+  const [loadingProgress, setLoadingProgress] = useState(100); // Always 100% complete
   const [webGLSupported, setWebGLSupported] = useState(true);
-  const [backgroundMode, setBackgroundMode] = useState('minimal');
+  const [backgroundMode, setBackgroundMode] = useState('minimal'); // Use minimal background for better performance
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Check WebGL support
+  // Check WebGL support and mobile status immediately
   useEffect(() => {
+    // Check if mobile for performance optimizations
+    const checkMobile = () => {
+      const isMobileDevice = window.innerWidth < 768;
+      setIsMobile(isMobileDevice);
+      
+      // If mobile, use even more minimal backgrounds
+      if (isMobileDevice) {
+        setBackgroundMode('ultra-minimal');
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    // Check WebGL support
     try {
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       const isWebGLSupported = !!gl;
-      setWebGLSupported(isWebGLSupported);
+      setWebGLSupported(isWebGLSupported && !isMobile); // Disable WebGL on mobile for better performance
       if (!isWebGLSupported) {
         console.warn("WebGL not supported - using fallback background");
       }
@@ -39,10 +56,11 @@ const App = () => {
       console.error("Error checking WebGL support:", e);
       setWebGLSupported(false);
     }
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
-
-  // Remove loading simulation to show content immediately
-  // This prevents blank screens on mobile devices
 
   // Effect to add body styles to ensure background extends across all content
   useEffect(() => {
@@ -51,64 +69,79 @@ const App = () => {
     document.body.style.minHeight = '100vh';
     document.body.style.overflowX = 'hidden';
     
+    // Add a class to help with mobile optimizations
+    if (isMobile) {
+      document.body.classList.add('is-mobile');
+    } else {
+      document.body.classList.remove('is-mobile');
+    }
+    
     // Clean up
     return () => {
       document.body.style.position = '';
       document.body.style.minHeight = '';
       document.body.style.overflowX = '';
+      document.body.classList.remove('is-mobile');
     };
-  }, []);
+  }, [isMobile]);
 
-  // Skip loading screen entirely to prevent blank screens
+  // Return the app with optimized background for mobile
   return (
     <main className='relative z-0'>
       <div className="relative z-0 min-h-screen flex flex-col overflow-x-hidden">
-        {/* Professional background with footer-style network lines */}
+        {/* Professional background with footer-style network lines - simplified for mobile */}
         <div className="fixed inset-0 z-[-2] bg-gradient-to-b from-black to-slate-950">
-          {/* Neural network lines in background */}
+          {/* Simplified neural network lines in background for better performance */}
           <div className="absolute inset-0 opacity-10">
-            {Array.from({ length: 10 }).map((_, i) => (
+            {/* Reduced number of lines on mobile for better performance */}
+            {Array.from({ length: isMobile ? 5 : 10 }).map((_, i) => (
               <div 
                 key={`h-line-${i}`}
                 className="absolute h-px bg-cyan-400"
                 style={{ 
-                  top: `${i * 10}%`, 
+                  top: `${i * (isMobile ? 20 : 10)}%`, 
                   left: 0, 
                   right: 0,
                   opacity: Math.random() * 0.5 + 0.2,
-                  boxShadow: '0 0 8px rgba(6, 182, 212, 0.5)'
+                  boxShadow: 'none' // Remove shadows on mobile for performance
                 }}
               />
             ))}
             
-            {Array.from({ length: 15 }).map((_, i) => (
+            {Array.from({ length: isMobile ? 8 : 15 }).map((_, i) => (
               <div 
                 key={`v-line-${i}`}
                 className="absolute w-px bg-cyan-400"
                 style={{ 
-                  left: `${i * 7}%`, 
+                  left: `${i * (isMobile ? 14 : 7)}%`, 
                   top: 0, 
                   bottom: 0,
                   opacity: Math.random() * 0.5 + 0.2,
-                  boxShadow: '0 0 8px rgba(6, 182, 212, 0.5)'
+                  boxShadow: 'none' // Remove shadows on mobile for performance
                 }}
               />
             ))}
           </div>
           
-          {/* Glow spots */}
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-cyan-500/5 blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
+          {/* Simpler glow spots for mobile */}
+          {!isMobile && (
+            <>
+              <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-cyan-500/5 blur-3xl"></div>
+              <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
+            </>
+          )}
           
-          {/* Circuit paths animation */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent top-[15%] animate-scan"></div>
-            <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent top-[45%] animate-scan-reverse"></div>
-            <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent top-[75%] animate-scan"></div>
-          </div>
+          {/* Simpler circuit paths animation for mobile */}
+          {!isMobile && (
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent top-[15%] animate-scan"></div>
+              <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent top-[45%] animate-scan-reverse"></div>
+              <div className="absolute h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent top-[75%] animate-scan"></div>
+            </div>
+          )}
           
-          {/* Add holographic effect with reduced intensity for additional depth */}
-          {webGLSupported && <HolographicBackground intensity={0.05} />}
+          {/* Only add holographic effect on desktop for better performance */}
+          {webGLSupported && !isMobile && <HolographicBackground intensity={0.05} />}
           
           {/* Subtle gradient overlay for better contrast */}
           <div className="fixed inset-0 bg-gradient-to-b from-slate-950/50 via-slate-950/30 to-slate-950/50" style={{ zIndex: -1 }}></div>

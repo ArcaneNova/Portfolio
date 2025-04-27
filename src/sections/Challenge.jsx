@@ -138,11 +138,44 @@ const ChallengeCard = ({ challenge }) => {
 
 const Challenge = () => {
   useGSAP(() => {
-    gsap.fromTo(
-      ".cyber-interface",
-      { y: 50, opacity: 0 },
-      { y: 0, opacity: 1, stagger: 0.2, duration: 0.8, ease: "power2.out" }
-    );
+    // Check if mobile
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // For mobile, set elements visible immediately 
+      gsap.set(".cyber-interface", { opacity: 1, y: 0 });
+      
+      // Add minimal fade-in animation that doesn't depend on scroll position
+      gsap.fromTo(
+        ".cyber-interface",
+        { opacity: 0.7, y: 10 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          stagger: 0.1,
+          duration: 0.4, 
+          ease: "power1.out" 
+        }
+      );
+    } else {
+      // Desktop version with normal animations
+      gsap.fromTo(
+        ".cyber-interface",
+        { y: 50, opacity: 0 },
+        { 
+          y: 0, 
+          opacity: 1, 
+          stagger: 0.2, 
+          duration: 0.8, 
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".cyber-interface",
+            start: "top 90%", // Make it appear earlier
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+    }
   }, []);
 
   return (
