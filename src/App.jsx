@@ -20,8 +20,8 @@ import { useEffect, useState, Component } from "react";
 import CVSection from "./sections/CV.jsx";
 
 const App = () => {
-  const [loading, setLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loading, setLoading] = useState(false); // Set initial loading to false to prevent blank screen
+  const [loadingProgress, setLoadingProgress] = useState(100); // Start with 100% progress
   const [webGLSupported, setWebGLSupported] = useState(true);
   const [backgroundMode, setBackgroundMode] = useState('minimal');
 
@@ -41,30 +41,8 @@ const App = () => {
     }
   }, []);
 
-  useEffect(() => {
-    // Simulate loading animation
-    const loadingDuration = 2000; // 2 seconds loading time (reduced)
-    const interval = 30; // update progress every 30ms
-    const steps = loadingDuration / interval;
-    let currentStep = 0;
-    
-    const loadingInterval = setInterval(() => {
-      currentStep++;
-      const newProgress = Math.min(100, Math.floor((currentStep / steps) * 100));
-      setLoadingProgress(newProgress);
-      
-      if (currentStep >= steps) {
-        clearInterval(loadingInterval);
-        setTimeout(() => {
-          setLoading(false);
-        }, 300);
-      }
-    }, interval);
-    
-    return () => {
-      clearInterval(loadingInterval);
-    };
-  }, []);
+  // Remove loading simulation to show content immediately
+  // This prevents blank screens on mobile devices
 
   // Effect to add body styles to ensure background extends across all content
   useEffect(() => {
@@ -81,47 +59,7 @@ const App = () => {
     };
   }, []);
 
-  if (loading) {
-    return (
-      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
-        {/* Simplified background grid with subtle animation */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,212,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,212,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.9)_100%)]"></div>
-        </div>
-        
-        {/* Simplified loading content */}
-        <div className="text-center z-10 px-4 relative">
-          <div className="mb-8">
-            <div className="w-20 h-20 border border-cyan-500/30 rounded-full mx-auto flex items-center justify-center">
-              <div className="text-3xl text-cyan-400 font-bold">{loadingProgress}%</div>
-            </div>
-          </div>
-          
-          <h1 className="text-cyan-100 text-2xl md:text-3xl font-mono mb-6 tracking-wider">INITIALIZING</h1>
-          
-          {/* Simplified loading bar */}
-          <div className="w-full max-w-md h-2 bg-black/70 rounded-full overflow-hidden mb-4 border border-cyan-500/20">
-            <div 
-              className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full transition-all duration-300"
-              style={{ width: `${loadingProgress}%` }}
-            ></div>
-          </div>
-          
-          {/* Simplified loading text */}
-          <div className="text-cyan-200/80 font-mono text-sm">
-            <span>Loading portfolio...</span>
-          </div>
-        </div>
-        
-        {/* Minimal corner decorations */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-cyan-500/40"></div>
-        <div className="absolute top-0 right-0 w-8 h-8 border-t border-r border-cyan-500/40"></div>
-        <div className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-cyan-500/40"></div>
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-cyan-500/40"></div>
-      </div>
-    );
-  }
-
+  // Skip loading screen entirely to prevent blank screens
   return (
     <main className='relative z-0'>
       <div className="relative z-0 min-h-screen flex flex-col overflow-x-hidden">
@@ -192,25 +130,6 @@ const App = () => {
       </div>
     </main>
   );
-};
-
-// Digital Clock Component
-const Clock = () => {
-  const [time, setTime] = useState(() => {
-    const now = new Date();
-    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-  });
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      setTime(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, []);
-  
-  return <div>{time}</div>;
 };
 
 // ErrorBoundary component for handling errors

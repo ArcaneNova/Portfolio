@@ -5,8 +5,9 @@ import { FaGithub, FaLinkedin, FaFileAlt } from 'react-icons/fa';
  * A reusable button component with multiple style variants.
  * Supports different types: filled, outlined, special
  * Can include icons from FontAwesome
+ * @param {boolean} noDelay - When true, transitions will be quicker for better mobile performance
  */
-const Button = ({ type = "filled", title, icon, link, className, id }) => {
+const Button = ({ type = "filled", title, icon, link, className, id, noDelay = false }) => {
   // Get the right icon component
   const getIcon = () => {
     switch(icon) {
@@ -40,7 +41,7 @@ const Button = ({ type = "filled", title, icon, link, className, id }) => {
       href={link}
       target="_blank"
       rel="noopener noreferrer"
-      className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-300 ${getButtonClasses()} ${className || ""}`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-md ${noDelay ? 'transition-colors duration-150' : 'transition-all duration-300'} ${getButtonClasses()} ${className || ""}`}
       onClick={(e) => {
         // If there's a section ID to scroll to, handle it
         if (id) {
@@ -50,7 +51,7 @@ const Button = ({ type = "filled", title, icon, link, className, id }) => {
           if (target) {
             const offset = window.innerHeight * 0.15;
             const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
-            window.scrollTo({ top, behavior: "smooth" });
+            window.scrollTo({ top, behavior: noDelay ? "auto" : "smooth" });
           }
         }
       }}

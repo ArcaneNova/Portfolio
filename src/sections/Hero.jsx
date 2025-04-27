@@ -29,30 +29,31 @@ const Hero = () => {
   const profileImageRef = useRef(null);
   
   useEffect(() => {
-    // Animation timeline
+    // Animation timeline with minimal delays
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
     
-    // Simple fade-in animations
+    // Reduced animation delays for faster loading
     tl.fromTo(textContentRef.current, 
-      { opacity: 0, y: 20 }, 
-      { opacity: 1, y: 0, duration: 0.8, delay: 0.3 }
+      { opacity: 0, y: 10 }, 
+      { opacity: 1, y: 0, duration: 0.4, delay: 0.1 } // Reduced duration and delay
     );
     
     tl.fromTo(profileRef.current, 
       { opacity: 0, scale: 0.95 }, 
-      { opacity: 1, scale: 1, duration: 0.7 }, 
-      "-=0.4"
+      { opacity: 1, scale: 1, duration: 0.4 }, 
+      "-=0.2" // Reduced stagger
     );
     
     tl.fromTo(buttonsRef.current, 
-      { opacity: 0, y: 15 }, 
-      { opacity: 1, y: 0, duration: 0.6 }, 
-      "-=0.3"
+      { opacity: 0, y: 10 }, 
+      { opacity: 1, y: 0, duration: 0.3 }, 
+      "-=0.2" // Reduced stagger
     );
     
     tl.fromTo(scrollIndicatorRef.current, 
       { opacity: 0 }, 
-      { opacity: 1, duration: 0.5, delay: 0.3 }
+      { opacity: 1, duration: 0.3 },
+      "-=0.1" // Show quickly
     );
     
     // Simple scroll indicator animation
@@ -81,7 +82,7 @@ const Hero = () => {
         
         {/* Left side - Text content with improved contrast */}
         <div ref={contentRef} className="flex flex-col space-y-6 text-center lg:text-left">
-          <h2 className="text-cyan-400 text-xl md:text-2xl font-mono tracking-wider">
+          <h2 className="text-cyan-400 text-xl md:text-2xl font-mono tracking-wider opacity-100">
             <CyberpunkInterface variant="minimal">HELLO WORLD</CyberpunkInterface>
           </h2>
           
@@ -89,21 +90,23 @@ const Hero = () => {
             Md Arshad Noor
           </h1>
           
-          <div className="h-20">
+          <div className="h-20 opacity-100">
+            {/* Reduce typewriter delay for faster visual feedback */}
             <TypewriterEffect 
               text="Software Engineer specializing in web development, machine learning, and app development."
-              delay={70}
+              delay={30} // Reduced delay for faster typing
               className="text-xl md:text-2xl text-white opacity-90"
             />
           </div>
           
           {/* Buttons */}
-          <div ref={buttonsRef} className="flex flex-wrap gap-4 justify-center lg:justify-start mt-8">
+          <div ref={buttonsRef} className="flex flex-wrap gap-4 justify-center lg:justify-start mt-8 opacity-100">
             <Button 
               type="filled" 
               title="GitHub" 
               icon="github"
               link="https://github.com/ArcaneNova"
+              noDelay={true} // Add a prop to disable animation delays
             />
             
             <Button 
@@ -111,6 +114,7 @@ const Hero = () => {
               title="LinkedIn" 
               icon="linkedin"
               link="https://linkedin.com/in/mdarshadnoor"
+              noDelay={true} // Add a prop to disable animation delays
             />
             
             <Button 
@@ -118,12 +122,13 @@ const Hero = () => {
               title="Resume" 
               icon="file"
               link="/ats-resume.html"
+              noDelay={true} // Add a prop to disable animation delays
             />
           </div>
         </div>
         
         {/* Right side - Profile Image with minimal, cleaner design */}
-        <div ref={imageContainerRef} className="flex justify-center items-center">
+        <div ref={imageContainerRef} className="flex justify-center items-center opacity-100">
           <div ref={profileRef} className="relative">
             {/* Subtle glow */}
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full blur-xl opacity-30"></div>
@@ -133,6 +138,7 @@ const Hero = () => {
                 src={profileImage} 
                 alt="Profile" 
                 className="w-full h-full object-cover"
+                loading="eager" // Ensure image loads immediately
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent"></div>
               
@@ -146,7 +152,7 @@ const Hero = () => {
       {/* Simple scroll indicator */}
       <div 
         ref={scrollIndicatorRef} 
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-cyan-400 flex flex-col items-center z-10"
+        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-cyan-400 flex flex-col items-center z-10 opacity-100"
       >
         <div className="flex flex-col items-center">
           <div className="text-white/80 text-sm mb-2 font-light">Scroll Down</div>
